@@ -2,13 +2,13 @@
 name = "mira"
 version = "0.1.0"
 description = "A companion memory agent that lets your agents focus and improve while you keep ownership of everything they learn."
-authors = [{ name = "Majid Fekri", email = "majid.fekri@edgeaiinnovations.com" }]
+authors = [{ name = "Mohit Bendale", email = "mohitab2005@gmail.com" }]
 requires-python = ">=3.10,<4"
 readme = "README.md"
 license = "MIT"
 keywords = [
     "mira",
-    "moorcheh",
+    "rivera",
     "memory layer",
     "agentic ai",
     "llm",
@@ -49,10 +49,10 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage = "https://www.moorcheh.ai"
-Documentation = "https://docs.moorcheh.ai"
-Repository = "https://github.com/moorcheh-ai/mira"
-"Bug Tracker" = "https://github.com/moorcheh-ai/mira/issues"
+Homepage = "https://api.wirtel.ca"
+Documentation = "https://api.wirtel.ca/documentation"
+Repository = "https://github.com/Mohit1298/mira"
+"Bug Tracker" = "https://github.com/Mohit1298/mira/issues"
 
 [project.optional-dependencies]
 all = [
