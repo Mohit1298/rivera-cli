@@ -51,8 +51,8 @@ dependencies = [
 [project.urls]
 Homepage = "https://api.wirtel.ca"
 Documentation = "https://api.wirtel.ca/documentation"
-Repository = "https://github.com/Mohit1298/rivera"
-"Bug Tracker" = "https://github.com/Mohit1298/rivera/issues"
+Repository = "https://github.com/Mohit1298/rivera-cli"
+"Bug Tracker" = "https://github.com/Mohit1298/rivera-cli/issues"
 
 [project.optional-dependencies]
 all = [

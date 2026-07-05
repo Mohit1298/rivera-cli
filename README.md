@@ -45,7 +45,7 @@ metadata, so an explicit user statement never gets confused with an inferred hun
 
 ```bash
 # 1. Install
-pip install git+https://github.com/Mohit1298/rivera.git
+pip install git+https://github.com/Mohit1298/rivera-cli.git
 
 # 2. Get a free API key at https://api.wirtel.ca/signup
 #    (free plan: 2,000 requests + 200 GenAI answers / month)
