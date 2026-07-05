@@ -12,11 +12,11 @@ _HOOKS_DIR = Path(__file__).resolve().parent.parent / "hooks"
 
 def _load_common():
     spec = importlib.util.spec_from_file_location(
-        "_mira_hook_common", _HOOKS_DIR / "_common.py"
+        "_rivera_hook_common", _HOOKS_DIR / "_common.py"
     )
     assert spec and spec.loader
     module = importlib.util.module_from_spec(spec)
-    sys.modules["_mira_hook_common"] = module
+    sys.modules["_rivera_hook_common"] = module
     spec.loader.exec_module(module)
     return module
 

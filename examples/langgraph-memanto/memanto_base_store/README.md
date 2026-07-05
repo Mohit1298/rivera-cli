@@ -1,8 +1,8 @@
-# LangGraph + Mira: Give Your Graph a Permanent Brain
+# LangGraph + Rivera: Give Your Graph a Permanent Brain
 
-A runnable customer-support agent that uses **[Mira](https://mira.ai)** as its long-term, cross-thread memory layer for **[LangGraph](https://github.com/langchain-ai/langgraph)**. Memories survive a brand-new `thread_id`, a fresh checkpointer, and a different Python process.
+A runnable customer-support agent that uses **[Rivera](https://rivera.ai)** as its long-term, cross-thread memory layer for **[LangGraph](https://github.com/langchain-ai/langgraph)**. Memories survive a brand-new `thread_id`, a fresh checkpointer, and a different Python process.
 
-> **Key design:** `MiraStore` is a real `langgraph.store.base.BaseStore` subclass, the official LangGraph long-term memory abstraction, drop-in alongside `InMemoryStore`, `PostgresStore`, and `RedisStore`.
+> **Key design:** `RiveraStore` is a real `langgraph.store.base.BaseStore` subclass, the official LangGraph long-term memory abstraction, drop-in alongside `InMemoryStore`, `PostgresStore`, and `RedisStore`.
 
 ## Architecture
 
@@ -13,7 +13,7 @@ A runnable customer-support agent that uses **[Mira](https://mira.ai)** as its l
 | Layer | LangGraph abstraction | What it persists | Scope |
 |---|---|---|---|
 | 🧠 Checkpointer (`InMemorySaver`) | `BaseCheckpointSaver` | Graph state snapshots | One `thread_id` |
-| 💎 Store (`MiraStore`) | `BaseStore` | User-scoped memories | Cross-thread, cross-session |
+| 💎 Store (`RiveraStore`) | `BaseStore` | User-scoped memories | Cross-thread, cross-session |
 
 Per the [official LangGraph docs](https://docs.langchain.com/oss/python/langgraph/add-memory):
 
@@ -24,10 +24,10 @@ They're not interchangeable. We use both, each for its proper job.
 ## What this demonstrates
 
 * **Cross-session recall.** Run session 1, kill the process, start session 2 with a *different* `thread_id`; the agent still remembers everything important about the user. The checkpointer is gone; the store remains.
-* **Official `BaseStore` integration point.** `MiraStore` is a real `BaseStore` subclass. Nodes declare `*, store: BaseStore` and LangGraph injects the compiled store automatically with no Mira-specific glue inside node code.
-* **Typed semantic memory.** The extractor LLM picks from 13 Mira memory categories (fact, preference, goal, decision, observation, …) so retrieval can filter by kind.
+* **Official `BaseStore` integration point.** `RiveraStore` is a real `BaseStore` subclass. Nodes declare `*, store: BaseStore` and LangGraph injects the compiled store automatically with no Rivera-specific glue inside node code.
+* **Typed semantic memory.** The extractor LLM picks from 13 Rivera memory categories (fact, preference, goal, decision, observation, …) so retrieval can filter by kind.
 * **Rate-limit resilience.** LangGraph's `RetryPolicy` is wired to LLM nodes (`max_attempts=5`, `initial_interval=32 s`) so transient OpenRouter 429s are transparently retried without crashing the graph.
-* **Conflict-aware long-term memory (bonus).** When a new memory contradicts an old one, Mira's daily-summary pass flags it; the bonus script shows programmatic resolution.
+* **Conflict-aware long-term memory (bonus).** When a new memory contradicts an old one, Rivera's daily-summary pass flags it; the bonus script shows programmatic resolution.
 
 ## Prerequisites
 
@@ -54,25 +54,25 @@ streamlit run app.py
 ```
 
 Opens a browser UI with:
-- **Session 1 tab**: chat with the agent; it extracts and stores facts in MiraStore
+- **Session 1 tab**: chat with the agent; it extracts and stores facts in RiveraStore
 - **Session 2 tab**: a fresh `thread_id` with an empty checkpointer; the agent still recalls everything from Session 1
-- **Live memory panel**: shows every memory currently stored in Mira for the user, updated after each message (with a brief indexing pause so all new memories appear after a single message)
-- **Clear chat history**: resets the chat UI only; stored memories in Mira are unaffected
-- **Reset demo**: rotates to a fresh user-id namespace so the next run starts with zero visible memories (previous memories are preserved in Mira under the prior user id)
+- **Live memory panel**: shows every memory currently stored in Rivera for the user, updated after each message (with a brief indexing pause so all new memories appear after a single message)
+- **Clear chat history**: resets the chat UI only; stored memories in Rivera are unaffected
+- **Reset demo**: rotates to a fresh user-id namespace so the next run starts with zero visible memories (previous memories are preserved in Rivera under the prior user id)
 
 > **Note on `@st.cache_resource`:** the compiled graph is cached by an MD5 hash of `graph.py`, so editing `graph.py` automatically rebuilds the cached graph on the next rerun. No manual server restart needed when iterating on extraction logic.
 
 ## Step-by-step CLI demo (proves persistence)
 
 ```bash
-# Session 1: Bob shares preferences. The graph stores them via MiraStore.
+# Session 1: Bob shares preferences. The graph stores them via RiveraStore.
 python run_session_1.py
 
 # Session 2: NEW thread_id, NEW process. Bob asks a road-trip snack question.
 # The agent recalls his peanut allergy via store.asearch and answers safely.
 python run_session_2.py
 
-# Bonus: stores contradictory preferences across sessions, surfaces Mira's
+# Bonus: stores contradictory preferences across sessions, surfaces Rivera's
 # conflict report, resolves programmatically.
 python run_contradiction.py
 ```
@@ -86,14 +86,14 @@ python run_full_demo.py
 ## File structure
 
 ```text
-examples/langgraph-mira/
+examples/langgraph-rivera/
 ├── README.md                # this file
 ├── requirements.txt         # Python deps
 ├── .env.example             # API key template
 ├── .gitignore               # excludes .env and venv from git
 ├── state.py                 # SupportState TypedDict (messages only)
-├── mira_setup.py         # Agent lifecycle helper (create + activate + teardown)
-├── mira_store.py         # MiraStore(BaseStore) - the LangGraph integration
+├── rivera_setup.py         # Agent lifecycle helper (create + activate + teardown)
+├── rivera_store.py         # RiveraStore(BaseStore) - the LangGraph integration
 ├── graph.py                 # build_support_graph: recall → respond → extract_and_store
 ├── app.py                   # Streamlit chat UI (two sessions + live memory panel)
 ├── run_session_1.py         # Session 1: store preferences
@@ -102,9 +102,9 @@ examples/langgraph-mira/
 └── run_contradiction.py     # Bonus: conflict detection + resolution
 ```
 
-## How `MiraStore` slots in
+## How `RiveraStore` slots in
 
-If you already have a LangGraph agent using `InMemoryStore`, swapping in `MiraStore` is a one-line change:
+If you already have a LangGraph agent using `InMemoryStore`, swapping in `RiveraStore` is a one-line change:
 
 ```python
 # Before: in-memory, lost when the process dies
@@ -112,11 +112,11 @@ from langgraph.store.memory import InMemoryStore
 store = InMemoryStore()
 
 # After: persistent, cross-session, typed semantic memory
-from mira_setup import MiraSetup
-from mira_store import MiraStore
+from rivera_setup import RiveraSetup
+from rivera_store import RiveraStore
 
-client = MiraSetup(api_key).setup(agent_id="my-app")
-store = MiraStore(client, agent_id="my-app")
+client = RiveraSetup(api_key).setup(agent_id="my-app")
+store = RiveraStore(client, agent_id="my-app")
 
 # Compile exactly the same way, nothing else changes:
 graph = builder.compile(checkpointer=checkpointer, store=store)
@@ -133,11 +133,11 @@ async def my_node(state: MyState, config, *, store: BaseStore) -> dict:
     return {}
 ```
 
-No Mira-specific imports inside your nodes. That's the whole point of being a `BaseStore` subclass.
+No Rivera-specific imports inside your nodes. That's the whole point of being a `BaseStore` subclass.
 
-## The `MiraStore` ↔ Mira mapping
+## The `RiveraStore` ↔ Rivera mapping
 
-| BaseStore | Mira |
+| BaseStore | Rivera |
 |---|---|
 | `namespace=(p0, p1, ...)` | Reserved tags `lg:ns:0:p0`, `lg:ns:1:p1`, ... |
 | `key="..."` | Reserved tag `lg:key:<key>` |
@@ -152,17 +152,17 @@ No Mira-specific imports inside your nodes. That's the whole point of being a `B
 
 ### Honest limitations
 
-* **Delete via `PutOp(value=None)` raises `NotImplementedError`.** Mira removes memories through its conflict-resolution flow, not free-form deletion. Use `mira conflicts resolve` or the SdkClient resolve API.
-* **`ttl` on put is ignored.** Mira memories don't expire on a timer.
-* **Pagination `offset` in search is ignored.** Mira recall doesn't paginate; raise the `limit` instead.
+* **Delete via `PutOp(value=None)` raises `NotImplementedError`.** Rivera removes memories through its conflict-resolution flow, not free-form deletion. Use `rivera conflicts resolve` or the SdkClient resolve API.
+* **`ttl` on put is ignored.** Rivera memories don't expire on a timer.
+* **Pagination `offset` in search is ignored.** Rivera recall doesn't paginate; raise the `limit` instead.
 * **`list_namespaces` is best-effort.** It samples recent memories and derives unique namespaces from their tags.
-* **Namespace listing uses a multi-anchor union internally.** Mira's recall is semantic search (top-N by similarity to a single query) capped at 100 server-side. When the agent contains many memories under other namespaces, a single recall can rank a target namespace's memories out of the top-100. To compensate, when a namespace filter is present `MiraStore._do_search` issues the caller's query plus four diverse semantic anchors (identity, contact, health, instructions/goals) and unions the namespace-matching results. Cost: one extra round-trip per anchor. A 30 s in-process cache and a "last good result" fallback keep this from hammering the API on UI polls or rate-limit windows.
+* **Namespace listing uses a multi-anchor union internally.** Rivera's recall is semantic search (top-N by similarity to a single query) capped at 100 server-side. When the agent contains many memories under other namespaces, a single recall can rank a target namespace's memories out of the top-100. To compensate, when a namespace filter is present `RiveraStore._do_search` issues the caller's query plus four diverse semantic anchors (identity, contact, health, instructions/goals) and unions the namespace-matching results. Cost: one extra round-trip per anchor. A 30 s in-process cache and a "last good result" fallback keep this from hammering the API on UI polls or rate-limit windows.
 
 These are documented up-front rather than papered over.
 
 ## Comparison table
 
-| Capability | LangGraph `InMemoryStore` | `MiraStore` |
+| Capability | LangGraph `InMemoryStore` | `RiveraStore` |
 |---|---|---|
 | Persistence | Process lifetime only | Permanent (cloud) |
 | Cross-thread | Yes (in-process) | Yes (any process, any time) |
@@ -179,13 +179,13 @@ These are documented up-front rather than papered over.
 * **`OPENROUTER_API_KEY not set`**: the graph routes `langchain-openai` through OpenRouter. Set the env var or override the model via `LANGGRAPH_LLM` (e.g. `LANGGRAPH_LLM=openai/gpt-4o-mini`).
 * **`429 RateLimitError` from OpenRouter**: the default `openai/gpt-oss-120b:free` is the fastest free option (~3 s per extraction) but shares rate limits across all OpenRouter free-tier users. The graph's `RetryPolicy` retries up to 5× with 32 s back-off. If retries are exhausted, switch to another free model via `LANGGRAPH_LLM=openai/gpt-oss-20b:free` (slower but less contested) or a paid model like `openai/gpt-4o-mini`.
 * **`Namespace limit reached (Community plan)`**: the free tier allows 5 agents. List your agents with `client.list_agents()` and delete unused ones with `client.delete_agent(agent_id)`, or reuse an existing agent id.
-* **`Agent already exists`**: fine. `MiraSetup.setup` catches `AgentAlreadyExistsError` and reuses the existing agent; no action needed.
+* **`Agent already exists`**: fine. `RiveraSetup.setup` catches `AgentAlreadyExistsError` and reuses the existing agent; no action needed.
 * **Streamlit `ScriptRunContext` warnings on startup**: harmless. They appear when Streamlit initialises the cached resources before the browser tab opens. The UI works normally.
-* **No conflicts detected in `run_contradiction.py`**: Mira's conflict detection runs during the daily-summary pass and depends on semantic similarity. The script prints a note explaining this when no conflicts surface.
+* **No conflicts detected in `run_contradiction.py`**: Rivera's conflict detection runs during the daily-summary pass and depends on semantic similarity. The script prints a note explaining this when no conflicts surface.
 
 ## See also
 
-* [Mira documentation](https://docs.mira.ai)
+* [Rivera documentation](https://docs.rivera.ai)
 * [`examples/crewai-memory/`](../crewai-memory/) the CrewAI sibling demo, same 13-type memory story.
 * [LangGraph: Add Memory](https://docs.langchain.com/oss/python/langgraph/add-memory)
 * [LangGraph: Store API reference](https://reference.langchain.com/python/langgraph/store)

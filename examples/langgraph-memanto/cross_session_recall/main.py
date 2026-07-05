@@ -3,9 +3,9 @@ import os
 from cross_session_recall.graph import create_research_graph
 from dotenv import load_dotenv
 from langchain_core.messages import HumanMessage
-from langgraph_mira import create_mira_tools
+from langgraph_rivera import create_rivera_tools
 
-from mira.cli.client.sdk_client import SdkClient
+from rivera.cli.client.sdk_client import SdkClient
 
 
 def run_session(agent_id, user_id, task, thread_id):
@@ -18,7 +18,7 @@ def run_session(agent_id, user_id, task, thread_id):
 
     client = SdkClient(api_key=api_key)
 
-    tools = create_mira_tools(client, agent_id)
+    tools = create_rivera_tools(client, agent_id)
     app = create_research_graph("poolside/laguna-xs.2:free", tools)
 
     config = {"configurable": {"thread_id": thread_id}}
@@ -40,19 +40,19 @@ def main():
     user_id = "user-123"
 
     task1 = (
-        "Research the top 3 benefits of using Mira for AI agents. "
-        "Store each benefit as a 'fact' in your memory with tags 'mira,benefits'. "
+        "Research the top 3 benefits of using Rivera for AI agents. "
+        "Store each benefit as a 'fact' in your memory with tags 'rivera,benefits'. "
         "Be specific and concise."
     )
 
     # Note: Each run_session call creates a completely fresh in-memory MemorySaver
     # using a distinct thread_id. LangGraph's checkpointer carries nothing between
     # the two sessions. The cross-session recall demonstrated here works because
-    # the Mira tools query a shared global store based on the agent_id.
+    # the Rivera tools query a shared global store based on the agent_id.
     run_session(agent_id, user_id, task1, thread_id="session-1")
 
     task2 = (
-        "I'm writing a report about Mira. What were those 3 benefits you found earlier? "
+        "I'm writing a report about Rivera. What were those 3 benefits you found earlier? "
         "Use your memory to recall them."
     )
 

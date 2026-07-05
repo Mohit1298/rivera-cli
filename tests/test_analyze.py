@@ -1,40 +1,40 @@
 """
-Unit tests for mira analyze pipeline (no API keys or network).
+Unit tests for rivera analyze pipeline (no API keys or network).
 
 Covers deterministic metrics, ingestion cost math, LLM prompts, and report
 markdown builders for Supermemory, Mem0, and Letta exports.
 """
 
-from mira.cli.analyze.ingestion_cost import (
+from rivera.cli.analyze.ingestion_cost import (
     DEFAULT_INPUT_USD_PER_1M,
     DEFAULT_OUTPUT_USD_PER_1M,
     estimate_ingestion_cost,
 )
-from mira.cli.analyze.letta_compare import (
+from rivera.cli.analyze.letta_compare import (
     build_llm_prompt as build_letta_llm_prompt,
 )
-from mira.cli.analyze.letta_compare import (
+from rivera.cli.analyze.letta_compare import (
     build_report_markdown as build_letta_report,
 )
-from mira.cli.analyze.letta_compare import (
+from rivera.cli.analyze.letta_compare import (
     compute_metrics as compute_letta_metrics,
 )
-from mira.cli.analyze.mem0_compare import (
+from rivera.cli.analyze.mem0_compare import (
     build_llm_prompt as build_mem0_llm_prompt,
 )
-from mira.cli.analyze.mem0_compare import (
+from rivera.cli.analyze.mem0_compare import (
     build_report_markdown as build_mem0_report,
 )
-from mira.cli.analyze.mem0_compare import (
+from rivera.cli.analyze.mem0_compare import (
     compute_metrics as compute_mem0_metrics,
 )
-from mira.cli.analyze.supermemory_compare import (
+from rivera.cli.analyze.supermemory_compare import (
     build_llm_prompt as build_supermemory_llm_prompt,
 )
-from mira.cli.analyze.supermemory_compare import (
+from rivera.cli.analyze.supermemory_compare import (
     build_report_markdown as build_supermemory_report,
 )
-from mira.cli.analyze.supermemory_compare import (
+from rivera.cli.analyze.supermemory_compare import (
     compute_metrics as compute_supermemory_metrics,
 )
 
@@ -110,17 +110,17 @@ class TestSupermemoryCompare:
         ingestion = metrics["ingestion_tax"]
         assert ingestion["supermemory_input_tokens"] == 20
         assert ingestion["supermemory_output_tokens"] == 5
-        assert ingestion["mira_extraction_tokens"] == 0
+        assert ingestion["rivera_extraction_tokens"] == 0
         assert ingestion["tokens_saved"] == 25
 
         storage = metrics["storage"]
         assert storage["supermemory_bytes"] == 2 * 4096
-        assert storage["mira_bytes"] == 2 * 128
+        assert storage["rivera_bytes"] == 2 * 128
         assert storage["compression_ratio"] == 32
 
         latency = metrics["latency"]
         assert latency["supermemory_read_ms"] == 300
-        assert latency["mira_read_ms"] == 90
+        assert latency["rivera_read_ms"] == 90
         assert latency["speedup_x"] == 3.3
         assert latency["ms_saved_per_query"] == 210
 
@@ -133,7 +133,7 @@ class TestSupermemoryCompare:
         assert "RAG chunks (vectors): 2" in prompt
         assert "Memory entries: 1" in prompt
         assert "Estimated content tokens: 25" in prompt
-        assert "PROJECTED MIRA IMPACT" in prompt
+        assert "PROJECTED RIVERA IMPACT" in prompt
         assert "Executive summary" in prompt
         assert "Do NOT invent benchmark scores" in prompt
 
@@ -148,7 +148,7 @@ class TestSupermemoryCompare:
             exported_at="2026-06-04T12:00:00Z",
         )
 
-        assert "# Mira vs. Supermemory" in report
+        assert "# Rivera vs. Supermemory" in report
         assert "Your Supermemory footprint (measured)" in report
         assert "| Documents | 1 |" in report
         assert "Test narrative." in report
@@ -197,7 +197,7 @@ class TestMem0Compare:
 
         storage = metrics["storage"]
         assert storage["mem0_bytes"] == 2 * 4096
-        assert storage["mira_bytes"] == 2 * 128
+        assert storage["rivera_bytes"] == 2 * 128
 
         latency = metrics["latency"]
         assert latency["mem0_read_ms"] == 499
@@ -214,7 +214,7 @@ class TestMem0Compare:
         assert "agent: 1" in prompt
         assert "user: 1" in prompt
         assert "Estimated content tokens: 20" in prompt
-        assert "PROJECTED MIRA IMPACT" in prompt
+        assert "PROJECTED RIVERA IMPACT" in prompt
         assert "Migration considerations" in prompt
 
     def test_build_report_markdown(self):
@@ -228,7 +228,7 @@ class TestMem0Compare:
             exported_at="2026-06-04T12:00:00Z",
         )
 
-        assert "# Mira vs. Mem0" in report
+        assert "# Rivera vs. Mem0" in report
         assert "Your Mem0 footprint (measured)" in report
         assert "| Entities | 2 |" in report
         assert "agent: 1, user: 1" in report
@@ -285,7 +285,7 @@ class TestLettaCompare:
 
         storage = metrics["storage"]
         assert storage["letta_bytes"] == 2 * 4096
-        assert storage["mira_bytes"] == 2 * 128
+        assert storage["rivera_bytes"] == 2 * 128
 
         latency = metrics["latency"]
         assert latency["letta_read_ms"] == 450
@@ -300,7 +300,7 @@ class TestLettaCompare:
         assert "Agents: 2" in prompt
         assert "Archival passages: 2" in prompt
         assert "Estimated content tokens: 20" in prompt
-        assert "PROJECTED MIRA IMPACT" in prompt
+        assert "PROJECTED RIVERA IMPACT" in prompt
         assert "Migration considerations" in prompt
 
     def test_build_report_markdown(self):
@@ -314,7 +314,7 @@ class TestLettaCompare:
             exported_at="2026-06-04T12:00:00Z",
         )
 
-        assert "# Mira vs. Letta" in report
+        assert "# Rivera vs. Letta" in report
         assert "Your Letta footprint (measured)" in report
         assert "| Agents | 2 |" in report
         assert "| Archival passages | 2 |" in report

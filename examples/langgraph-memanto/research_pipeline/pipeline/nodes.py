@@ -2,7 +2,7 @@
 LangGraph node definitions for the Research + Writer pipeline.
 
 Each node is a function (state_in, state_out) that gets compiled into
-the LangGraph pipeline via langgraph_mira.graph.build_graph().
+the LangGraph pipeline via langgraph_rivera.graph.build_graph().
 """
 
 from __future__ import annotations
@@ -13,15 +13,15 @@ from typing import Any, Literal
 from dotenv import load_dotenv
 from langchain_core.tools import tool
 from langchain_openai import ChatOpenAI
-from langgraph_mira import create_mira_tools
+from langgraph_rivera import create_rivera_tools
 
-from mira.cli.client.sdk_client import SdkClient
+from rivera.cli.client.sdk_client import SdkClient
 
 client = SdkClient(api_key=os.environ.get("RIVERA_API_KEY", ""))
-tools = create_mira_tools(client, "research_agent")
-_mira_remember = next(t for t in tools if t.name == "mira_remember")
-mira_recall = next(t for t in tools if t.name == "mira_recall")
-mira_answer = next(t for t in tools if t.name == "mira_answer")
+tools = create_rivera_tools(client, "research_agent")
+_rivera_remember = next(t for t in tools if t.name == "rivera_remember")
+rivera_recall = next(t for t in tools if t.name == "rivera_recall")
+rivera_answer = next(t for t in tools if t.name == "rivera_answer")
 
 load_dotenv()
 
@@ -60,19 +60,19 @@ def _get_llm():
 # ---------------------------------------------------------------------------
 
 
-def _build_mira_remember_tool(agent_id: str):
-    """Build a LangChain-compatible tool bound to the current Mira namespace."""
+def _build_rivera_remember_tool(agent_id: str):
+    """Build a LangChain-compatible tool bound to the current Rivera namespace."""
 
-    @tool("mira_remember")
-    def mira_remember_tool(
+    @tool("rivera_remember")
+    def rivera_remember_tool(
         memory_type: str,
         title: str,
         content: str,
         confidence: float = 0.85,
         tags: list[str] | None = None,
     ) -> str:
-        """Store a structured memory in Mira for later cross-session recall."""
-        from mira.cli.client.sdk_client import SdkClient
+        """Store a structured memory in Rivera for later cross-session recall."""
+        from rivera.cli.client.sdk_client import SdkClient
 
         client = SdkClient(api_key=_get_moorcheh_api_key())
         try:
@@ -89,7 +89,7 @@ def _build_mira_remember_tool(agent_id: str):
         except Exception as e:
             return f"Error storing memory: {e}"
 
-    return mira_remember_tool
+    return rivera_remember_tool
 
 
 # ---------------------------------------------------------------------------
@@ -101,8 +101,8 @@ def research_agent_factory(tools: list):
     """
     Returns a node function for the Research Agent.
     """
-    mira_remember = next((t for t in tools if t.name == "mira_remember"), None)
-    tools_to_bind = [mira_remember] if mira_remember else tools
+    rivera_remember = next((t for t in tools if t.name == "rivera_remember"), None)
+    tools_to_bind = [rivera_remember] if rivera_remember else tools
     llm = _get_llm()
     llm_with_tools = llm.bind_tools(tools_to_bind)
 
@@ -111,10 +111,10 @@ def research_agent_factory(tools: list):
         system_prompt = (
             f"You are a Senior Market Research Analyst specialized in '{topic}'.\n"
             f"Your job is to research this topic thoroughly and store every significant "
-            f"finding as a structured Mira memory using the mira_remember tool.\n\n"
+            f"finding as a structured Rivera memory using the rivera_remember tool.\n\n"
             f"Research approach:\n"
             f"1. Think about the key aspects of '{topic}'\n"
-            f"2. Use the mira_remember tool to store at least 3 findings\n"
+            f"2. Use the rivera_remember tool to store at least 3 findings\n"
             f"3. Each memory should be atomic: one fact/observation per memory\n\n"
             f"Memory types: fact, observation, decision, learning, event\n"
             f"Confidence: 1.0 for verified facts, 0.7-0.9 for observations\n"
@@ -137,7 +137,7 @@ def writer_agent_factory(tools: list):
     Returns a node function for the Writer Agent.
     """
     # Exclude remember so writer only recalls/answers
-    tools_to_bind = [t for t in tools if t.name in ("mira_recall", "mira_answer")]
+    tools_to_bind = [t for t in tools if t.name in ("rivera_recall", "rivera_answer")]
     llm = _get_llm()
     llm_with_tools = llm.bind_tools(tools_to_bind)
 
@@ -147,7 +147,7 @@ def writer_agent_factory(tools: list):
             f"You are a Technical Briefing Writer.\n"
             f"Topic: {topic}\n\n"
             f"Your goal is to write a clear, data-driven executive briefing on '{topic}'.\n"
-            f"First, use the 'mira_recall' and 'mira_answer' tools to retrieve the research findings that were just stored.\n"
+            f"First, use the 'rivera_recall' and 'rivera_answer' tools to retrieve the research findings that were just stored.\n"
             f"Then, using ONLY that retrieved information, write the executive briefing. "
             f"Do not fabricate data. Cite sources based on the memories."
         )
@@ -159,12 +159,12 @@ def writer_agent_factory(tools: list):
         writer_messages = []
         for msg in state.get("messages", []):
             if hasattr(msg, "name") and msg.name in (
-                "mira_recall",
-                "mira_answer",
+                "rivera_recall",
+                "rivera_answer",
             ):
                 writer_messages.append(msg)
             elif hasattr(msg, "tool_calls") and any(
-                tc.get("name") in ("mira_recall", "mira_answer")
+                tc.get("name") in ("rivera_recall", "rivera_answer")
                 for tc in msg.tool_calls
             ):
                 writer_messages.append(msg)

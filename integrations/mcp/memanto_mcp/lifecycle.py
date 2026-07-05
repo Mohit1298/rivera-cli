@@ -3,7 +3,7 @@
 MCP tool calls are stateless from the model's perspective — the agent decides
 to call ``recall`` and expects it to "just work". This module owns:
 
-* Resolving which Mira agent_id a given tool call targets (explicit arg
+* Resolving which Rivera agent_id a given tool call targets (explicit arg
   wins; otherwise the configured default).
 * Lazily creating the default agent on first use (if enabled).
 * Lazily activating a session and keeping it valid across calls. The underlying
@@ -20,15 +20,15 @@ import logging
 import threading
 from typing import TYPE_CHECKING
 
-from mira.app.utils.errors import (
+from rivera.app.utils.errors import (
     AgentAlreadyExistsError,
     AgentNotFoundError,
     SessionError,
 )
-from mira.cli.client.sdk_client import SdkClient
+from rivera.cli.client.sdk_client import SdkClient
 
 if TYPE_CHECKING:
-    from mira_mcp.config import MCPServerSettings
+    from rivera_mcp.config import MCPServerSettings
 
 logger = logging.getLogger(__name__)
 
@@ -37,7 +37,7 @@ class NoAgentConfiguredError(ValueError):
     """Raised when a tool call omits agent_id and no default is configured."""
 
 
-class MiraLifecycle:
+class RiveraLifecycle:
     """Owns the long-lived SdkClient and per-agent session bookkeeping."""
 
     def __init__(self, settings: MCPServerSettings) -> None:
@@ -53,7 +53,7 @@ class MiraLifecycle:
 
     @property
     def client(self) -> SdkClient:
-        """The shared Mira SDK client."""
+        """The shared Rivera SDK client."""
         return self._client
 
     @property
@@ -72,7 +72,7 @@ class MiraLifecycle:
         if self._settings.default_agent_id:
             return self._settings.default_agent_id
         raise NoAgentConfiguredError(
-            "No agent_id was supplied and no MIRA_DEFAULT_AGENT_ID is "
+            "No agent_id was supplied and no RIVERA_DEFAULT_AGENT_ID is "
             "configured. Either pass agent_id explicitly or set the env var."
         )
 
@@ -99,9 +99,9 @@ class MiraLifecycle:
     def shutdown(self) -> None:
         """Best-effort cleanup. Sessions can outlive the process safely."""
         # We deliberately do NOT deactivate sessions on shutdown: they are
-        # JWT-backed with a TTL and other Mira clients (CLI, REST) may
+        # JWT-backed with a TTL and other Rivera clients (CLI, REST) may
         # still want to use them after the MCP server exits.
-        logger.debug("MiraLifecycle shutting down (no-op cleanup).")
+        logger.debug("RiveraLifecycle shutting down (no-op cleanup).")
 
     # ------------------------------------------------------------------ #
     # Internals
@@ -117,8 +117,8 @@ class MiraLifecycle:
 
         if not self._settings.agent_auto_create:
             raise AgentNotFoundError(
-                f"Agent '{agent_id}' does not exist and MIRA_AGENT_AUTO_CREATE "
-                f"is disabled. Create it first with `mira agent create "
+                f"Agent '{agent_id}' does not exist and RIVERA_AGENT_AUTO_CREATE "
+                f"is disabled. Create it first with `rivera agent create "
                 f"{agent_id}` or via the create_agent tool."
             )
 
@@ -131,7 +131,7 @@ class MiraLifecycle:
             self._client.create_agent(
                 agent_id=agent_id,
                 pattern=self._settings.agent_pattern,
-                description="Auto-created by mira-mcp",
+                description="Auto-created by rivera-mcp",
             )
         except AgentAlreadyExistsError:
             # Race: another caller created it between our get_agent and create.
@@ -143,9 +143,9 @@ class MiraLifecycle:
                 agent_id=agent_id,
                 duration_hours=self._settings.session_duration_hours,
             )
-            logger.info("Activated Mira session for agent '%s'.", agent_id)
+            logger.info("Activated Rivera session for agent '%s'.", agent_id)
         except Exception as exc:
             # Wrap so tools surface a uniform error type.
             raise SessionError(
-                f"Failed to activate Mira session for '{agent_id}': {exc}"
+                f"Failed to activate Rivera session for '{agent_id}': {exc}"
             ) from exc

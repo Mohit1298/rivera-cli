@@ -1,4 +1,4 @@
 crewai>=0.80.0
-mira>=0.1.0
-crewai-mira
+rivera>=0.1.0
+crewai-rivera
 python-dotenv>=1.0.0

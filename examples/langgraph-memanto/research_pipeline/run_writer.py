@@ -1,5 +1,5 @@
 """
-Run 2: Writer Agent retrieves memories from Mira.
+Run 2: Writer Agent retrieves memories from Rivera.
 
 This script proves cross-session persistence: the memories stored
 by run_research.py are retrieved here even in a completely new session.
@@ -14,20 +14,20 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
-from langgraph_mira import create_mira_tools
+from langgraph_rivera import create_rivera_tools
 
-from mira.cli.client.sdk_client import SdkClient
+from rivera.cli.client.sdk_client import SdkClient
 
 load_dotenv()
 
 client = SdkClient(api_key=os.environ.get("RIVERA_API_KEY", ""))
-tools = create_mira_tools(client, "research_agent")
-mira_recall = next(t for t in tools if t.name == "mira_recall")
-mira_answer = next(t for t in tools if t.name == "mira_answer")
+tools = create_rivera_tools(client, "research_agent")
+rivera_recall = next(t for t in tools if t.name == "rivera_recall")
+rivera_answer = next(t for t in tools if t.name == "rivera_answer")
 
 RIVERA_API_KEY = os.getenv("RIVERA_API_KEY", "")
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "")
-AGENT_ID = os.getenv("MIRA_AGENT_ID", "langgraph-research-team")
+AGENT_ID = os.getenv("RIVERA_AGENT_ID", "langgraph-research-team")
 TOPIC = os.getenv("RESEARCH_TOPIC", "AI agent framework market size and trends 2024")
 
 
@@ -50,8 +50,8 @@ def main():
     print("---")
 
     # Recall memories
-    print("\n[Step 1: Recalling memories from Mira...]")
-    recall_result = mira_recall.invoke(
+    print("\n[Step 1: Recalling memories from Rivera...]")
+    recall_result = rivera_recall.invoke(
         {
             "query": f"key findings about {TOPIC}",
             "limit": 10,
@@ -62,7 +62,7 @@ def main():
 
     # RAG answer
     print("[Step 2: Synthesizing via RAG...]")
-    answer_result = mira_answer.invoke(
+    answer_result = rivera_answer.invoke(
         {
             "question": f"Summarize all research findings about {TOPIC} in a clear executive briefing"
         }

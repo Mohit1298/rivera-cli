@@ -1,4 +1,4 @@
-# MIRA CLI User Guide
+# RIVERA CLI User Guide
 
 **Status**: Production Ready
 **Last Updated**: December 2025
@@ -20,7 +20,7 @@
 
 ## Introduction
 
-MIRA CLI provides a command-line interface for interacting with MIRA (Memory that AI Agents Love!). It enables you to:
+RIVERA CLI provides a command-line interface for interacting with RIVERA (Memory that AI Agents Love!). It enables you to:
 
 - Create and manage AI agents
 - Store and retrieve agent memories
@@ -29,7 +29,7 @@ MIRA CLI provides a command-line interface for interacting with MIRA (Memory tha
 - Ask questions using RAG (Retrieval-Augmented Generation)
 - Manage agent sessions
 
-The CLI uses the MIRA API with session-based authentication and provides a beautiful terminal UI powered by Rich.
+The CLI uses the RIVERA API with session-based authentication and provides a beautiful terminal UI powered by Rich.
 
 ---
 
@@ -38,13 +38,13 @@ The CLI uses the MIRA API with session-based authentication and provides a beaut
 ### Prerequisites
 
 - Python 3.10 or higher
-- MIRA REST API server (optional, only if using HTTP endpoints)
+- RIVERA REST API server (optional, only if using HTTP endpoints)
 - Moorcheh API key (required for cloud connectivity)
 
 ### Install Dependencies
 
 ```bash
-cd mira
+cd rivera
 pip install -e .
 ```
 
@@ -54,7 +54,7 @@ This installs:
 - httpx (HTTP client)
 - cryptography (secure key storage)
 - pyyaml (configuration)
-- All other MIRA dependencies
+- All other RIVERA dependencies
 
 ### Verify Installation
 
@@ -71,39 +71,39 @@ You should see the main help screen with all available commands.
 ### 1. Initialize the CLI
 
 ```bash
-mira
+rivera
 ```
 
 This will:
 - Prompt for your Moorcheh API key
 - Securely encrypt and store the key
-- Test connection to the MIRA server
-- Create configuration file at `~/.mira/config.yaml`
+- Test connection to the RIVERA server
+- Create configuration file at `~/.rivera/config.yaml`
 
 **Interactive Example:**
 ```
 ╭──────────────────────────────────────────╮
-│ MIRA CLI Initialization                 │
-│ Setting up your MIRA configuration...   │
+│ RIVERA CLI Initialization                 │
+│ Setting up your RIVERA configuration...   │
 ╰──────────────────────────────────────────╯
 
 Enter your Moorcheh API key: ********
 
-Testing connection to MIRA server...
+Testing connection to RIVERA server...
 ✓ Connection successful!
 Server version: 0.1.0
 
-Configuration saved to: /home/user/.mira/config.yaml
+Configuration saved to: /home/user/.rivera/config.yaml
 
 Next steps:
-  1. Create and activate an agent: mira agent create my-agent
-  2. Start storing memories: mira remember 'your memory here'
+  1. Create and activate an agent: rivera agent create my-agent
+  2. Start storing memories: rivera remember 'your memory here'
 ```
 
 ### 2. Create and Activate an Agent
 
 ```bash
-mira agent create my-agent --pattern tool
+rivera agent create my-agent --pattern tool
 ```
 
 This creates the agent and starts a session immediately (default: 6 hours). You don't need to run `agent activate` manually after creation.
@@ -111,7 +111,7 @@ This creates the agent and starts a session immediately (default: 6 hours). You 
 ### 3. Store a Memory
 
 ```bash
-mira remember "Implemented authentication using JWT tokens" \
+rivera remember "Implemented authentication using JWT tokens" \
   --type decision \
   --tags "authentication,security" \
   --confidence 0.9
@@ -120,13 +120,13 @@ mira remember "Implemented authentication using JWT tokens" \
 ### 4. Search Memories
 
 ```bash
-mira recall "authentication" --limit 5
+rivera recall "authentication" --limit 5
 ```
 
 ### 5. Ask a Question
 
 ```bash
-mira answer "How did we implement authentication?"
+rivera answer "How did we implement authentication?"
 ```
 
 ---
@@ -138,15 +138,15 @@ mira answer "How did we implement authentication?"
 #### Use base command for Initialization
  
  ```bash
- mira [OPTIONS]
+ rivera [OPTIONS]
  ```
  
  **Options:**
-- `--version` - Show installed MIRA version and exit
+- `--version` - Show installed RIVERA version and exit
  
  **Example:**
  ```bash
- mira
+ rivera
  ```
 
 ---
@@ -156,7 +156,7 @@ mira answer "How did we implement authentication?"
 #### `agent create` - Create and Activate New Agent
 
 ```bash
-mira agent create AGENT_ID [OPTIONS]
+rivera agent create AGENT_ID [OPTIONS]
 ```
 
 **Arguments:**
@@ -177,7 +177,7 @@ mira agent create AGENT_ID [OPTIONS]
 python -m cli.main agent create code-assistant --pattern tool
 
 # Create and activate a support agent with description
-mira agent create researcher \
+rivera agent create researcher \
   --pattern support \
   --description "Agent for customer support and ticket triage"
 ```
@@ -185,7 +185,7 @@ mira agent create researcher \
 #### `agent list` - List All Agents
 
 ```bash
-mira agent list
+rivera agent list
 ```
 
 **Output:**
@@ -201,7 +201,7 @@ mira agent list
 #### `agent activate` - Activate Agent
 
 ```bash
-mira agent activate AGENT_ID [OPTIONS]
+rivera agent activate AGENT_ID [OPTIONS]
 ```
 
 **Arguments:**
@@ -216,13 +216,13 @@ mira agent activate AGENT_ID [OPTIONS]
 python -m cli.main agent activate code-assistant
 
 # Activate with 8-hour session
-mira agent activate code-assistant --duration-hours 8
+rivera agent activate code-assistant --duration-hours 8
 ```
 
 #### `agent deactivate` - Deactivate Current Agent
 
 ```bash
-mira agent deactivate
+rivera agent deactivate
 ```
 
 Clears the active session pointer in local CLI configuration.
@@ -233,7 +233,7 @@ Clears the active session pointer in local CLI configuration.
 #### `agent delete` - Delete Agent
 
 ```bash
-mira agent delete AGENT_ID [OPTIONS]
+rivera agent delete AGENT_ID [OPTIONS]
 ```
 
 **Arguments:**
@@ -254,10 +254,10 @@ mira agent delete AGENT_ID [OPTIONS]
 **Examples:**
 ```bash
 # Delete with interactive prompts
-mira agent delete my-agent
+rivera agent delete my-agent
 
 # Force delete, skip confirmation (still asks about cloud memories)
-mira agent delete my-agent --force
+rivera agent delete my-agent --force
 ```
 
 ---
@@ -267,7 +267,7 @@ mira agent delete my-agent --force
 #### `remember` - Store Memory
 
 ```bash
-mira remember CONTENT [OPTIONS]
+rivera remember CONTENT [OPTIONS]
 ```
 
 **Arguments:**
@@ -307,7 +307,7 @@ Type: decision | Confidence: 0.95
 #### `upload` - Upload a File to Memory
 
 ```bash
-mira upload FILE_PATH
+rivera upload FILE_PATH
 ```
 
 **Arguments:**
@@ -315,15 +315,15 @@ mira upload FILE_PATH
 
 **Supported formats:** `.pdf`, `.docx`, `.xlsx`, `.json`, `.txt`, `.csv`, `.md`
 
-The file is processed by Moorcheh — its content is chunked and embedded, making it instantly searchable via `mira recall`. When you recall memories, file-sourced results are labelled `· file upload · summary` or `· file upload · chunk` in the panel title so you can distinguish them from manually stored memories.
+The file is processed by Moorcheh — its content is chunked and embedded, making it instantly searchable via `rivera recall`. When you recall memories, file-sourced results are labelled `· file upload · summary` or `· file upload · chunk` in the panel title so you can distinguish them from manually stored memories.
 
 **Examples:**
 ```bash
 # Upload a PDF document
-mira upload report.pdf
+rivera upload report.pdf
 
 # Upload a markdown file
-mira upload SECURITY.md
+rivera upload SECURITY.md
 ```
 
 **Output:**
@@ -340,7 +340,7 @@ Completed in 3.21s
 #### `recall` - Search Memories
 
 ```bash
-mira recall QUERY [OPTIONS]
+rivera recall QUERY [OPTIONS]
 ```
 
 **Arguments:**
@@ -391,7 +391,7 @@ Found 3 memories:
 #### `answer` - RAG Question Answering
 
 ```bash
-mira answer QUESTION [OPTIONS]
+rivera answer QUESTION [OPTIONS]
 ```
 
 **Arguments:**
@@ -403,10 +403,10 @@ mira answer QUESTION [OPTIONS]
 **Examples:**
 ```bash
 # Ask about project decisions
-mira answer "Why did we choose PostgreSQL?"
+rivera answer "Why did we choose PostgreSQL?"
 
 # Ask with more context
-mira answer "What security measures have we implemented?" --limit 10
+rivera answer "What security measures have we implemented?" --limit 10
 ```
 
 **Output:**
@@ -433,7 +433,7 @@ Used 3 memories as context:
 #### `session info` - Show Session Info
 
 ```bash
-mira session info
+rivera session info
 ```
 
 **Output:**
@@ -451,7 +451,7 @@ mira session info
 #### `config show` - Display Configuration
 
 ```bash
-mira config show
+rivera config show
 ```
 
 **Output:**
@@ -459,7 +459,7 @@ mira config show
 ┏━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃ Setting          ┃ Value                        ┃
 ┡━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┩
-│ Config File      │ /home/user/.mira/config.yaml│
+│ Config File      │ /home/user/.rivera/config.yaml│
 │ Server URL       │ localhost:8000               │
 │ API Key          │ ***configured***             │
 │ Active Agent     │ code-assistant               │
@@ -477,60 +477,60 @@ mira config show
 
 ```bash
 # Morning: Activate your agent
-mira agent activate dev-assistant
+rivera agent activate dev-assistant
 
 # Throughout the day: Store important decisions and facts
-mira remember "Fixed authentication bug in login endpoint" \
+rivera remember "Fixed authentication bug in login endpoint" \
   --type decision \
   --tags "bugfix,authentication"
 
-mira remember "User requested dark mode feature" \
+rivera remember "User requested dark mode feature" \
   --type instruction \
   --tags "feature-request,ui"
 
 # Review day's work
-mira recall "today" --limit 20
+rivera recall "today" --limit 20
 
 # End of day: Deactivate
-mira agent deactivate
+rivera agent deactivate
 ```
 
 ### Project Knowledge Base
 
 ```bash
 # Store architecture decisions
-mira remember "Using microservices architecture with API gateway" \
+rivera remember "Using microservices architecture with API gateway" \
   --type decision \
   --title "Architecture Pattern" \
   --tags "architecture,microservices" \
   --confidence 1.0
 
 # Store team guidelines
-mira remember "All PRs require 2 approvals before merge" \
+rivera remember "All PRs require 2 approvals before merge" \
   --type instruction \
   --tags "process,code-review"
 
 # Query the knowledge base
-mira answer "What are our code review requirements?"
+rivera answer "What are our code review requirements?"
 ```
 
 ### Research Assistant
 
 ```bash
 # Create and auto-activate support agent
-mira agent create support-assistant --pattern support
+rivera agent create support-assistant --pattern support
 
 # Store research findings
-mira remember "Paper XYZ shows 30% improvement in model accuracy" \
+rivera remember "Paper XYZ shows 30% improvement in model accuracy" \
   --type fact \
   --tags "research,ml,paper-xyz" \
   --confidence 0.9
 
 # Search research by topic
-mira recall "model accuracy improvements" --limit 10
+rivera recall "model accuracy improvements" --limit 10
 
 # Synthesize findings
-mira answer "What papers discuss model accuracy improvements?"
+rivera answer "What papers discuss model accuracy improvements?"
 ```
 
 ---
@@ -539,8 +539,8 @@ mira answer "What papers discuss model accuracy improvements?"
 
 ### Configuration File Location
 
-- **Linux/Mac**: `~/.mira/config.yaml`
-- **Windows**: `C:\Users\<username>\.mira\config.yaml`
+- **Linux/Mac**: `~/.rivera/config.yaml`
+- **Windows**: `C:\Users\<username>\.rivera\config.yaml`
 
 ### Configuration Structure
 
@@ -584,7 +584,7 @@ active_session_token: "eyJhbGciOiJIUzI1NiI..."
 ### Security
 
 - API keys are encrypted using Fernet (symmetric encryption)
-- Encryption key stored in `~/.mira/.key` with 0600 permissions
+- Encryption key stored in `~/.rivera/.key` with 0600 permissions
 - Session tokens stored in config but require valid API key
 - Never commit config files to version control
 
@@ -592,13 +592,13 @@ active_session_token: "eyJhbGciOiJIUzI1NiI..."
 
 ## Troubleshooting
 
-### "MIRA not configured" Error
+### "RIVERA not configured" Error
 
 **Problem**: Running commands before setup
 
 **Solution**:
 ```bash
-mira
+rivera
 ```
 
 ### "No active agent" Error
@@ -608,27 +608,27 @@ mira
 **Solution**:
 ```bash
 # List available agents
-mira agent list
+rivera agent list
 
 # Activate one
-mira agent activate <agent-id>
+rivera agent activate <agent-id>
 ```
 
 ### Connection Failed
 
-**Problem**: Cannot reach Moorcheh/MIRA services.
+**Problem**: Cannot reach Moorcheh/RIVERA services.
 
 **Check**:
 1. **Network**: Do you have internet access? (CLI talks directly to Moorcheh Cloud).
 2. **API Key**: Is your key valid?
    ```bash
-   mira config show
+   rivera config show
    ```
 
 3. **Reconfigure**:
    ```bash
    # Re-run setup and enter your new key when prompted
-   mira
+   rivera
    ```
 
 ### API Key Issues
@@ -639,7 +639,7 @@ mira agent activate <agent-id>
 ```bash
 # Get new API key from Moorcheh dashboard
 # Reconfigure by running setup again
-mira
+rivera
 ```
 
 ### Session Expired
@@ -649,7 +649,7 @@ mira
 **Solution**:
 ```bash
 # Reactivate the agent
-mira agent activate <agent-id>
+rivera agent activate <agent-id>
 ```
 
 ---
@@ -660,53 +660,53 @@ mira agent activate <agent-id>
 
 ```bash
 # 1. Setup
-mira
+rivera
 
 # 2. Create and auto-activate project-specific agent
-mira agent create project-alpha --pattern tool \
+rivera agent create project-alpha --pattern tool \
   --description "Agent for Project Alpha development"
 
 # 3. (Optional) Reactivate or change duration
-mira agent activate project-alpha --duration-hours 8
+rivera agent activate project-alpha --duration-hours 8
 
 # 4. Store initial context
-mira remember "Project uses Python 3.11, FastAPI, PostgreSQL" \
+rivera remember "Project uses Python 3.11, FastAPI, PostgreSQL" \
   --type fact \
   --title "Tech Stack" \
   --tags "project-setup,stack"
 
-mira remember "API versioning using /api/v2/ prefix" \
+rivera remember "API versioning using /api/v2/ prefix" \
   --type decision \
   --tags "api,architecture"
 
 # 5. Work session...
-mira remember "Implemented user authentication with JWT" \
+rivera remember "Implemented user authentication with JWT" \
   --type decision \
   --tags "auth,security"
 
 # 6. Review progress
-mira recall "authentication security" --limit 5
+rivera recall "authentication security" --limit 5
 
 # 7. Get context for next task
-mira answer "What have we implemented for security so far?"
+rivera answer "What have we implemented for security so far?"
 ```
 
 ### Multi-Agent Workflow
 
 ```bash
 # Development agent
-mira agent create dev --pattern tool
-mira agent activate dev
-mira remember "Implemented feature X" --type fact
+rivera agent create dev --pattern tool
+rivera agent activate dev
+rivera remember "Implemented feature X" --type fact
 
 # Switch to support agent (auto-activates)
-mira agent deactivate
-mira agent create support --pattern support
-mira remember "Found paper on optimization technique Y" --type fact
+rivera agent deactivate
+rivera agent create support --pattern support
+rivera remember "Found paper on optimization technique Y" --type fact
 
 # Switch back
-mira agent deactivate
-mira agent activate dev
+rivera agent deactivate
+rivera agent activate dev
 ```
 
 ### Bulk Knowledge Import
@@ -718,11 +718,11 @@ mira agent activate dev
 AGENT_ID="knowledge-base"
 
 # Activate agent
-mira agent activate $AGENT_ID
+rivera agent activate $AGENT_ID
 
 # Import facts from file
 while IFS='|' read -r title content tags; do
-  mira remember "$content" \
+  rivera remember "$content" \
     --title "$title" \
     --type fact \
     --tags "$tags" \
@@ -736,16 +736,16 @@ echo "Import complete!"
 
 ## Advanced Usage
 
-### Scripting with MIRA CLI
+### Scripting with RIVERA CLI
 
 ```python
 #!/usr/bin/env python3
 import subprocess
 import json
 
-def mira_cli(*args):
-    """Helper to call MIRA CLI"""
-    cmd = ["mira"] + list(args)
+def rivera_cli(*args):
+    """Helper to call RIVERA CLI"""
+    cmd = ["rivera"] + list(args)
     result = subprocess.run(cmd, capture_output=True, text=True)
     return result.stdout
 
@@ -756,10 +756,10 @@ memories = [
 ]
 
 for title, mem_type, tags in memories:
-    mira_cli("remember", title, "--type", mem_type, "--tags", tags)
+    rivera_cli("remember", title, "--type", mem_type, "--tags", tags)
 
 # Search and process
-results = mira_cli("recall", "decision", "--limit", 10)
+results = rivera_cli("recall", "decision", "--limit", 10)
 print(results)
 ```
 
@@ -767,7 +767,7 @@ print(results)
 
 ## Next Steps
 
-1. **Integration**: Use MIRA CLI in your development workflow
+1. **Integration**: Use RIVERA CLI in your development workflow
 2. **Automation**: Create scripts for common tasks
 3. **Team Adoption**: Share configuration patterns with team
 4. **Monitoring**: Track memory growth and query patterns

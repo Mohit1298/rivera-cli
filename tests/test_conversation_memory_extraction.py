@@ -1,6 +1,6 @@
 import pytest
 
-from mira.app.services.conversation_memory_extraction_service import (
+from rivera.app.services.conversation_memory_extraction_service import (
     ConversationMemoryExtractionService,
 )
 
@@ -50,7 +50,7 @@ def test_extract_conversation_memories_normalizes_candidates():
 
     service = ConversationMemoryExtractionService(client)
     candidates = service.extract(
-        namespace="mira_agent_test",
+        namespace="rivera_agent_test",
         messages=[
             {"role": "user", "content": "Please keep PR summaries concise."},
             {"role": "assistant", "content": "I will use pytest for checks."},
@@ -75,7 +75,7 @@ def test_extract_conversation_memories_normalizes_candidates():
             "provenance": "inferred",
         },
     ]
-    assert client.answer.call_kwargs["namespace"] == "mira_agent_test"
+    assert client.answer.call_kwargs["namespace"] == "rivera_agent_test"
     assert client.answer.call_kwargs["temperature"] == 0
     assert "user:" in client.answer.call_kwargs["query"]
 
@@ -85,7 +85,7 @@ def test_extract_rejects_non_json_answers():
 
     with pytest.raises(ValueError, match="valid JSON"):
         service.extract(
-            namespace="mira_agent_test",
+            namespace="rivera_agent_test",
             messages=[{"role": "user", "content": "Remember that I like Python."}],
         )
 
@@ -94,4 +94,4 @@ def test_extract_requires_messages():
     service = ConversationMemoryExtractionService(FakeClient("[]"))
 
     with pytest.raises(ValueError, match="at least one message"):
-        service.extract(namespace="mira_agent_test", messages=[])
+        service.extract(namespace="rivera_agent_test", messages=[])

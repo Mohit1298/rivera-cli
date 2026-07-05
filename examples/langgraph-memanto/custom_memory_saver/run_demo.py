@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-Demo: LangGraph + Mira Cross-Session Recall
+Demo: LangGraph + Rivera Cross-Session Recall
 
 Demonstrates two sessions:
-  Session 1: User shares preferences → Agent stores them as Mira memories.
+  Session 1: User shares preferences → Agent stores them as Rivera memories.
   Session 2: New thread, no context → Agent recalls preferences automatically.
 
 Prerequisites:
@@ -80,7 +80,7 @@ def session_1():
         print(f"\n  --- Turn {i} ---")
         print(f"  {resp}")
 
-    print("\n✅ Session 1 complete. Memories stored in Mira.")
+    print("\n✅ Session 1 complete. Memories stored in Rivera.")
     return responses
 
 
@@ -117,7 +117,7 @@ def session_2():
 
 def main():
     parser = argparse.ArgumentParser(
-        description="LangGraph + Mira Cross-Session Recall Demo"
+        description="LangGraph + Rivera Cross-Session Recall Demo"
     )
     parser.add_argument(
         "--session",
@@ -144,7 +144,7 @@ def main():
     print("=" * 70)
     print()
     print("📖 Check README.md for instructions on recording a demo video.")
-    print("📸 Take a screenshot/GIF and share on X with #Mira!")
+    print("📸 Take a screenshot/GIF and share on X with #Rivera!")
 
 
 if __name__ == "__main__":

@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import pytest
 
-from mira_mcp import __version__
-from mira_mcp.__main__ import main
+from rivera_mcp import __version__
+from rivera_mcp.__main__ import main
 
 
 def test_version_flag(capsys: pytest.CaptureFixture[str]) -> None:
@@ -20,7 +20,7 @@ def test_help_flag(capsys: pytest.CaptureFixture[str]) -> None:
         main(["--help"])
     assert exc.value.code == 0
     out = capsys.readouterr().out
-    assert "mira-mcp" in out
+    assert "rivera-mcp" in out
     assert "--transport" in out
 
 

@@ -1,13 +1,13 @@
-"""``mira-skills`` CLI — manual control over the skill memory layer.
+"""``rivera-skills`` CLI — manual control over the skill memory layer.
 
 The lifecycle hooks make memory automatic; this CLI is the manual escape hatch
-(and what the /mira-companion skill shells out to):
+(and what the /rivera-companion skill shells out to):
 
-    mira-skills recall <skill> [--hint TEXT]   # print injectable context
-    mira-skills store  <skill> "summary..."    # distill + persist
-    mira-skills profile                         # show accumulated profile
-    mira-skills install [--global]              # register lifecycle hooks
-    mira-skills doctor                          # check config + connectivity
+    rivera-skills recall <skill> [--hint TEXT]   # print injectable context
+    rivera-skills store  <skill> "summary..."    # distill + persist
+    rivera-skills profile                         # show accumulated profile
+    rivera-skills install [--global]              # register lifecycle hooks
+    rivera-skills doctor                          # check config + connectivity
 
 Uses only the standard library (argparse) to stay dependency-light.
 """
@@ -23,14 +23,14 @@ from .skill_map import known_skills
 
 
 def main(argv: list[str] | None = None) -> int:
-    """Dispatch the ``mira-skills`` CLI.
+    """Dispatch the ``rivera-skills`` CLI.
 
     Parses ``argv`` (defaulting to ``sys.argv``), runs the matching subcommand,
     and returns its exit code. Network/API failures are surfaced as a single
     clean error line, not a traceback.
     """
     parser = argparse.ArgumentParser(
-        prog="mira-skills",
+        prog="rivera-skills",
         description="Cross-session engineering memory for Claude Code skills.",
     )
     sub = parser.add_subparsers(dest="command", required=True)
@@ -132,7 +132,7 @@ def _doctor() -> int:
     try:
         mem = SkillMemory(cfg)
         mem.setup()
-        print("✓ connected to Mira and session active")
+        print("✓ connected to Rivera and session active")
     except Exception as exc:
         print(f"✗ connectivity: {exc}", file=sys.stderr)
         return 1

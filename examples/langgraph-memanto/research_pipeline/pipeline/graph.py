@@ -1,5 +1,5 @@
 """
-LangGraph pipeline for the Research + Writer team with Mira memory.
+LangGraph pipeline for the Research + Writer team with Rivera memory.
 """
 
 from __future__ import annotations
@@ -87,32 +87,32 @@ def compile_graph(tools: list):
 
 
 def run_research(
-    topic: str, mira_agent_id: str = "langgraph-research-team"
+    topic: str, rivera_agent_id: str = "langgraph-research-team"
 ) -> dict[str, Any]:
     """
     Run the full research → writer pipeline.
 
     Args:
         topic: The research topic to investigate.
-        mira_agent_id: Mira agent namespace for shared memory.
+        rivera_agent_id: Rivera agent namespace for shared memory.
 
     Returns:
         The final state after the graph completes.
     """
     import os
 
-    from langgraph_mira import create_mira_tools
+    from langgraph_rivera import create_rivera_tools
 
-    from mira.cli.client.sdk_client import SdkClient
+    from rivera.cli.client.sdk_client import SdkClient
 
     client = SdkClient(api_key=os.environ.get("RIVERA_API_KEY", ""))
-    tools = create_mira_tools(client, mira_agent_id)
+    tools = create_rivera_tools(client, rivera_agent_id)
 
     compiled = compile_graph(tools)
 
     initial_state = {
         "messages": [],
-        "mira_agent_id": mira_agent_id,
+        "rivera_agent_id": rivera_agent_id,
         "research_topic": topic,
         "findings": [],
     }
@@ -128,11 +128,11 @@ if __name__ == "__main__":
     load_dotenv()
 
     topic = os.getenv("RESEARCH_TOPIC", "AI agent framework market size and trends")
-    agent_id = os.getenv("MIRA_AGENT_ID", "langgraph-research-team")
+    agent_id = os.getenv("RIVERA_AGENT_ID", "langgraph-research-team")
 
-    print("Running LangGraph + Mira research pipeline...")
+    print("Running LangGraph + Rivera research pipeline...")
     print(f"Topic: {topic}")
-    print(f"Mira Agent ID: {agent_id}")
+    print(f"Rivera Agent ID: {agent_id}")
     print("---")
 
     result = run_research(topic, agent_id)

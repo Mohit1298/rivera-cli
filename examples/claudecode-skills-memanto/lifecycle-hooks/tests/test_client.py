@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from typing import Any
 
-from mira_skills.client import SOURCE_TAG, SkillMemory
-from mira_skills.config import SkillsConfig
+from rivera_skills.client import SOURCE_TAG, SkillMemory
+from rivera_skills.config import SkillsConfig
 
 from .conftest import FakeSdkClient
 

@@ -1,13 +1,13 @@
-"""``claudecode-mira`` CLI — manual control over the skill memory layer.
+"""``claudecode-rivera`` CLI — manual control over the skill memory layer.
 
 The lifecycle hooks make memory automatic; this CLI is the manual escape hatch
-(and what the /mira-companion skill shells out to):
+(and what the /rivera-companion skill shells out to):
 
-    claudecode-mira recall <skill> [--hint TEXT]   # print injectable context
-    claudecode-mira store  <skill> "summary..."    # distill + persist
-    claudecode-mira profile                         # show accumulated profile
-    claudecode-mira install [--global]              # register lifecycle hooks
-    claudecode-mira doctor                          # check config + connectivity
+    claudecode-rivera recall <skill> [--hint TEXT]   # print injectable context
+    claudecode-rivera store  <skill> "summary..."    # distill + persist
+    claudecode-rivera profile                         # show accumulated profile
+    claudecode-rivera install [--global]              # register lifecycle hooks
+    claudecode-rivera doctor                          # check config + connectivity
 
 Uses only the standard library (argparse) to stay dependency-light.
 """
@@ -23,14 +23,14 @@ from .skill_map import known_skills
 
 
 def main(argv: list[str] | None = None) -> int:
-    """Dispatch the ``claudecode-mira`` CLI.
+    """Dispatch the ``claudecode-rivera`` CLI.
 
     Parses ``argv`` (defaulting to ``sys.argv``), runs the matching subcommand,
     and returns its exit code. Network/API failures are surfaced as a single
     clean error line, not a traceback.
     """
     parser = argparse.ArgumentParser(
-        prog="claudecode-mira",
+        prog="claudecode-rivera",
         description="Cross-session engineering memory for Claude Code skills.",
     )
     sub = parser.add_subparsers(dest="command", required=True)
@@ -47,7 +47,7 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("doctor", help="Check configuration and connectivity.")
 
     p_install = sub.add_parser(
-        "install", help="Install the Mira integration (hooks or prompt)."
+        "install", help="Install the Rivera integration (hooks or prompt)."
     )
     p_install.add_argument(
         "--method",
@@ -145,7 +145,7 @@ def _doctor() -> int:
     try:
         mem = SkillMemory(cfg)
         mem.setup()
-        print("✓ connected to Mira and session active")
+        print("✓ connected to Rivera and session active")
     except Exception as exc:
         print(f"✗ connectivity: {exc}", file=sys.stderr)
         return 1

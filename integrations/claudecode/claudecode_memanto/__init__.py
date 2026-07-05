@@ -1,19 +1,19 @@
 """Cross-session engineering memory for Claude Code + mattpocock/skills.
 
-Mira becomes a global, active memory companion across skill executions.
+Rivera becomes a global, active memory companion across skill executions.
 Three real Claude Code lifecycle hooks make it work without manual effort:
 
 * ``SessionStart``     -> inject the accumulated Engineering Profile once.
 * ``UserPromptExpansion`` -> recall memories relevant to the skill being invoked
                           and inject them before Claude reads the prompt.
 * ``Stop``             -> distill the just-finished session into typed memories
-                          using Mira's backend LLM, then persist them.
+                          using Rivera's backend LLM, then persist them.
 
 The public surface is intentionally tiny:
 
-    from claudecode_mira import SkillMemory
+    from claudecode_rivera import SkillMemory
 
-    mem = SkillMemory()              # reads RIVERA_API_KEY + MIRA_AGENT_ID
+    mem = SkillMemory()              # reads RIVERA_API_KEY + RIVERA_AGENT_ID
     block = mem.recall_for_skill("tdd", task_hint="auth module")
     mem.distill_and_store("tdd", transcript)
 """

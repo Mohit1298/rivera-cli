@@ -1,6 +1,6 @@
-"""SkillMemory — the single integration point between Claude Code skills and Mira.
+"""SkillMemory — the single integration point between Claude Code skills and Rivera.
 
-Wraps Mira's ``SdkClient`` with the three operations the bounty calls for:
+Wraps Rivera's ``SdkClient`` with the three operations the bounty calls for:
 
 * ``recall_for_skill``  — dynamic injection: pull memories relevant to the skill
                           being invoked and render an injectable context block.
@@ -18,8 +18,8 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from mira.app.utils.errors import AgentAlreadyExistsError, AgentNotFoundError
-from mira.cli.client.sdk_client import SdkClient
+from rivera.app.utils.errors import AgentAlreadyExistsError, AgentNotFoundError
+from rivera.cli.client.sdk_client import SdkClient
 
 from . import extractor
 from .config import SkillsConfig
@@ -29,10 +29,10 @@ from .skill_map import normalize_skill, route_for
 logger = logging.getLogger(__name__)
 
 # Stamped onto every memory this layer writes, so skill memories are filterable
-# and separable from memories written by other Mira integrations.
-SOURCE_TAG = "claudecode-skills-mira"
+# and separable from memories written by other Rivera integrations.
+SOURCE_TAG = "claudecode-skills-rivera"
 
-# Mira session lifetime requested on activation. Sessions are JWT-backed and
+# Rivera session lifetime requested on activation. Sessions are JWT-backed and
 # auto-renewed by the SDK when nearing expiry, so the exact value is not load-bearing.
 _SESSION_HOURS = 6
 
@@ -100,10 +100,10 @@ class SkillMemory:
             query = f"{query}; current task: {task_hint.strip()}"
 
         # We deliberately do NOT pass a hard ``type`` filter here. Live testing
-        # showed that combining a type filter with Mira's semantic threshold
+        # showed that combining a type filter with Rivera's semantic threshold
         # over-constrains and can return nothing even when matching-typed
         # memories exist. The skill-specific ``query`` already biases retrieval
-        # toward the right memories, and Mira returns relevant results only.
+        # toward the right memories, and Rivera returns relevant results only.
         result = self._sdk.recall(
             agent_id=self.config.agent_id,
             query=query,

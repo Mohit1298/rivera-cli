@@ -2,9 +2,9 @@
 
 ## Reporting Security Vulnerabilities
 
-If you discover a security vulnerability in MIRA, please report it to:
+If you discover a security vulnerability in RIVERA, please report it to:
 - **Email**: support@moorcheh.ai
-- **Subject**: [MIRA Security] Brief description
+- **Subject**: [RIVERA Security] Brief description
 
 **Please do not** open public GitHub issues for security vulnerabilities.
 
@@ -110,9 +110,9 @@ Before making your repository public:
 
 ---
 
-## Security Features in MIRA
+## Security Features in RIVERA
 
-MIRA implements multiple security layers:
+RIVERA implements multiple security layers:
 
 ### 1. Authentication & Authorization
 - Server-owned `RIVERA_API_KEY` required at startup for backend access

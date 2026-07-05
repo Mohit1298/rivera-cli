@@ -1,4 +1,4 @@
-"""Shared fixtures for mira-mcp tests.
+"""Shared fixtures for rivera-mcp tests.
 
 These tests never hit the network: ``SdkClient.__init__`` only stores the key
 and lazy-loads the real Moorcheh client on first call. Tests that exercise the
@@ -18,7 +18,7 @@ def _isolate_env(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
     """Wipe env vars AND switch cwd so a developer's local ``.env`` cannot
     bleed into settings construction (pydantic-settings reads ``./.env``)."""
     for var in list(os.environ):
-        if var.startswith(("MOORCHEH_", "MIRA_")):
+        if var.startswith(("MOORCHEH_", "RIVERA_")):
             monkeypatch.delenv(var, raising=False)
     monkeypatch.chdir(tmp_path)
 

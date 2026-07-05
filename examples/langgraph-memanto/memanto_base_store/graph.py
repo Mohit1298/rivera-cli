@@ -1,4 +1,4 @@
-"""LangGraph customer-support agent backed by MiraStore.
+"""LangGraph customer-support agent backed by RiveraStore.
 
 Graph shape:
 
@@ -14,8 +14,8 @@ Graph shape:
   ``store.aput`` so the next session can use them.
 
 The graph is compiled with both a checkpointer (short-term thread state)
-and the MiraStore (long-term cross-thread memory). That split is the
-whole point - see ``examples/langgraph-mira/README.md`` for why.
+and the RiveraStore (long-term cross-thread memory). That split is the
+whole point - see ``examples/langgraph-rivera/README.md`` for why.
 """
 
 from __future__ import annotations
@@ -35,8 +35,8 @@ from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.graph import END, START, StateGraph
 from langgraph.store.base import BaseStore
 from langgraph.types import RetryPolicy
-from langgraph_mira import MiraStore
-from mira_base_store.state import SupportState
+from langgraph_rivera import RiveraStore
+from rivera_base_store.state import SupportState
 from pydantic import BaseModel, Field, model_validator
 
 logger = logging.getLogger(__name__)
@@ -337,10 +337,10 @@ def build_support_graph(
     api_key: str,
     llm: ChatOpenAI | None = None,
 ):
-    """Compile a customer-support graph with MiraStore + InMemorySaver.
+    """Compile a customer-support graph with RiveraStore + InMemorySaver.
 
     Args:
-        api_key: Moorcheh API key to provision Mira clients.
+        api_key: Moorcheh API key to provision Rivera clients.
         llm: Optional override for the underlying chat model.
     """
     chat = llm or _default_llm()
@@ -364,9 +364,9 @@ def build_support_graph(
     # Instead we pipe the raw AIMessage through _parse_memories_response which
     # handles numbered lists, bare arrays, wrapped objects, and code fences.
     extractor = extractor_llm | RunnableLambda(_parse_memories_response)
-    # MiraStore is created here and passed to compile(store=...) below.
+    # RiveraStore is created here and passed to compile(store=...) below.
     # LangGraph then injects it into any node that declares `*, store: BaseStore`.
-    store = MiraStore(api_key=api_key)
+    store = RiveraStore(api_key=api_key)
 
     async def recall_context(state: SupportState, config, *, store: BaseStore) -> dict:
         """Pull cross-thread memories for this user, scoped by user_id."""

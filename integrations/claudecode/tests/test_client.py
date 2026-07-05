@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from typing import Any
 
-from claudecode_mira.client import SOURCE_TAG, SkillMemory
-from claudecode_mira.config import SkillsConfig
+from claudecode_rivera.client import SOURCE_TAG, SkillMemory
+from claudecode_rivera.config import SkillsConfig
 
 from .conftest import FakeSdkClient
 

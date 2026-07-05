@@ -1,4 +1,4 @@
-# MIRA Quick Start Guide
+# RIVERA Quick Start Guide
 
 **5-Minute Guide to Session-Based API**
 
@@ -20,7 +20,7 @@ curl -X POST "http://localhost:8000/api/v2/agents" \
   -d '{
     "agent_id": "my-agent",
     "pattern": "support",
-    "description": "My first MIRA agent"
+    "description": "My first RIVERA agent"
   }'
 ```
 
@@ -37,7 +37,7 @@ curl -X POST "http://localhost:8000/api/v2/agents/my-agent/activate" \
   "session_id": "sess_abc123",
   "session_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
   "agent_id": "my-agent",
-  "namespace": "mira_agent_my-agent",
+  "namespace": "rivera_agent_my-agent",
   "started_at": "2025-12-28T16:00:00Z",
   "expires_at": "2025-12-28T20:00:00Z",
   "status": "active"
@@ -78,7 +78,7 @@ curl -X POST "http://localhost:8000/api/v2/agents/my-agent/upload-file" \
 {
   "agent_id": "my-agent",
   "session_id": "sess_abc123",
-  "namespace": "mira_agent_my-agent",
+  "namespace": "rivera_agent_my-agent",
   "file_name": "document.pdf",
   "file_size": 204800,
   "status": "uploaded",
@@ -116,7 +116,7 @@ curl -X POST "http://localhost:8000/api/v2/agents/my-agent/answer" \
   }'
 ```
 
-`threshold` is only used when `kiosk_mode` is `true`. If omitted in kiosk mode, MIRA uses `0.15`.
+`threshold` is only used when `kiosk_mode` is `true`. If omitted in kiosk mode, RIVERA uses `0.15`.
 
 ---
 
@@ -206,7 +206,7 @@ print("Answer:", answer.json()["answer"])
 | **Authentication** | `?tenant_id=...` in query | Session token in header |
 | **Setup** | None required | Create agent + activate session |
 | **Security** | Query params (spoofable) | JWT tokens (signed) |
-| **Namespace** | `mira_{tenant}_agent_{id}` | `mira_agent_{id}` |
+| **Namespace** | `rivera_{tenant}_agent_{id}` | `rivera_agent_{id}` |
 
 ---
 
@@ -326,8 +326,8 @@ except httpx.HTTPStatusError as e:
 
 - **Full Documentation**: [SESSION_ARCHITECTURE.md](SESSION_ARCHITECTURE.md)
 - **API Reference**: http://localhost:8000/docs
-- **TypeScript SDK**: See [`@moorcheh-ai/mira`](../sdks/typescript) for the Node.js/TypeScript client
+- **TypeScript SDK**: See [`@moorcheh-ai/rivera`](../sdks/typescript) for the Node.js/TypeScript client
 
 ---
 
-**That's it!** You're ready to use MIRA. No tenant_id required! 🎉
+**That's it!** You're ready to use RIVERA. No tenant_id required! 🎉

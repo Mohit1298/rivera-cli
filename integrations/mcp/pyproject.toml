@@ -3,17 +3,17 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "mira-mcp"
+name = "rivera-mcp"
 version = "0.1.0"
-description = "Model Context Protocol (MCP) server for Mira - persistent semantic memory for any MCP-compatible agent"
+description = "Model Context Protocol (MCP) server for Rivera - persistent semantic memory for any MCP-compatible agent"
 readme = "README.md"
 license = { text = "MIT" }
 requires-python = ">=3.10,<4"
 authors = [
-    { name = "Mira", email = "info@mira.ai" }
+    { name = "Rivera", email = "info@rivera.ai" }
 ]
 keywords = [
-    "mira",
+    "rivera",
     "moorcheh",
     "mcp",
     "model-context-protocol",
@@ -38,7 +38,7 @@ classifiers = [
 ]
 dependencies = [
     "mcp[cli]>=1.2.0",
-    "mira>=0.1.0",
+    "rivera>=0.1.0",
     "pydantic>=2.0.0",
     "pydantic-settings>=2.0.0",
     "python-dotenv>=1.0.0",
@@ -54,16 +54,16 @@ dev = [
 ]
 
 [project.scripts]
-mira-mcp = "mira_mcp.__main__:main"
+rivera-mcp = "rivera_mcp.__main__:main"
 
 [project.urls]
-Homepage = "https://www.mira.ai"
-Documentation = "https://docs.mira.ai"
-Repository = "https://github.com/moorcheh-ai/mira"
-"Bug Tracker" = "https://github.com/moorcheh-ai/mira/issues"
+Homepage = "https://www.rivera.ai"
+Documentation = "https://docs.rivera.ai"
+Repository = "https://github.com/moorcheh-ai/rivera"
+"Bug Tracker" = "https://github.com/moorcheh-ai/rivera/issues"
 
 [tool.hatch.build.targets.wheel]
-packages = ["mira_mcp"]
+packages = ["rivera_mcp"]
 
 [tool.ruff]
 target-version = "py310"

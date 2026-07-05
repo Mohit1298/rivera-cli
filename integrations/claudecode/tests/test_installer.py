@@ -8,7 +8,7 @@ from typing import Any
 
 import pytest
 
-from claudecode_mira import installer
+from claudecode_rivera import installer
 
 _EVENTS = ("SessionStart", "UserPromptExpansion", "Stop")
 

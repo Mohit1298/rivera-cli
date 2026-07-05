@@ -32,9 +32,9 @@ def build_graph(tools: list[callable]):
         sys_msg = SystemMessage(
             content=(
                 "You are an intelligent personal assistant equipped with a persistent memory. "
-                "You have two special tools: mira_remember and mira_recall. "
-                "1. When the user tells you personal facts, preferences, or important instructions, ALWAYS use 'mira_remember' to save them. "
-                "2. When the user asks you a question that might require past context, ALWAYS use 'mira_recall' to search your memory first. "
+                "You have two special tools: rivera_remember and rivera_recall. "
+                "1. When the user tells you personal facts, preferences, or important instructions, ALWAYS use 'rivera_remember' to save them. "
+                "2. When the user asks you a question that might require past context, ALWAYS use 'rivera_recall' to search your memory first. "
                 "Do not hallucinate facts about the user. Rely on your long-term memory."
             )
         )

@@ -1,5 +1,5 @@
 """
-Crew orchestration for the CrewAI + Mira integration example.
+Crew orchestration for the CrewAI + Rivera integration example.
 
 Provides factory functions that wire up agents, tasks, and tools
 into ready-to-run Crews.
@@ -9,10 +9,10 @@ from __future__ import annotations
 
 from agents import create_research_agent, create_writer_agent
 from crewai import Crew, Process
-from crewai_mira import create_mira_tools
+from crewai_rivera import create_rivera_tools
 from tasks import create_research_task, create_writing_task
 
-from mira.cli.client.sdk_client import SdkClient
+from rivera.cli.client.sdk_client import SdkClient
 
 
 def build_research_crew(
@@ -22,7 +22,7 @@ def build_research_crew(
     llm: str = "openrouter/baidu/cobuddy:free",
 ) -> Crew:
     """Build a crew with only the Research Agent."""
-    tools = create_mira_tools(client, agent_id)
+    tools = create_rivera_tools(client, agent_id)
     researcher = create_research_agent(tools["remember"], tools["recall"], llm=llm)
     research_task = create_research_task(researcher, topic=topic)
 
@@ -30,7 +30,7 @@ def build_research_crew(
         agents=[researcher],
         tasks=[research_task],
         process=Process.sequential,
-        memory=False,  # Mira replaces CrewAI's built-in LanceDB memory via tools
+        memory=False,  # Rivera replaces CrewAI's built-in LanceDB memory via tools
         verbose=True,
     )
 
@@ -42,7 +42,7 @@ def build_writer_crew(
     llm: str = "openrouter/baidu/cobuddy:free",
 ) -> Crew:
     """Build a crew with only the Writer Agent."""
-    tools = create_mira_tools(client, agent_id)
+    tools = create_rivera_tools(client, agent_id)
     writer = create_writer_agent(tools["recall"], tools["answer"], llm=llm)
     writing_task = create_writing_task(writer, topic=topic)
 
@@ -50,7 +50,7 @@ def build_writer_crew(
         agents=[writer],
         tasks=[writing_task],
         process=Process.sequential,
-        memory=False,  # Mira replaces CrewAI's built-in LanceDB memory via tools
+        memory=False,  # Rivera replaces CrewAI's built-in LanceDB memory via tools
         verbose=True,
     )
 
@@ -62,7 +62,7 @@ def build_full_crew(
     llm: str = "openrouter/baidu/cobuddy:free",
 ) -> Crew:
     """Build the full pipeline: Research Agent -> Writer Agent."""
-    tools = create_mira_tools(client, agent_id)
+    tools = create_rivera_tools(client, agent_id)
 
     researcher = create_research_agent(tools["remember"], tools["recall"], llm=llm)
     writer = create_writer_agent(tools["recall"], tools["answer"], llm=llm)
@@ -74,6 +74,6 @@ def build_full_crew(
         agents=[researcher, writer],
         tasks=[research_task, writing_task],
         process=Process.sequential,
-        memory=False,  # Mira replaces CrewAI's built-in LanceDB memory via tools
+        memory=False,  # Rivera replaces CrewAI's built-in LanceDB memory via tools
         verbose=True,
     )

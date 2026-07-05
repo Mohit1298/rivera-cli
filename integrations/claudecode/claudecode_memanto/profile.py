@@ -1,6 +1,6 @@
 """The Engineering Profile — recalled memories shaped for prompt injection.
 
-Mira returns a list of memory dicts from ``recall``. ``MemoryProfile`` wraps
+Rivera returns a list of memory dicts from ``recall``. ``MemoryProfile`` wraps
 that list and renders a compact, token-frugal context block that Claude Code
 injects via a hook's ``additionalContext``. The block is deterministic and
 grouped by memory type so hard rules (instructions) read before softer ones
@@ -15,7 +15,7 @@ from typing import Any
 
 # Render order: hard constraints first, context last. Mirrors how a senior
 # engineer would brief a teammate — rules before nice-to-knows. Covers all of
-# Mira's valid memory types; anything unrecognised renders after these with
+# Rivera's valid memory types; anything unrecognised renders after these with
 # a capitalised fallback label.
 _TYPE_ORDER = [
     "instruction",
@@ -68,9 +68,9 @@ class MemoryProfile:
         result: dict[str, Any] | None,
         min_similarity: float | None = None,
     ) -> MemoryProfile:
-        """Build a profile from a Mira ``recall`` response.
+        """Build a profile from a Rivera ``recall`` response.
 
-        Applies an optional similarity floor. Mira exposes the score as
+        Applies an optional similarity floor. Rivera exposes the score as
         either ``score`` or ``similarity_score`` depending on the endpoint, so
         we coalesce both.
         """
@@ -99,7 +99,7 @@ class MemoryProfile:
         safe_skill = html.escape(skill_name, quote=True) if skill_name else ""
         header_skill = f" for /{safe_skill}" if safe_skill else ""
         lines = [
-            f'<engineering-profile source="mira"{_skill_attr(safe_skill)}>',
+            f'<engineering-profile source="rivera"{_skill_attr(safe_skill)}>',
             f"Relevant engineering memory{header_skill} "
             "(carried over from previous skill sessions — honour it, "
             "do not re-ask the user):",

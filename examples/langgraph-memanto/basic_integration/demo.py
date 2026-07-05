@@ -6,10 +6,10 @@ import warnings
 
 from dotenv import load_dotenv
 from langchain_core.messages import HumanMessage
-from langgraph_mira import create_mira_tools
+from langgraph_rivera import create_rivera_tools
 
 from basic_integration.agent import build_graph
-from mira.cli.client.sdk_client import SdkClient
+from rivera.cli.client.sdk_client import SdkClient
 
 warnings.filterwarnings("ignore", module="langgraph")
 
@@ -18,7 +18,7 @@ def main():
     load_dotenv()
 
     print("\n" + "=" * 60)
-    print("🚀 Initializing Mira + LangGraph Integration Demo...")
+    print("🚀 Initializing Rivera + LangGraph Integration Demo...")
     print("=" * 60 + "\n")
 
     if not os.getenv("RIVERA_API_KEY"):
@@ -33,11 +33,11 @@ def main():
         print("Please set one: export OPENROUTER_API_KEY='your_key'")
         sys.exit(1)
 
-    # Initialize Mira Client
+    # Initialize Rivera Client
     client = SdkClient(api_key=os.environ["RIVERA_API_KEY"])
     agent_id = f"langgraph-demo-{uuid.uuid4().hex[:6]}"
 
-    tools = create_mira_tools(client, agent_id)
+    tools = create_rivera_tools(client, agent_id)
     graph = build_graph(tools)
 
     # ---------------------------------------------------------
@@ -80,7 +80,7 @@ def main():
 
     print("\n" + "=" * 60)
     print(
-        "✅ Demo complete. The agent successfully recalled cross-session memory using Mira!"
+        "✅ Demo complete. The agent successfully recalled cross-session memory using Rivera!"
     )
     print("=" * 60 + "\n")
 

@@ -1,13 +1,13 @@
-"""Streamlit chat UI for the LangGraph + Mira cross-session memory demo.
+"""Streamlit chat UI for the LangGraph + Rivera cross-session memory demo.
 
 Run with:
     streamlit run app.py
 
-Two chat tabs share the same MiraStore.  Session 1 stores Bob's
+Two chat tabs share the same RiveraStore.  Session 1 stores Bob's
 preferences; Session 2 opens a brand-new LangGraph thread_id so the
 checkpointer has zero history, yet the agent recalls everything from
-Session 1 via MiraStore.  The right-hand memory panel shows exactly
-what is stored in Mira in real time.
+Session 1 via RiveraStore.  The right-hand memory panel shows exactly
+what is stored in Rivera in real time.
 """
 
 from __future__ import annotations
@@ -95,10 +95,10 @@ async def _poll_for_memories(
 ):
     """Wait for newly-stored memories to become searchable.
 
-    Mira's aput returns as soon as the write is acknowledged; the
+    Rivera's aput returns as soon as the write is acknowledged; the
     search index catches up asynchronously, taking up to several seconds.
     We poll sparingly (every 3 s, up to 12 s) so we don't burn through
-    Mira's Community-plan recall rate-limit budget. The MiraStore
+    Rivera's Community-plan recall rate-limit budget. The RiveraStore
     caches results internally, so a poll after the first non-zero result
     is essentially free.
     """
@@ -128,25 +128,25 @@ def _graph_hash() -> str:
 
 @st.cache_resource(show_spinner=False)
 def _load(_graph_version: str = ""):
-    """Set up Mira + compile the graph once per ``_graph_version`` value.
+    """Set up Rivera + compile the graph once per ``_graph_version`` value.
 
     ``_graph_version`` is a hash of ``graph.py``; changing it busts the
     cache so edits to graph.py take effect on the next Streamlit rerun
     without a manual server restart.
     """
-    from langgraph_mira import MiraStore
-    from mira_base_store.graph import build_support_graph
+    from langgraph_rivera import RiveraStore
+    from rivera_base_store.graph import build_support_graph
 
     api_key = os.environ.get("RIVERA_API_KEY", "")
     graph = build_support_graph(api_key)
-    store = MiraStore(api_key)
+    store = RiveraStore(api_key)
     return graph, store
 
 
 # ── Page config ───────────────────────────────────────────────────────────────
 
 st.set_page_config(
-    page_title="LangGraph + Mira",
+    page_title="LangGraph + Rivera",
     page_icon="🧠",
     layout="wide",
 )
@@ -194,23 +194,23 @@ if "user_id" not in st.session_state:
 # ── Sidebar ───────────────────────────────────────────────────────────────────
 
 with st.sidebar:
-    st.markdown("## 🧠 LangGraph + Mira")
+    st.markdown("## 🧠 LangGraph + Rivera")
     st.markdown(
         "Demonstrates **cross-session memory recall** using "
-        "[Mira](https://mira.ai) as a LangGraph `BaseStore`."
+        "[Rivera](https://rivera.ai) as a LangGraph `BaseStore`."
     )
     st.divider()
     st.markdown("**How it works**")
     st.markdown(
         "**Session 1** runs inside a LangGraph thread. When you send a message, "
         "the `extract_and_store` node pulls atomic facts from what you said and "
-        "writes them to **MiraStore**, backed by Mira's cloud.\n\n"
+        "writes them to **RiveraStore**, backed by Rivera's cloud.\n\n"
         "**Session 2** starts with a completely fresh `thread_id` and an empty "
-        "checkpointer. The `recall_context` node queries MiraStore and injects "
+        "checkpointer. The `recall_context` node queries RiveraStore and injects "
         "any matching memories as system context, so the agent knows your "
         "preferences without seeing any prior conversation.\n\n"
         "The memory panel on the right shows everything currently stored in "
-        "Mira for this user, updated after each message."
+        "Rivera for this user, updated after each message."
     )
     st.divider()
     st.caption(f"User: `{st.session_state.user_id}`")
@@ -228,18 +228,18 @@ with st.sidebar:
         st.rerun()
     st.caption(
         "Switches to a new user namespace so the next run starts with zero memories. "
-        "Previous memories remain in Mira under the old user ID."
+        "Previous memories remain in Rivera under the old user ID."
     )
 
 # ── Header ────────────────────────────────────────────────────────────────────
 
 st.markdown(
-    "### 🧠 LangGraph + Mira: Cross-Session Memory Demo  "
+    "### 🧠 LangGraph + Rivera: Cross-Session Memory Demo  "
     "<span style='color:#22c55e;font-size:0.8rem'>● Connected</span>",
     unsafe_allow_html=True,
 )
 st.caption(
-    "**Session 1** stores Bob's preferences in **MiraStore**. "
+    "**Session 1** stores Bob's preferences in **RiveraStore**. "
     "**Session 2** opens a *completely fresh* `thread_id` with an empty checkpointer, "
     "yet the agent recalls everything Bob said in Session 1."
 )
@@ -292,7 +292,7 @@ with mem_col:
                 )
                 st.markdown(f"> {content}")
                 if conf is not None:
-                    # Clamp + try/except: Mira could in principle return a
+                    # Clamp + try/except: Rivera could in principle return a
                     # confidence outside [0, 1] or a non-numeric value; st.progress
                     # throws on either, which would break the whole memory panel
                     # render. Defensive coercion keeps the UI alive.
@@ -349,7 +349,7 @@ with chat_col:
             st.markdown(reply)
         st.session_state[session_key].append(("assistant", reply))
 
-        # Wait for Mira to index all new memories. aput returns as soon as
+        # Wait for Rivera to index all new memories. aput returns as soon as
         # the write is acknowledged but the search index catches up async,
         # so a single fixed sleep would miss memories that take longer than
         # the sleep window. Polling waits until the count grows past prev_count
@@ -372,7 +372,7 @@ with chat_col:
         with col_info:
             st.caption(
                 f"`thread_id = {st.session_state.s1_thread!r}`: "
-                "Bob shares facts; the graph extracts and stores them in Mira."
+                "Bob shares facts; the graph extracts and stores them in Rivera."
             )
         with col_clear:
             if st.button("Clear", key="clear_s1"):
@@ -404,7 +404,7 @@ with chat_col:
         with col_info2:
             st.caption(
                 f"`thread_id = {st.session_state.s2_thread!r}`: "
-                "Checkpointer is **empty**. What the agent knows came from MiraStore only."
+                "Checkpointer is **empty**. What the agent knows came from RiveraStore only."
             )
         with col_clear2:
             if st.button("Clear", key="clear_s2"):

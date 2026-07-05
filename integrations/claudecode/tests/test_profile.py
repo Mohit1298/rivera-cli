@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from claudecode_mira.profile import MemoryProfile
+from claudecode_rivera.profile import MemoryProfile
 
 
 class TestFromRecall:
@@ -36,7 +36,7 @@ class TestFormatContextBlock:
         self, sample_memories: list[dict[str, Any]]
     ) -> None:
         block = MemoryProfile(sample_memories).format_context_block(skill_name="tdd")
-        assert block.startswith('<engineering-profile source="mira"')
+        assert block.startswith('<engineering-profile source="rivera"')
         assert 'skill="tdd"' in block
         assert block.rstrip().endswith("</engineering-profile>")
 

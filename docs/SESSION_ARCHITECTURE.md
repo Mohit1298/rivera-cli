@@ -1,4 +1,4 @@
-# MIRA Session-Based Architecture
+# RIVERA Session-Based Architecture
 
 **Status**: Design Specification
 **Date**: December 2025
@@ -8,7 +8,7 @@
 
 ## Overview
 
-MIRA v2 introduces a **session-based authentication model** that eliminates the tenant_id concept and provides a secure, stateful interaction model for AI agents.
+RIVERA v2 introduces a **session-based authentication model** that eliminates the tenant_id concept and provides a secure, stateful interaction model for AI agents.
 
 ## Core Principles
 
@@ -16,7 +16,7 @@ MIRA v2 introduces a **session-based authentication model** that eliminates the 
 2. **Agent = Memory Namespace**: Each agent has one persistent namespace
 3. **Session = Time-Bounded Access**: Sessions provide temporary, scoped access to specific agents
 4. **CLI-First UX**: Users interact via CLI, not raw HTTP calls
-5. **Zero Configuration for Agents**: Real AI agents just call `mira remember "content"`
+5. **Zero Configuration for Agents**: Real AI agents just call `rivera remember "content"`
 
 ---
 
@@ -27,19 +27,19 @@ MIRA v2 introduces a **session-based authentication model** that eliminates the 
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │ User provides Moorcheh API Key                              │
-│ (stored in ~/.mira/config.yaml, encrypted)                 │
+│ (stored in ~/.rivera/config.yaml, encrypted)                 │
 └─────────────────────────────────────────────────────────────┘
                            │
                            ▼
 ┌─────────────────────────────────────────────────────────────┐
-│ User creates MIRA agent                                    │
+│ User creates RIVERA agent                                    │
 │ POST /api/v2/agents                                         │
 │ Auth: Bearer {moorcheh_api_key}                             │
 └─────────────────────────────────────────────────────────────┘
                            │
                            ▼
 ┌─────────────────────────────────────────────────────────────┐
-│ MIRA creates namespace: mira_agent_{agent_id}             │
+│ RIVERA creates namespace: rivera_agent_{agent_id}             │
 │ (Isolated by Moorcheh API key at Moorcheh backend)         │
 └─────────────────────────────────────────────────────────────┘
                            │
@@ -52,7 +52,7 @@ MIRA v2 introduces a **session-based authentication model** that eliminates the 
                            │
                            ▼
 ┌─────────────────────────────────────────────────────────────┐
-│ MIRA issues session token (JWT)                            │
+│ RIVERA issues session token (JWT)                            │
 │ - Includes: agent_id, namespace, moorcheh_api_key (enc)    │
 │ - Expires: 6 hours (configurable)                          │
 │ - Signed: HMAC-SHA256                                      │
@@ -68,19 +68,19 @@ MIRA v2 introduces a **session-based authentication model** that eliminates the 
 
 ### 2. Namespace Model
 
-**Format**: `mira_agent_{agent_id}`
+**Format**: `rivera_agent_{agent_id}`
 
 **Isolation**: Moorcheh backend enforces isolation by API key
 
 ```
 User A (API Key: key_abc123)
-├── mira_agent_customer-support    (accessible)
-├── mira_agent_sales-bot           (accessible)
-└── mira_agent_research-assistant  (accessible)
+├── rivera_agent_customer-support    (accessible)
+├── rivera_agent_sales-bot           (accessible)
+└── rivera_agent_research-assistant  (accessible)
 
 User B (API Key: key_xyz789)
-├── mira_agent_customer-support    (different namespace, isolated)
-└── mira_agent_project-manager     (accessible)
+├── rivera_agent_customer-support    (different namespace, isolated)
+└── rivera_agent_project-manager     (accessible)
 ```
 
 **Key insight**: Same `agent_id` under different API keys = different namespaces (isolated by Moorcheh)
@@ -91,7 +91,7 @@ User B (API Key: key_xyz789)
 ```json
 {
   "agent_id": "customer-support",
-  "namespace": "mira_agent_customer-support",
+  "namespace": "rivera_agent_customer-support",
   "moorcheh_api_key_hash": "sha256...",
   "session_id": "sess_abc123xyz",
   "started_at": "2025-12-28T16:00:00Z",
@@ -103,13 +103,13 @@ User B (API Key: key_xyz789)
 
 **Security**:
 - Moorcheh API key NOT included in plaintext (hash only)
-- Token signed with MIRA secret key
+- Token signed with RIVERA secret key
 - Short expiration (6 hours default, configurable)
 - Scoped to specific agent (cannot access other agents)
 
 ### 4. Session Storage
 
-**File-based storage** (v1): `~/.mira/sessions/`
+**File-based storage** (v1): `~/.rivera/sessions/`
 
 > Important: CLI local session state and API server session are related but distinct.
 > - CLI stores local "active session" pointers for convenience.
@@ -117,7 +117,7 @@ User B (API Key: key_xyz789)
 > - Clearing local CLI state does not, by itself, guarantee server session termination.
 
 ```
-~/.mira/
+~/.rivera/
 ├── config.yaml                      # Main configuration
 └── sessions/
     ├── customer-support.json        # Session state
@@ -131,7 +131,7 @@ User B (API Key: key_xyz789)
   "agent_id": "customer-support",
   "session_id": "sess_abc123xyz",
   "session_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "namespace": "mira_agent_customer-support",
+  "namespace": "rivera_agent_customer-support",
   "started_at": "2025-12-28T16:00:00Z",
   "expires_at": "2025-12-28T20:00:00Z",
   "pattern": "support",
@@ -161,7 +161,7 @@ Content-Type: application/json
 Response:
 {
   "agent_id": "customer-support",
-  "namespace": "mira_agent_customer-support",
+  "namespace": "rivera_agent_customer-support",
   "pattern": "support",
   "created_at": "2025-12-28T16:00:00Z",
   "status": "created"
@@ -177,7 +177,7 @@ Response:
   "agents": [
     {
       "agent_id": "customer-support",
-      "namespace": "mira_agent_customer-support",
+      "namespace": "rivera_agent_customer-support",
       "pattern": "support",
       "created_at": "2025-12-27T10:00:00Z",
       "last_session": "2025-12-28T15:30:00Z",
@@ -221,7 +221,7 @@ Response:
   "session_id": "sess_abc123xyz",
   "session_token": "eyJhbGc...",
   "agent_id": "customer-support",
-  "namespace": "mira_agent_customer-support",
+  "namespace": "rivera_agent_customer-support",
   "started_at": "2025-12-28T16:00:00Z",
   "expires_at": "2025-12-28T20:00:00Z"
 }
@@ -262,7 +262,7 @@ Response:
   "memory_id": "mem_abc123",
   "agent_id": "customer-support",
   "session_id": "sess_abc123xyz",
-  "namespace": "mira_agent_customer-support",
+  "namespace": "rivera_agent_customer-support",
   "status": "queued"
 }
 ```
@@ -317,7 +317,7 @@ Response:
 ### 1. API Key Protection
 
 ```python
-# Server key is owned by MIRA (RIVERA_API_KEY).
+# Server key is owned by RIVERA (RIVERA_API_KEY).
 # NEVER expose RIVERA_API_KEY in request/response payloads.
 # NEVER log RIVERA_API_KEY.
 # Session tokens remain scoped credentials for runtime operations.
@@ -382,29 +382,29 @@ POST /api/v2/agents/{agent_id}/remember?tenant_id=any-value
 1. **Activate session**: `POST /api/v2/agents/{agent_id}/activate`
 2. **Authorize**: Use `X-Session-Token` for subsequent operations
 3. **Automatic isolation**: All memory operations (`remember`, `recall`, `answer`) are automatically scoped to the active agent.
-4. **CLI Convenience**: In the CLI, `mira agent create` automatically performs activation for you.
+4. **CLI Convenience**: In the CLI, `rivera agent create` automatically performs activation for you.
 ```
 
 ### Namespace Migration
 
 ```python
 # OLD namespace format:
-mira_{tenant_id}_agent_{agent_id}
-mira_acme-corp_agent_customer-support
+rivera_{tenant_id}_agent_{agent_id}
+rivera_acme-corp_agent_customer-support
 
 # NEW namespace format:
-mira_agent_{agent_id}
-mira_agent_customer-support
+rivera_agent_{agent_id}
+rivera_agent_customer-support
 ```
 
 ---
 
 ## Configuration
 
-### User Configuration (~/.mira/config.yaml)
+### User Configuration (~/.rivera/config.yaml)
 
 ```yaml
-mira:
+rivera:
   version: "2.0"
 
   server:
@@ -467,6 +467,6 @@ mira:
 
 ---
 
-**Conclusion**: The session-based architecture provides **secure**, **stateful**, and **user-friendly** access to MIRA memory services while maintaining perfect isolation through Moorcheh's multi-tenant backend.
+**Conclusion**: The session-based architecture provides **secure**, **stateful**, and **user-friendly** access to RIVERA memory services while maintaining perfect isolation through Moorcheh's multi-tenant backend.
 
 **Questions?** Contact Dr. Majid Fekri, CTO Moorcheh.ai

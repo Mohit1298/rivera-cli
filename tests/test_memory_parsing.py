@@ -1,9 +1,9 @@
 from typing import Any, cast
 
-from mira.app.config import settings
-from mira.app.constants import MemoryType
-from mira.app.core import MemoryRecord
-from mira.app.services.memory_parsing_service import MemoryParsingService
+from rivera.app.config import settings
+from rivera.app.constants import MemoryType
+from rivera.app.core import MemoryRecord
+from rivera.app.services.memory_parsing_service import MemoryParsingService
 
 
 def make_memory(content: str, memory_type: MemoryType | None = None) -> MemoryRecord:

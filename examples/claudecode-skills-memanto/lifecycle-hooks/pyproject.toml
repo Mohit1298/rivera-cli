@@ -3,17 +3,17 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "claudecode-skills-mira"
+name = "claudecode-skills-rivera"
 version = "0.1.0"
-description = "Cross-session engineering memory for Claude Code + mattpocock/skills, powered by Mira. Real lifecycle hooks + LLM distillation = zero repeated instructions."
+description = "Cross-session engineering memory for Claude Code + mattpocock/skills, powered by Rivera. Real lifecycle hooks + LLM distillation = zero repeated instructions."
 readme = "README.md"
 license = { text = "MIT" }
 requires-python = ">=3.10,<4"
 authors = [
-    { name = "Mira", email = "info@mira.ai" }
+    { name = "Rivera", email = "info@rivera.ai" }
 ]
 keywords = [
-    "mira",
+    "rivera",
     "moorcheh",
     "claude-code",
     "claude",
@@ -38,7 +38,7 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
 ]
 dependencies = [
-    "mira>=0.1.0",
+    "rivera>=0.1.0",
     "python-dotenv>=1.0.0",
 ]
 
@@ -51,16 +51,16 @@ dev = [
 ]
 
 [project.scripts]
-mira-skills = "mira_skills.cli:main"
+rivera-skills = "rivera_skills.cli:main"
 
 [project.urls]
-Homepage = "https://www.mira.ai"
-Documentation = "https://docs.mira.ai"
-Repository = "https://github.com/moorcheh-ai/mira"
-"Bug Tracker" = "https://github.com/moorcheh-ai/mira/issues"
+Homepage = "https://www.rivera.ai"
+Documentation = "https://docs.rivera.ai"
+Repository = "https://github.com/moorcheh-ai/rivera"
+"Bug Tracker" = "https://github.com/moorcheh-ai/rivera/issues"
 
 [tool.hatch.build.targets.wheel]
-packages = ["mira_skills"]
+packages = ["rivera_skills"]
 
 [tool.ruff]
 target-version = "py310"

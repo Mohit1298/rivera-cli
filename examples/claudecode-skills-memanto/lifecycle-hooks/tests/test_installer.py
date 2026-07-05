@@ -7,7 +7,7 @@ from pathlib import Path
 
 import pytest
 
-from mira_skills import installer
+from rivera_skills import installer
 
 _EVENTS = ("SessionStart", "UserPromptExpansion", "Stop")
 

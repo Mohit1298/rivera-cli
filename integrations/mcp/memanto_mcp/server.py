@@ -1,6 +1,6 @@
 """FastMCP server assembly and transport runner.
 
-Builds a fully configured ``FastMCP`` instance with every Mira tool
+Builds a fully configured ``FastMCP`` instance with every Rivera tool
 registered, then dispatches to the requested transport.
 
 Logging is routed to **stderr only** because stdio MCP clients use stdout
@@ -16,14 +16,14 @@ try:
     from mcp.server.fastmcp import FastMCP
 except ImportError as exc:  # pragma: no cover - install-time message
     raise ImportError(
-        "mira-mcp requires the `mcp` package. Install with: pip install 'mcp[cli]>=1.2'"
+        "rivera-mcp requires the `mcp` package. Install with: pip install 'mcp[cli]>=1.2'"
     ) from exc
 
-from mira_mcp.config import MCPServerSettings, TransportType
-from mira_mcp.lifecycle import MiraLifecycle
-from mira_mcp.tools import register_tools
+from rivera_mcp.config import MCPServerSettings, TransportType
+from rivera_mcp.lifecycle import RiveraLifecycle
+from rivera_mcp.tools import register_tools
 
-logger = logging.getLogger("mira_mcp")
+logger = logging.getLogger("rivera_mcp")
 
 
 def _configure_logging(level: str) -> None:
@@ -50,7 +50,7 @@ def _configure_logging(level: str) -> None:
 
 
 def build_server(settings: MCPServerSettings | None = None) -> FastMCP:
-    """Construct a FastMCP server with all Mira tools wired up.
+    """Construct a FastMCP server with all Rivera tools wired up.
 
     Returned without being run, so callers (tests, custom hosts) can mount
     additional tools or inspect the schema before serving.
@@ -59,7 +59,7 @@ def build_server(settings: MCPServerSettings | None = None) -> FastMCP:
     _configure_logging(settings.log_level)
 
     instructions = (
-        "Mira provides persistent semantic memory for AI agents. Use "
+        "Rivera provides persistent semantic memory for AI agents. Use "
         "`recall` (or `answer` for RAG) BEFORE asking the user to repeat "
         "stable facts, preferences, or prior decisions - the answer may "
         "already be in memory. After learning something new and durable, "
@@ -69,21 +69,21 @@ def build_server(settings: MCPServerSettings | None = None) -> FastMCP:
     )
 
     mcp = FastMCP(
-        name="mira",
+        name="rivera",
         instructions=instructions,
         host=settings.host,
         port=settings.port,
     )
 
-    lifecycle = MiraLifecycle(settings)
+    lifecycle = RiveraLifecycle(settings)
     register_tools(mcp, lifecycle)
 
     # Stash on the server object so transport runners / tests can reach it.
-    mcp._mira_lifecycle = lifecycle  # type: ignore[attr-defined]
-    mcp._mira_settings = settings  # type: ignore[attr-defined]
+    mcp._rivera_lifecycle = lifecycle  # type: ignore[attr-defined]
+    mcp._rivera_settings = settings  # type: ignore[attr-defined]
 
     logger.info(
-        "Mira MCP server ready (transport=%s, default_agent=%s, admin_tools=%s)",
+        "Rivera MCP server ready (transport=%s, default_agent=%s, admin_tools=%s)",
         settings.transport.value,
         settings.default_agent_id or "<none>",
         settings.expose_admin_tools,
@@ -94,8 +94,8 @@ def build_server(settings: MCPServerSettings | None = None) -> FastMCP:
 def run_server(settings: MCPServerSettings | None = None) -> None:
     """Build the server and serve over the configured transport."""
     mcp = build_server(settings)
-    settings = mcp._mira_settings  # type: ignore[attr-defined]
-    lifecycle: MiraLifecycle = mcp._mira_lifecycle  # type: ignore[attr-defined]
+    settings = mcp._rivera_settings  # type: ignore[attr-defined]
+    lifecycle: RiveraLifecycle = mcp._rivera_lifecycle  # type: ignore[attr-defined]
 
     transport = settings.transport
     try:

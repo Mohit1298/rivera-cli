@@ -1,5 +1,5 @@
 """
-MIRA Core Unit Tests (No Server Required)
+RIVERA Core Unit Tests (No Server Required)
 
 Tests the session and agent services directly without HTTP layer.
 """
@@ -10,10 +10,10 @@ from unittest.mock import MagicMock, patch
 import jwt
 import pytest
 
-from mira.app.config import settings
-from mira.app.models.session import AgentCreate, AgentPattern, SessionStatus
-from mira.app.services.agent_service import AgentService
-from mira.app.services.session_service import SessionService
+from rivera.app.config import settings
+from rivera.app.models.session import AgentCreate, AgentPattern, SessionStatus
+from rivera.app.services.agent_service import AgentService
+from rivera.app.services.session_service import SessionService
 
 
 class TestSessionService:
@@ -41,7 +41,7 @@ class TestSessionService:
     def test_generate_namespace(self, session_service):
         """Test namespace generation"""
         namespace = session_service._generate_namespace("test-agent")
-        assert namespace == "mira_agent_test-agent"
+        assert namespace == "rivera_agent_test-agent"
         print(f"✅ Namespace format correct: {namespace}")
 
     def test_create_session(self, session_service):
@@ -53,7 +53,7 @@ class TestSessionService:
         )
 
         assert session.agent_id == "test-agent"
-        assert session.namespace == "mira_agent_test-agent"
+        assert session.namespace == "rivera_agent_test-agent"
         assert session.status == SessionStatus.ACTIVE
         assert session.session_token is not None
         assert session.pattern == AgentPattern.SUPPORT
@@ -78,7 +78,7 @@ class TestSessionService:
         token_payload = session_service.validate_session(session.session_token)
 
         assert token_payload.agent_id == "test-agent"
-        assert token_payload.namespace == "mira_agent_test-agent"
+        assert token_payload.namespace == "rivera_agent_test-agent"
 
         print("✅ Session validation successful")
 
@@ -147,7 +147,7 @@ class TestAgentService:
     def mock_moorcheh_client(self):
         """Mock Moorcheh client so unit tests never call external API."""
         with patch(
-            "mira.app.services.agent_service.get_moorcheh_client"
+            "rivera.app.services.agent_service.get_moorcheh_client"
         ) as mock_client_factory:
             mock_client = MagicMock()
             mock_client.namespaces.create.return_value = {"status": "created"}
@@ -169,7 +169,7 @@ class TestAgentService:
     def test_generate_namespace(self, agent_service):
         """Test namespace generation"""
         namespace = agent_service._generate_namespace("customer-support")
-        assert namespace == "mira_agent_customer-support"
+        assert namespace == "rivera_agent_customer-support"
         print(f"✅ Agent namespace correct: {namespace}")
 
     def test_create_agent(self, agent_service):
@@ -186,7 +186,7 @@ class TestAgentService:
 
         assert agent.agent_id == "test-agent"
         assert agent.pattern == AgentPattern.SUPPORT
-        assert agent.namespace == "mira_agent_test-agent"
+        assert agent.namespace == "rivera_agent_test-agent"
         assert agent.description == "Test agent"
         assert agent.status == "ready"
 
@@ -281,7 +281,7 @@ class TestMemoryWriteServiceDelete:
         ],
     )
     def test_delete_memory_handles_backend_shapes(self, response, expected):
-        from mira.app.services.memory_write_service import MemoryWriteService
+        from rivera.app.services.memory_write_service import MemoryWriteService
 
         client = MagicMock()
         client.documents.delete.return_value = response
@@ -297,20 +297,20 @@ class TestForgetEndToEnd:
     @pytest.fixture
     def direct_client(self, tmp_path, monkeypatch, mock_moorcheh_for_tests):
         """A wired ``DirectClient`` with the agent + session dirs redirected
-        into ``tmp_path`` so we don't touch ``~/.mira``. The conftest's
+        into ``tmp_path`` so we don't touch ``~/.rivera``. The conftest's
         ``mock_moorcheh_for_tests`` covers ``app.clients.moorcheh`` and
         ``agent_service.get_moorcheh_client``; ``DirectClient`` has its own
         inline ``MoorchehClient`` class, so we also patch that and force the
         lazy ``_moorcheh`` slot to the shared mock."""
-        from mira.cli.client import direct_client as direct_mod
-        from mira.cli.client.direct_client import DirectClient
+        from rivera.cli.client import direct_client as direct_mod
+        from rivera.cli.client.direct_client import DirectClient
 
         monkeypatch.setattr(
-            "mira.app.services.agent_service.get_data_dir",
+            "rivera.app.services.agent_service.get_data_dir",
             lambda: tmp_path,
         )
         monkeypatch.setattr(
-            "mira.app.services.session_service.get_data_dir",
+            "rivera.app.services.session_service.get_data_dir",
             lambda: tmp_path,
         )
         monkeypatch.setattr(
@@ -336,9 +336,9 @@ class TestForgetEndToEnd:
 
         assert result["status"] == "deleted"
         assert result["memory_id"] == "mem-abc"
-        assert result["namespace"] == "mira_agent_test-agent"
+        assert result["namespace"] == "rivera_agent_test-agent"
         moorcheh.documents.delete.assert_called_once_with(
-            namespace_name="mira_agent_test-agent", ids=["mem-abc"]
+            namespace_name="rivera_agent_test-agent", ids=["mem-abc"]
         )
 
     def test_forget_reports_not_found_when_truly_missing(self, direct_client):
@@ -366,20 +366,20 @@ class TestForgetEndToEnd:
         assert result["memory_id"] == "mem-xyz"
 
 
-class TestMIRAArchitecture:
-    """Tests for MIRA architecture principles"""
+class TestRIVERAArchitecture:
+    """Tests for RIVERA architecture principles"""
 
     def test_no_tenant_id_in_namespace(self):
         """Verify namespace format does NOT include tenant_id"""
-        from mira.app.services.session_service import SessionService
+        from rivera.app.services.session_service import SessionService
 
         service = SessionService()
         namespace = service._generate_namespace("my-agent")
 
-        # NEW FORMAT: mira_agent_{agent_id}
-        assert namespace == "mira_agent_my-agent"
+        # NEW FORMAT: rivera_agent_{agent_id}
+        assert namespace == "rivera_agent_my-agent"
 
-        # OLD FORMAT would have been: mira_{tenant}_agent_{agent_id}
+        # OLD FORMAT would have been: rivera_{tenant}_agent_{agent_id}
         # Verify it doesn't contain "tenant" string
         assert "tenant" not in namespace.lower()
 
@@ -388,7 +388,7 @@ class TestMIRAArchitecture:
 
     def test_jwt_token_structure(self):
         """Verify JWT token contains correct fields"""
-        from mira.app.services.session_service import SessionService
+        from rivera.app.services.session_service import SessionService
 
         service = SessionService(secret_key="test-secret-min-32-bytes-abcdefg")
         session = service.create_session(agent_id="test-agent", duration_hours=4)
@@ -416,7 +416,7 @@ def test_conflict_report_handles_non_object_json_items(tmp_path, monkeypatch):
     import json
     from unittest.mock import MagicMock
 
-    from mira.app.services import daily_analysis_service as module
+    from rivera.app.services import daily_analysis_service as module
 
     sessions_dir = tmp_path / "sessions"
     summaries_dir = tmp_path / "summaries"
@@ -443,7 +443,7 @@ def test_conflict_report_handles_non_object_json_items(tmp_path, monkeypatch):
     assert result["conflict_count"] == 1
 
     conflicts_path = (
-        tmp_path / ".mira" / "conflicts" / ("agent-1_2026-06-28_conflicts.json")
+        tmp_path / ".rivera" / "conflicts" / ("agent-1_2026-06-28_conflicts.json")
     )
     conflicts = json.loads(conflicts_path.read_text(encoding="utf-8"))
     assert conflicts[0]["title"] == "Unparsed conflict report"

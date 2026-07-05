@@ -1,18 +1,18 @@
 {
   "$schema": "https://code.claude.com/schemas/plugin-manifest.json",
-  "name": "mira-skills",
-  "displayName": "Mira Engineering Memory",
-  "description": "Cross-session engineering memory for Claude Code skills, powered by Mira. Recalls past architectural decisions before a skill runs and distills new ones after — automatically, via lifecycle hooks.",
+  "name": "rivera-skills",
+  "displayName": "Rivera Engineering Memory",
+  "description": "Cross-session engineering memory for Claude Code skills, powered by Rivera. Recalls past architectural decisions before a skill runs and distills new ones after — automatically, via lifecycle hooks.",
   "version": "0.1.0",
   "author": {
     "name": "Moorcheh AI",
-    "url": "https://mira.ai"
+    "url": "https://rivera.ai"
   },
-  "homepage": "https://mira.ai",
-  "repository": "https://github.com/moorcheh-ai/mira",
+  "homepage": "https://rivera.ai",
+  "repository": "https://github.com/moorcheh-ai/rivera",
   "license": "MIT",
-  "keywords": ["mira", "memory", "skills", "hooks", "claude-code", "mattpocock"],
+  "keywords": ["rivera", "memory", "skills", "hooks", "claude-code", "mattpocock"],
   "skills": [
-    "./skills/mira-companion"
+    "./skills/rivera-companion"
   ]
 }

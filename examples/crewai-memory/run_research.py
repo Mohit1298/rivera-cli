@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-Run 1: Research Agent stores findings in Mira.
+Run 1: Research Agent stores findings in Rivera.
 
 This script demonstrates the Research Agent gathering market intelligence
-and storing it as structured, typed memories in Mira. Run this first,
+and storing it as structured, typed memories in Rivera. Run this first,
 then run `run_writer.py` separately to prove cross-session persistence.
 
 Usage:
@@ -16,7 +16,7 @@ import os
 import sys
 
 from crew import build_research_crew
-from crewai_mira import MiraSetup
+from crewai_rivera import RiveraSetup
 from dotenv import load_dotenv
 
 AGENT_ID = "crewai-research-team"
@@ -35,15 +35,15 @@ def main() -> None:
 
     llm = os.environ.get("CREWAI_LLM", "openrouter/baidu/cobuddy:free")
 
-    # Set up Mira agent and session
-    setup = MiraSetup(api_key)
+    # Set up Rivera agent and session
+    setup = RiveraSetup(api_key)
     client = setup.setup(
         agent_id=AGENT_ID,
         description="Shared memory for CrewAI research pipeline",
     )
 
     print(f"\n{'=' * 60}")
-    print("  Research Agent - Storing findings in Mira")
+    print("  Research Agent - Storing findings in Rivera")
     print(f"  Agent ID: {AGENT_ID}")
     print(f"  Topic: {TOPIC}")
     print(f"{'=' * 60}\n")
@@ -57,7 +57,7 @@ def main() -> None:
         print(f"{'=' * 60}")
         print(f"\nResult:\n{result}")
         print(
-            "\nMemories are now stored in Mira. Run `python run_writer.py` "
+            "\nMemories are now stored in Rivera. Run `python run_writer.py` "
             "to see the Writer Agent retrieve them in a separate session."
         )
     finally:

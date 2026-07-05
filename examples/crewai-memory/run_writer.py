@@ -16,7 +16,7 @@ import os
 import sys
 
 from crew import build_writer_crew
-from crewai_mira import MiraSetup
+from crewai_rivera import RiveraSetup
 from dotenv import load_dotenv
 
 AGENT_ID = "crewai-research-team"
@@ -35,15 +35,15 @@ def main() -> None:
 
     llm = os.environ.get("CREWAI_LLM", "openrouter/baidu/cobuddy:free")
 
-    # Set up Mira - reuses the SAME agent_id as the Research Agent
-    setup = MiraSetup(api_key)
+    # Set up Rivera - reuses the SAME agent_id as the Research Agent
+    setup = RiveraSetup(api_key)
     client = setup.setup(
         agent_id=AGENT_ID,
         description="Shared memory for CrewAI research pipeline",
     )
 
     print(f"\n{'=' * 60}")
-    print("  Writer Agent - Retrieving memories from Mira")
+    print("  Writer Agent - Retrieving memories from Rivera")
     print(f"  Agent ID: {AGENT_ID}")
     print(f"  Topic: {TOPIC}")
     print(f"{'=' * 60}")

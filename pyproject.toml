@@ -1,5 +1,5 @@
 [project]
-name = "mira"
+name = "rivera"
 version = "0.1.0"
 description = "A companion memory agent that lets your agents focus and improve while you keep ownership of everything they learn."
 authors = [{ name = "Mohit Bendale", email = "mohitab2005@gmail.com" }]
@@ -7,7 +7,7 @@ requires-python = ">=3.10,<4"
 readme = "README.md"
 license = "MIT"
 keywords = [
-    "mira",
+    "rivera",
     "rivera",
     "memory layer",
     "agentic ai",
@@ -51,8 +51,8 @@ dependencies = [
 [project.urls]
 Homepage = "https://api.wirtel.ca"
 Documentation = "https://api.wirtel.ca/documentation"
-Repository = "https://github.com/Mohit1298/mira"
-"Bug Tracker" = "https://github.com/Mohit1298/mira/issues"
+Repository = "https://github.com/Mohit1298/rivera"
+"Bug Tracker" = "https://github.com/Mohit1298/rivera/issues"
 
 [project.optional-dependencies]
 all = [
@@ -68,14 +68,14 @@ all = [
 ]
 
 [project.scripts]
-mira = "mira.cli.main:app"
+rivera = "rivera.cli.main:app"
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
-packages = ["mira"]
+packages = ["rivera"]
 
 [dependency-groups]
 dev = [
@@ -99,7 +99,7 @@ ignore_missing_imports = true
 exclude = [
     "^integrations/",
     "^examples/",
-    "^mira/app/legacy/",
+    "^rivera/app/legacy/",
 ]
 
 # Optional: Configure pytest
@@ -117,7 +117,7 @@ filterwarnings = [
 [tool.ruff]
 target-version = "py310"
 line-length = 88
-extend-exclude = ["legacy_archive", "mira/app/legacy"]
+extend-exclude = ["legacy_archive", "rivera/app/legacy"]
 
 [tool.ruff.lint]
 select = [

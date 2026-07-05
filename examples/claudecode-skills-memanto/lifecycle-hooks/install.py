@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
-"""One-command setup for the Mira + Claude Code skills memory layer.
+"""One-command setup for the Rivera + Claude Code skills memory layer.
 
     python install.py            # install hooks into ./.claude/settings.json
     python install.py --global   # install into ~/.claude/settings.json
     python install.py --uninstall
 
-Thin wrapper around ``mira_skills.installer`` so the example is usable
+Thin wrapper around ``rivera_skills.installer`` so the example is usable
 without pip-installing the package first.
 """
 
@@ -17,7 +17,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from mira_skills.installer import install_hooks, uninstall_hooks  # noqa: E402
+from rivera_skills.installer import install_hooks, uninstall_hooks  # noqa: E402
 
 
 def main() -> int:

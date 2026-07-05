@@ -1,15 +1,15 @@
 ---
-name: mira-companion
-description: Inspect and manage the cross-session engineering memory that Mira maintains for your Claude Code skills. Use when the user asks what Mira remembers, wants to see their engineering profile, manually recall context for a skill, or store a decision. The automatic lifecycle hooks handle capture/injection on their own — this skill is the manual control surface.
+name: rivera-companion
+description: Inspect and manage the cross-session engineering memory that Rivera maintains for your Claude Code skills. Use when the user asks what Rivera remembers, wants to see their engineering profile, manually recall context for a skill, or store a decision. The automatic lifecycle hooks handle capture/injection on their own — this skill is the manual control surface.
 ---
 
-# Mira Companion
+# Rivera Companion
 
 Cross-session engineering memory for Claude Code skills runs automatically via
 lifecycle hooks (`SessionStart`, `UserPromptExpansion`, `Stop`). This skill is the
 **manual control surface** for when the user wants to inspect or steer it.
 
-All operations go through the `mira-skills` CLI. Requires `RIVERA_API_KEY`
+All operations go through the `rivera-skills` CLI. Requires `RIVERA_API_KEY`
 in the environment.
 
 ## When the user wants to SEE what is remembered
@@ -17,7 +17,7 @@ in the environment.
 Run:
 
 ```bash
-mira-skills profile
+rivera-skills profile
 ```
 
 Then summarise the returned engineering profile for the user in plain language,
@@ -29,7 +29,7 @@ If they ask "what do you remember about testing / TDD?" or want to preview what
 would be injected before a skill, run:
 
 ```bash
-mira-skills recall <skill> --hint "<the current task>"
+rivera-skills recall <skill> --hint "<the current task>"
 ```
 
 `<skill>` is a mattpocock skill name such as `tdd`, `grill-with-docs`,
@@ -43,16 +43,16 @@ decision they want persisted immediately (rather than waiting for the automatic
 `Stop` hook), distill and store it:
 
 ```bash
-mira-skills store <skill> "<a concise summary of what was decided>"
+rivera-skills store <skill> "<a concise summary of what was decided>"
 ```
 
-Mira's backend LLM extracts the typed memories and persists them. Report
+Rivera's backend LLM extracts the typed memories and persists them. Report
 back which memories were stored.
 
 ## When the user wants to verify the setup
 
 ```bash
-mira-skills doctor
+rivera-skills doctor
 ```
 
 This checks the API key, agent id, and live connectivity. If it fails, the

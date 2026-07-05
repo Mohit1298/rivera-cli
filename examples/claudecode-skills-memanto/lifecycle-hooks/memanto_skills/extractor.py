@@ -1,13 +1,13 @@
 """Distill a finished skill session into typed engineering memories.
 
 This is the heart of the "active extraction" guideline: instead of regex-only
-keyword matching, we lead with **Mira's backend LLM** to read the session
+keyword matching, we lead with **Rivera's backend LLM** to read the session
 summary and emit structured memories. We degrade gracefully to a lightweight
 heuristic only if the LLM path yields nothing parseable, so a lifecycle hook
 never silently no-ops.
 
 Why ``answer()`` for extraction?
-    ``SdkClient.answer`` routes to Mira's backend LLM
+    ``SdkClient.answer`` routes to Rivera's backend LLM
     (``moorcheh.answer.generate``) and accepts an arbitrary ``question`` plus a
     ``header_prompt``. We turn that LLM into an extraction engine: the header
     frames it as a distiller, the question carries the session summary, and we
@@ -22,10 +22,10 @@ import json
 import re
 from typing import Any
 
-from mira.app.constants import VALID_MEMORY_TYPES
-from mira.app.utils.validation import InputLimits
+from rivera.app.constants import VALID_MEMORY_TYPES
+from rivera.app.utils.validation import InputLimits
 
-# Sourced from the SDK so this never drifts if Mira adds a 14th type.
+# Sourced from the SDK so this never drifts if Rivera adds a 14th type.
 VALID_TYPES = set(VALID_MEMORY_TYPES)
 
 # Cap how much of a transcript we hand to the LLM. The bounty asks us to pass

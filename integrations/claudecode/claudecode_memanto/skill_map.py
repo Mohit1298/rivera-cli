@@ -9,9 +9,9 @@ mattpocock skill names to:
   * ``tags`` to stamp on memories captured from that skill.
 
 Recall is intentionally *not* hard-filtered by memory type — live testing
-showed that combining a type filter with Mira's semantic threshold can
+showed that combining a type filter with Rivera's semantic threshold can
 return nothing even when matching-typed memories exist. The ``query`` provides
-the skill-awareness instead, and Mira returns relevant results only.
+the skill-awareness instead, and Rivera returns relevant results only.
 
 Skill names are taken from the mattpocock/skills repository
 (github.com/mattpocock/skills): engineering skills (tdd, diagnose,
@@ -34,7 +34,7 @@ class SkillRoute:
 
 
 # Curated routes for the real mattpocock skills. The query is phrased as
-# natural language because Mira recall is semantic, not keyword-based.
+# natural language because Rivera recall is semantic, not keyword-based.
 _ROUTES: dict[str, SkillRoute] = {
     "tdd": SkillRoute(
         query="testing conventions, test framework, mocking strategy, and test structure preferences",

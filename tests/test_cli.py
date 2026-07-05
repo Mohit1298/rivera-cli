@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-MIRA CLI Integration Tests
+RIVERA CLI Integration Tests
 
 Tests all major CLI commands using typer.testing.CliRunner.
 Uses extensive mocking to intercept API calls across all command modules.
@@ -12,23 +12,23 @@ from unittest.mock import MagicMock, patch
 import pytest
 from typer.testing import CliRunner
 
-from mira.app.clients.backend import Backend
-from mira.cli.main import app
+from rivera.app.clients.backend import Backend
+from rivera.cli.main import app
 
 runner = CliRunner()
 
 # Modules that import get_client and need to be patched
 COMMAND_MODULES = [
-    "mira.cli.commands._shared",
-    "mira.cli.commands.agent",
-    "mira.cli.commands.memory",
-    "mira.cli.commands.session",
-    "mira.cli.commands.core",
-    "mira.cli.commands.config_cmd",
-    "mira.cli.commands.connect",
-    "mira.cli.commands.memory_mgmt",
-    "mira.cli.commands.schedule",
-    "mira.cli.commands.migrate",
+    "rivera.cli.commands._shared",
+    "rivera.cli.commands.agent",
+    "rivera.cli.commands.memory",
+    "rivera.cli.commands.session",
+    "rivera.cli.commands.core",
+    "rivera.cli.commands.config_cmd",
+    "rivera.cli.commands.connect",
+    "rivera.cli.commands.memory_mgmt",
+    "rivera.cli.commands.schedule",
+    "rivera.cli.commands.migrate",
 ]
 
 
@@ -85,30 +85,30 @@ def mock_all_clients():
                 "url": "http://localhost:8080",
                 "embedding_provider": "",
             }
-            mock_cfg.config_dir = "/tmp/.mira"
+            mock_cfg.config_dir = "/tmp/.rivera"
             patches.append(p_cfg)
         except (ImportError, AttributeError):
             pass
 
     # Specialized patches for connect module utilities
-    p_la = patch("mira.cli.commands.connect.list_agents", return_value=[])
+    p_la = patch("rivera.cli.commands.connect.list_agents", return_value=[])
     p_la.start()
     patches.append(p_la)
 
     p_da = patch(
-        "mira.cli.commands.connect.detect_agents_in_project", return_value=[]
+        "rivera.cli.commands.connect.detect_agents_in_project", return_value=[]
     )
     p_da.start()
     patches.append(p_da)
 
     p_mi = patch(
-        "mira.cli.commands.connect.detect_mira_installed", return_value=[]
+        "rivera.cli.commands.connect.detect_rivera_installed", return_value=[]
     )
     p_mi.start()
     patches.append(p_mi)
 
     p_mig = patch(
-        "mira.cli.commands.connect.detect_mira_installed_global", return_value=[]
+        "rivera.cli.commands.connect.detect_rivera_installed_global", return_value=[]
     )
     p_mig.start()
     patches.append(p_mig)
@@ -119,31 +119,31 @@ def mock_all_clients():
         p.stop()
 
 
-class TestMIRACLI:
-    """Integration tests for MIRA CLI commands"""
+class TestRIVERACLI:
+    """Integration tests for RIVERA CLI commands"""
 
     def test_base_command_help(self):
-        """Test 'mira --help'"""
+        """Test 'rivera --help'"""
         result = runner.invoke(app, ["--help"])
         assert result.exit_code == 0
         assert "Memory that AI Agents Love!" in result.stdout
 
     def test_status_command(self, mock_all_clients):
-        """Test 'mira status'"""
+        """Test 'rivera status'"""
         # Status command might use helper functions, let's just check it runs
         result = runner.invoke(app, ["status"])
         assert result.exit_code == 0
-        assert "MIRA Status" in result.stdout
+        assert "RIVERA Status" in result.stdout
 
     # ========================================================================
     # AGENT COMMANDS
     # ========================================================================
 
     def test_agent_create(self, mock_all_clients):
-        """Test 'mira agent create'"""
+        """Test 'rivera agent create'"""
         mock_all_clients.create_agent.return_value = {
             "agent_id": "test-agent",
-            "namespace": "mira_agent_test-agent",
+            "namespace": "rivera_agent_test-agent",
         }
         mock_all_clients.activate_agent.return_value = {
             "session_id": "sess-test",
@@ -166,7 +166,7 @@ class TestMIRACLI:
         mock_all_clients.activate_agent.assert_called_once_with("test-agent", 6)
 
     def test_agent_list(self, mock_all_clients):
-        """Test 'mira agent list'"""
+        """Test 'rivera agent list'"""
         mock_all_clients.list_agents.return_value = [
             {"agent_id": "agent-1", "pattern": "support", "description": "Desc 1"},
             {"agent_id": "agent-2", "pattern": "tool", "description": "Desc 2"},
@@ -178,7 +178,7 @@ class TestMIRACLI:
         assert "agent-2" in result.stdout
 
     def test_agent_activate(self, mock_all_clients):
-        """Test 'mira agent activate'"""
+        """Test 'rivera agent activate'"""
         mock_all_clients.activate_agent.return_value = {
             "session_id": "test-session",
             "session_token": "test-token",
@@ -196,7 +196,7 @@ class TestMIRACLI:
     # ========================================================================
 
     def test_remember(self, mock_all_clients):
-        """Test 'mira remember'"""
+        """Test 'rivera remember'"""
         mock_all_clients.remember.return_value = {
             "memory_id": "mem-123",
             "status": "queued",
@@ -225,7 +225,7 @@ class TestMIRACLI:
         assert mock_all_clients.remember.call_args.kwargs["title"] == "Custom Title"
 
     def test_edit(self, mock_all_clients):
-        """Test 'mira edit' updates selected memory fields."""
+        """Test 'rivera edit' updates selected memory fields."""
         mock_all_clients.update_memory.return_value = {
             "memory_id": "mem-123",
             "status": "success",
@@ -253,7 +253,7 @@ class TestMIRACLI:
         )
 
     def test_edit_requires_field(self, mock_all_clients):
-        """Test 'mira edit' rejects an empty update."""
+        """Test 'rivera edit' rejects an empty update."""
         result = runner.invoke(app, ["edit", "mem-123"])
 
         assert result.exit_code != 0
@@ -271,7 +271,7 @@ class TestMIRACLI:
         """
         from unittest.mock import MagicMock, patch
 
-        from mira.cli.client.direct_client import DirectClient
+        from rivera.cli.client.direct_client import DirectClient
 
         mock_write_service = MagicMock()
         mock_write_service.update_memory.return_value = {
@@ -281,7 +281,7 @@ class TestMIRACLI:
             "updated_fields": ["confidence"],
         }
         mock_session = MagicMock()
-        mock_session.namespace = "mira_agent_test-agent"
+        mock_session.namespace = "rivera_agent_test-agent"
         mock_session.session_token = "test-token"
 
         with (
@@ -315,11 +315,11 @@ class TestMIRACLI:
         the direct-client path (same contract as the API route)."""
         from unittest.mock import MagicMock, patch
 
-        from mira.cli.client.direct_client import DirectClient
+        from rivera.cli.client.direct_client import DirectClient
 
         mock_write_service = MagicMock()
         mock_session = MagicMock()
-        mock_session.namespace = "mira_agent_test-agent"
+        mock_session.namespace = "rivera_agent_test-agent"
 
         with (
             patch.object(
@@ -351,11 +351,11 @@ class TestMIRACLI:
         the SDK path forwarded unknown fields straight to the write service."""
         from unittest.mock import MagicMock, patch
 
-        from mira.cli.client.sdk_client import SdkClient
+        from rivera.cli.client.sdk_client import SdkClient
 
         mock_write_service = MagicMock()
         mock_session = MagicMock()
-        mock_session.namespace = "mira_agent_test-agent"
+        mock_session.namespace = "rivera_agent_test-agent"
 
         with (
             patch.object(
@@ -382,11 +382,11 @@ class TestMIRACLI:
         """SdkClient.update_memory must reject blank content strings."""
         from unittest.mock import MagicMock, patch
 
-        from mira.cli.client.sdk_client import SdkClient
+        from rivera.cli.client.sdk_client import SdkClient
 
         mock_write_service = MagicMock()
         mock_session = MagicMock()
-        mock_session.namespace = "mira_agent_test-agent"
+        mock_session.namespace = "rivera_agent_test-agent"
 
         with (
             patch.object(
@@ -416,7 +416,7 @@ class TestMIRACLI:
         the full valid payload set, matching the API route contract."""
         from unittest.mock import MagicMock, patch
 
-        from mira.cli.client.sdk_client import SdkClient
+        from rivera.cli.client.sdk_client import SdkClient
 
         mock_write_service = MagicMock()
         mock_write_service.update_memory.return_value = {
@@ -426,7 +426,7 @@ class TestMIRACLI:
             "updated_fields": ["confidence", "tags"],
         }
         mock_session = MagicMock()
-        mock_session.namespace = "mira_agent_test-agent"
+        mock_session.namespace = "rivera_agent_test-agent"
 
         with (
             patch.object(
@@ -457,7 +457,7 @@ class TestMIRACLI:
         assert result["status"] == "updated"
 
     def test_recall(self, mock_all_clients):
-        """Test 'mira recall'"""
+        """Test 'rivera recall'"""
         mock_all_clients.recall.return_value = {
             "memories": [
                 {"content": "Found memory 1", "score": 0.9, "type": "fact"},
@@ -472,7 +472,7 @@ class TestMIRACLI:
         assert "Found memory 1" in result.stdout
 
     def test_recall_recent(self, mock_all_clients):
-        """`mira recall --recent` lists newest memories chronologically."""
+        """`rivera recall --recent` lists newest memories chronologically."""
         mock_all_clients.recall_recent.return_value = {
             "memories": [
                 {"content": "Newest memory", "score": 0.0, "type": "fact"},
@@ -502,7 +502,7 @@ class TestMIRACLI:
         assert "multiple temporal query modes" in result.stdout
 
     def test_forget_force(self, mock_all_clients):
-        """Test 'mira forget --force' deletes a memory without prompting."""
+        """Test 'rivera forget --force' deletes a memory without prompting."""
         mock_all_clients.delete_memory.return_value = {
             "status": "deleted",
             "agent_id": "test-agent",
@@ -519,7 +519,7 @@ class TestMIRACLI:
         )
 
     def test_forget_cancelled(self, mock_all_clients):
-        """Test 'mira forget' respects a negative confirmation."""
+        """Test 'rivera forget' respects a negative confirmation."""
         result = runner.invoke(app, ["forget", "mem-123"], input="n\n")
 
         assert result.exit_code == 0
@@ -527,7 +527,7 @@ class TestMIRACLI:
         mock_all_clients.delete_memory.assert_not_called()
 
     def test_forget_not_found(self, mock_all_clients):
-        """Test 'mira forget' shows a clear client error."""
+        """Test 'rivera forget' shows a clear client error."""
         mock_all_clients.delete_memory.side_effect = Exception("Memory not found")
 
         result = runner.invoke(app, ["forget", "missing-memory", "--force"])
@@ -536,7 +536,7 @@ class TestMIRACLI:
         assert "Memory not found" in result.stdout
 
     def test_answer(self, mock_all_clients):
-        """Test 'mira answer'"""
+        """Test 'rivera answer'"""
         mock_all_clients.answer.return_value = {
             "answer": "This is the RAG answer.",
             "sources": ["source-1"],
@@ -551,13 +551,13 @@ class TestMIRACLI:
     # ========================================================================
 
     def test_session_info(self, mock_all_clients):
-        """Test 'mira session info'"""
+        """Test 'rivera session info'"""
         mock_all_clients.get_session_info.return_value = {
             "agent_id": "test-agent",
             "status": "active",
             "time_remaining_seconds": 3600,
             "session_id": "test-session",
-            "namespace": "mira_agent_test-agent",
+            "namespace": "rivera_agent_test-agent",
             "pattern": "support",
             "started_at": "2026-03-19T14:00:00Z",
             "expires_at": "2026-03-19T15:00:00Z",
@@ -569,13 +569,13 @@ class TestMIRACLI:
         assert "Session Token" in result.stdout
 
     def test_agent_deactivate(self, mock_all_clients):
-        """Test 'mira agent deactivate'"""
+        """Test 'rivera agent deactivate'"""
         result = runner.invoke(app, ["agent", "deactivate"])
         assert result.exit_code == 0
         assert "deactivated" in result.stdout.lower()
 
     def test_agent_delete_keep_cloud(self, mock_all_clients):
-        """Test 'mira agent delete --force' keeping cloud memories (default)"""
+        """Test 'rivera agent delete --force' keeping cloud memories (default)"""
         mock_all_clients.delete_agent.return_value = {
             "status": "deleted",
             "agent_id": "test-agent",
@@ -591,7 +591,7 @@ class TestMIRACLI:
         mock_all_clients._get_moorcheh.return_value.namespaces.delete.assert_not_called()
 
     def test_agent_delete_purge_cloud(self, mock_all_clients):
-        """Test 'mira agent delete --force' also deleting cloud namespace"""
+        """Test 'rivera agent delete --force' also deleting cloud namespace"""
         mock_all_clients.delete_agent.return_value = {
             "status": "deleted",
             "agent_id": "test-agent",
@@ -606,11 +606,11 @@ class TestMIRACLI:
         assert result.exit_code == 0
         assert "deleted" in result.stdout.lower()
         mock_moorcheh.namespaces.delete.assert_called_once_with(
-            "mira_agent_test-agent"
+            "rivera_agent_test-agent"
         )
 
     def test_agent_delete_not_found(self, mock_all_clients):
-        """Test 'mira agent delete' when agent does not exist"""
+        """Test 'rivera agent delete' when agent does not exist"""
         mock_all_clients.delete_agent.side_effect = Exception("Agent not found")
 
         result = runner.invoke(
@@ -620,11 +620,11 @@ class TestMIRACLI:
         assert "ghost-agent" in result.stdout
 
     def test_agent_bootstrap(self, mock_all_clients):
-        """Test 'mira agent bootstrap'"""
+        """Test 'rivera agent bootstrap'"""
         mock_all_clients.get_agent.return_value = {
             "agent_id": "test-agent",
             "pattern": "support",
-            "namespace": "mira_agent_test-agent",
+            "namespace": "rivera_agent_test-agent",
         }
         mock_all_clients.recall.return_value = {"memories": []}
 
@@ -633,7 +633,7 @@ class TestMIRACLI:
         assert "Intelligence Snapshot" in result.stdout
 
     def test_memory_batch_remember(self, mock_all_clients, tmp_path):
-        """Test 'mira remember --batch'"""
+        """Test 'rivera remember --batch'"""
         batch_file = tmp_path / "batch.json"
         batch_data = [{"content": "Batch memory 1"}, {"content": "Batch memory 2"}]
         batch_file.write_text(json.dumps(batch_data))
@@ -649,7 +649,7 @@ class TestMIRACLI:
         assert "Stored 2/2 memories successfully" in result.stdout
 
     def test_remember_from_conversation_dry_run(self, mock_all_clients, tmp_path):
-        """Test 'mira remember --from-conversation --dry-run'"""
+        """Test 'rivera remember --from-conversation --dry-run'"""
         conversation_file = tmp_path / "messages.json"
         conversation_file.write_text(
             json.dumps(
@@ -741,7 +741,7 @@ class TestMIRACLI:
         assert "cannot be combined" in result.stdout
 
     def test_daily_summary(self, mock_all_clients):
-        """Test 'mira daily-summary' (summary only — no conflicts)."""
+        """Test 'rivera daily-summary' (summary only — no conflicts)."""
         mock_all_clients.generate_daily_summary.return_value = {
             "summary": {"status": "success", "summary_path": "summary.md"},
         }
@@ -750,7 +750,7 @@ class TestMIRACLI:
         assert "generated" in result.stdout.lower()
 
     def test_detect_conflicts(self, mock_all_clients):
-        """Test 'mira detect-conflicts'"""
+        """Test 'rivera detect-conflicts'"""
         mock_all_clients.generate_conflict_report.return_value = {
             "conflicts": {
                 "status": "success",
@@ -763,7 +763,7 @@ class TestMIRACLI:
         assert "conflict report generated" in result.stdout.lower()
 
     def test_conflicts_list(self, mock_all_clients):
-        """Test 'mira conflicts --list'"""
+        """Test 'rivera conflicts --list'"""
         # Patch Path.home to avoid real file checks if possible or just mock the logic
         mock_all_clients.list_conflicts.return_value = [
             {
@@ -778,7 +778,7 @@ class TestMIRACLI:
         assert "Found 1 unresolved conflict" in result.stdout
 
     def test_memory_export(self, mock_all_clients):
-        """Test 'mira memory export'"""
+        """Test 'rivera memory export'"""
         mock_all_clients.export_memory_md.return_value = {
             "total_memories": 5,
             "output_path": "memory.md",
@@ -788,7 +788,7 @@ class TestMIRACLI:
         assert "Exported 5 memories" in result.stdout
 
     def test_memory_sync(self, mock_all_clients):
-        """Test 'mira memory sync'"""
+        """Test 'rivera memory sync'"""
         mock_all_clients.sync_memory_to_project.return_value = {
             "total_memories": 5,
             "source": "cache",
@@ -800,7 +800,7 @@ class TestMIRACLI:
 
     def test_schedule_commands(self, mock_all_clients):
         """Test schedule commands"""
-        with patch("mira.cli.commands.schedule.ScheduleManager") as mock_manager_cls:
+        with patch("rivera.cli.commands.schedule.ScheduleManager") as mock_manager_cls:
             mock_manager = mock_manager_cls.return_value
             mock_manager.enable.return_value = {
                 "status": "success",
@@ -831,19 +831,19 @@ class TestMIRACLI:
             assert "ENABLED" in result.stdout
 
     def test_config_show(self, mock_all_clients):
-        """Test 'mira config show'"""
+        """Test 'rivera config show'"""
         result = runner.invoke(app, ["config", "show"])
         assert result.exit_code == 0
-        assert "MIRA Configuration" in result.stdout
+        assert "RIVERA Configuration" in result.stdout
 
     def test_connect_list(self, mock_all_clients):
-        """Test 'mira connect list'"""
+        """Test 'rivera connect list'"""
         result = runner.invoke(app, ["connect", "list"])
         assert result.exit_code == 0
-        assert "MIRA Agent Integrations" in result.stdout
+        assert "RIVERA Agent Integrations" in result.stdout
 
     def test_migrate_help(self):
-        """Test 'mira migrate --help'"""
+        """Test 'rivera migrate --help'"""
         result = runner.invoke(app, ["migrate", "--help"])
         assert result.exit_code == 0
         assert "supermemory" in result.stdout.lower()
@@ -857,7 +857,7 @@ class TestMIRACLI:
         return path
 
     def test_migrate_supermemory_dry_run(self, mock_all_clients, tmp_path):
-        """'mira migrate supermemory --file ... --dry-run' renders a savings report."""
+        """'rivera migrate supermemory --file ... --dry-run' renders a savings report."""
         export = {
             "exported_at": "2026-06-04T00:00:00Z",
             "summary": {
@@ -881,7 +881,7 @@ class TestMIRACLI:
             "answer": "## Executive summary\nMigrating saves tokens.",
         }
 
-        with patch("mira.cli.commands.migrate.config_manager") as mock_cfg:
+        with patch("rivera.cli.commands.migrate.config_manager") as mock_cfg:
             mock_cfg.get_migrate_dir.return_value = tmp_path
             mock_cfg.get_active_session.return_value = ("test-agent", "test-token")
             mock_cfg.get_answer_config.return_value = {
@@ -899,12 +899,12 @@ class TestMIRACLI:
         reports = list(tmp_path.glob("*/migrate-report.md"))
         assert len(reports) == 1
         report_text = reports[0].read_text(encoding="utf-8")
-        assert "Mira vs. Supermemory" in report_text
+        assert "Rivera vs. Supermemory" in report_text
         assert "Executive summary" in report_text
         assert "Method & assumptions" in report_text
 
     def test_migrate_mem0_dry_run(self, mock_all_clients, tmp_path):
-        """'mira migrate mem0 --file ... --dry-run' maps and renders a report."""
+        """'rivera migrate mem0 --file ... --dry-run' maps and renders a report."""
         export = {
             "exported_at": "2026-06-04T00:00:00Z",
             "summary": {
@@ -927,7 +927,7 @@ class TestMIRACLI:
             "answer": "## Executive summary\nMigrating from Mem0 saves tokens.",
         }
 
-        with patch("mira.cli.commands.migrate.config_manager") as mock_cfg:
+        with patch("rivera.cli.commands.migrate.config_manager") as mock_cfg:
             mock_cfg.get_migrate_dir.return_value = tmp_path
             mock_cfg.get_active_session.return_value = ("test-agent", "test-token")
             mock_cfg.get_answer_config.return_value = {
@@ -945,12 +945,12 @@ class TestMIRACLI:
         reports = list(tmp_path.glob("*/migrate-report.md"))
         assert len(reports) == 1
         report_text = reports[0].read_text(encoding="utf-8")
-        assert "Mira vs. Mem0" in report_text
+        assert "Rivera vs. Mem0" in report_text
         assert "Executive summary" in report_text
         assert "Method & assumptions" in report_text
 
     def test_migrate_letta_dry_run(self, mock_all_clients, tmp_path):
-        """'mira migrate letta --file ... --dry-run' maps and renders a report."""
+        """'rivera migrate letta --file ... --dry-run' maps and renders a report."""
         export = {
             "exported_at": "2026-06-04T00:00:00Z",
             "export_mode": "all_agents",
@@ -974,7 +974,7 @@ class TestMIRACLI:
             "answer": "## Executive summary\nMigrating from Letta saves tokens.",
         }
 
-        with patch("mira.cli.commands.migrate.config_manager") as mock_cfg:
+        with patch("rivera.cli.commands.migrate.config_manager") as mock_cfg:
             mock_cfg.get_migrate_dir.return_value = tmp_path
             mock_cfg.get_active_session.return_value = ("test-agent", "test-token")
             mock_cfg.get_answer_config.return_value = {
@@ -992,7 +992,7 @@ class TestMIRACLI:
         reports = list(tmp_path.glob("*/migrate-report.md"))
         assert len(reports) == 1
         report_text = reports[0].read_text(encoding="utf-8")
-        assert "Mira vs. Letta" in report_text
+        assert "Rivera vs. Letta" in report_text
         assert "Executive summary" in report_text
         assert "Method & assumptions" in report_text
 
@@ -1000,7 +1000,7 @@ class TestMIRACLI:
         self, mock_all_clients, tmp_path
     ):
         """Migrate re-activates the agent when the Moorcheh session token is invalid."""
-        from mira.app.utils.errors import InvalidSessionTokenError
+        from rivera.app.utils.errors import InvalidSessionTokenError
 
         export = {
             "exported_at": "2026-06-04T00:00:00Z",
@@ -1022,7 +1022,7 @@ class TestMIRACLI:
             "session_token": "new-token",
         }
 
-        with patch("mira.cli.commands.migrate.config_manager") as mock_cfg:
+        with patch("rivera.cli.commands.migrate.config_manager") as mock_cfg:
             mock_cfg.get_migrate_dir.return_value = tmp_path
             mock_cfg.get_active_session.return_value = ("test-agent", "stale-token")
             mock_cfg.get_answer_config.return_value = {

@@ -1,11 +1,11 @@
-# Claude Code + Mira Integration
+# Claude Code + Rivera Integration
 
-This package provides native integration of [Mira's](https://mira.ai) persistent, cross-session memory capabilities into [Claude Code](https://docs.anthropic.com/en/docs/agents-and-tools/claude-code/overview) and the [`mattpocock/skills`](https://github.com/mattpocock/skills) ecosystem.
+This package provides native integration of [Rivera's](https://rivera.ai) persistent, cross-session memory capabilities into [Claude Code](https://docs.anthropic.com/en/docs/agents-and-tools/claude-code/overview) and the [`mattpocock/skills`](https://github.com/mattpocock/skills) ecosystem.
 
 ## Installation
 
 ```bash
-pip install claudecode-mira
+pip install claudecode-rivera
 ```
 
 ![How it works](./assets/how-it-works-three-real-lifecycle-hooks.png)
@@ -28,10 +28,10 @@ Install the global lifecycle hooks into your Claude Code settings. This automati
 
 ```bash
 # Register hooks locally (.claude/settings.json)
-claudecode-mira install
+claudecode-rivera install
 
 # Or globally (~/.claude/settings.json)
-claudecode-mira install --global
+claudecode-rivera install --global
 ```
 
 Ensure `RIVERA_API_KEY` is set in your environment. Run any skill (e.g., `/tdd`) and Claude Code will automatically recall relevant engineering memories.
@@ -44,15 +44,15 @@ Install the prompt injection instructions into your global `~/.claude/CLAUDE.md`
 
 ```bash
 # Append instructions to your local .claude/CLAUDE.md
-claudecode-mira install --method prompt
+claudecode-rivera install --method prompt
 
 # Or append globally to ~/.claude/CLAUDE.md
-claudecode-mira install --method prompt --global
+claudecode-rivera install --method prompt --global
 ```
 
 ## Configuration
 
 You can configure the integration via environment variables:
 - `RIVERA_API_KEY`: Required. Your API key.
-- `MIRA_AGENT_ID`: Set a custom agent ID namespace.
-- `MIRA_RECALL_LIMIT`: Max memories to inject (default: 15).
+- `RIVERA_AGENT_ID`: Set a custom agent ID namespace.
+- `RIVERA_RECALL_LIMIT`: Max memories to inject (default: 15).

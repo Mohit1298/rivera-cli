@@ -3,7 +3,7 @@
 
 Run this AFTER ``demo_session_1.py``, ideally in a new terminal. It is a brand
 new process with no shared in-memory state — everything it knows comes from
-Mira. This is the exact context block the ``UserPromptExpansion`` hook would
+Rivera. This is the exact context block the ``UserPromptExpansion`` hook would
 inject before the real ``/tdd`` skill runs.
 
     python demo_session_2.py
@@ -11,7 +11,7 @@ inject before the real ``/tdd`` skill runs.
 
 from __future__ import annotations
 
-from mira_skills import SkillMemory
+from rivera_skills import SkillMemory
 
 
 def main() -> None:

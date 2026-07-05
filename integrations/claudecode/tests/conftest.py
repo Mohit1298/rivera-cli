@@ -6,9 +6,9 @@ import json
 from typing import Any
 
 import pytest
-from mira.app.utils.errors import AgentNotFoundError
+from rivera.app.utils.errors import AgentNotFoundError
 
-from claudecode_mira.config import SkillsConfig
+from claudecode_rivera.config import SkillsConfig
 
 
 class FakeSdkClient:

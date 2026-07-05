@@ -1,9 +1,9 @@
-## Mira Memory
+## Rivera Memory
 
 Before running ANY skill, always execute:
 
 ```bash
-claudecode-mira recall <skill-name> --hint "<brief task description>"
+claudecode-rivera recall <skill-name> --hint "<brief task description>"
 ```
 
 Read the output carefully. It contains your persistent engineering profile:
@@ -19,7 +19,7 @@ After completing ANY skill, ask the user:
 If yes, run:
 
 ```bash
-claudecode-mira store <skill-name> "<insight>" --type <type>
+claudecode-rivera store <skill-name> "<insight>" --type <type>
 ```
 
 Where `<type>` is one of: `instruction`, `decision`, `preference`, `learning`, `fact`, `artifact`, `goal`.
@@ -27,9 +27,9 @@ Where `<type>` is one of: `instruction`, `decision`, `preference`, `learning`, `
 ### Available commands
 
 ```bash
-claudecode-mira recall <skill> [--hint TEXT] [--limit N]
-claudecode-mira store <skill> "<summary>" [--type TYPE] [--confidence 0.0-1.0]
-claudecode-mira store-file <skill> <path> [--split]
-claudecode-mira profile
-claudecode-mira clear-agent
+claudecode-rivera recall <skill> [--hint TEXT] [--limit N]
+claudecode-rivera store <skill> "<summary>" [--type TYPE] [--confidence 0.0-1.0]
+claudecode-rivera store-file <skill> <path> [--split]
+claudecode-rivera profile
+claudecode-rivera clear-agent
 ```

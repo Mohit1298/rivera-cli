@@ -1,6 +1,6 @@
-"""Module entrypoint: ``python -m mira_mcp``.
+"""Module entrypoint: ``python -m rivera_mcp``.
 
-Equivalent to the ``mira-mcp`` console script declared in pyproject.toml.
+Equivalent to the ``rivera-mcp`` console script declared in pyproject.toml.
 """
 
 from __future__ import annotations
@@ -9,15 +9,15 @@ import argparse
 import logging
 import sys
 
-from mira_mcp.config import MCPServerSettings, TransportType
-from mira_mcp.server import run_server
+from rivera_mcp.config import MCPServerSettings, TransportType
+from rivera_mcp.server import run_server
 
 
 def _build_arg_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        prog="mira-mcp",
+        prog="rivera-mcp",
         description=(
-            "Mira MCP server - exposes Mira's persistent semantic memory "
+            "Rivera MCP server - exposes Rivera's persistent semantic memory "
             "(remember, recall, answer) as Model Context Protocol tools."
         ),
     )
@@ -57,7 +57,7 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     if args.version:
-        from mira_mcp import __version__
+        from rivera_mcp import __version__
 
         print(__version__)
         return 0
@@ -77,16 +77,16 @@ def main(argv: list[str] | None = None) -> int:
     except Exception as exc:
         # Print a clear actionable error to stderr - do NOT pollute stdout in
         # stdio mode (it is reserved for JSON-RPC frames).
-        print(f"mira-mcp: configuration error: {exc}", file=sys.stderr)
+        print(f"rivera-mcp: configuration error: {exc}", file=sys.stderr)
         return 2
 
     try:
         run_server(settings)
     except KeyboardInterrupt:
-        logging.getLogger("mira_mcp").info("Shutting down (KeyboardInterrupt)")
+        logging.getLogger("rivera_mcp").info("Shutting down (KeyboardInterrupt)")
         return 0
     except Exception as exc:
-        logging.getLogger("mira_mcp").exception("Fatal error: %s", exc)
+        logging.getLogger("rivera_mcp").exception("Fatal error: %s", exc)
         return 1
     return 0
 

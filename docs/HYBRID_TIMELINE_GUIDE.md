@@ -1,13 +1,13 @@
 # Hybrid Timeline Guide: Combining Automatic + Semantic
 
-**For**: AI agents and developers using MIRA's timeline features
+**For**: AI agents and developers using RIVERA's timeline features
 **Status**: Production Guide
 
 ---
 
 ## Introduction
 
-MIRA's **hybrid timeline model** combines the reliability of automatic server-side timestamps with the richness of semantic timeline memories. This guide shows you how to get the best of both worlds.
+RIVERA's **hybrid timeline model** combines the reliability of automatic server-side timestamps with the richness of semantic timeline memories. This guide shows you how to get the best of both worlds.
 
 ---
 
@@ -217,13 +217,13 @@ def generate_weekly_report(agent_id, session_token):
 #!/bin/bash
 
 AGENT_ID="claude_dev"
-MIRA_URL="http://localhost:8000"
+RIVERA_URL="http://localhost:8000"
 SESSION_TOKEN="your_session_token_here" # Replace with your actual session token
 
 echo "Restoring agent context..."
 
 # 1. Find last session using semantic timeline
-LAST_SESSION=$(curl -s "$MIRA_URL/api/v2/agents/$AGENT_ID/recall?\
+LAST_SESSION=$(curl -s "$RIVERA_URL/api/v2/agents/$AGENT_ID/recall?\
 query=session+start&\
 tags=timeline,session-start&\
 limit=1" -H "X-Session-Token: $SESSION_TOKEN" | python -m json.tool | grep '"created_at"' | head -1)
@@ -235,14 +235,14 @@ if [ -n "$LAST_SESSION" ]; then
     echo "Last session: $LAST_DATE"
     echo "Retrieving activity since then..."
 
-    curl -s -X POST "$MIRA_URL/api/v2/agents/$AGENT_ID/recall/changed-since" \
+    curl -s -X POST "$RIVERA_URL/api/v2/agents/$AGENT_ID/recall/changed-since" \
       -H "X-Session-Token: $SESSION_TOKEN" \
       -H "Content-Type: application/json" \
       -d "{\"since\":\"$LAST_DATE\",\"limit\":50}" | python -m json.tool
 else
     echo "No previous session found, getting recent context..."
 
-    curl -s -X POST "$MIRA_URL/api/v2/agents/$AGENT_ID/recall/recent" \
+    curl -s -X POST "$RIVERA_URL/api/v2/agents/$AGENT_ID/recall/recent" \
       -H "X-Session-Token: $SESSION_TOKEN" \
       -H "Content-Type: application/json" \
       -d '{"limit":20}' | python -m json.tool
@@ -250,7 +250,7 @@ fi
 
 # 3. Store new session start (semantic timeline)
 CURRENT_DATE=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-curl -s -X POST "$MIRA_URL/api/v2/agents/$AGENT_ID/remember?\
+curl -s -X POST "$RIVERA_URL/api/v2/agents/$AGENT_ID/remember?\
 memory_type=fact&\
 title=Session+Started+$CURRENT_DATE&\
 content=Agent+started+new+work+session&\
@@ -270,7 +270,7 @@ echo "✅ Context restored. Session start recorded."
 
 **Week 1: Automatic Only**
 ```bash
-# Just use MIRA normally - automatic timestamps work
+# Just use RIVERA normally - automatic timestamps work
 curl -X POST ".../remember?memory_type=fact&title=Bug+Fix&content=..."
 # Server adds created_at and updated_at automatically
 ```

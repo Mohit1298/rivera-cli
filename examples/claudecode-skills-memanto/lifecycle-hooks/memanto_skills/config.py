@@ -20,10 +20,10 @@ except Exception:  # pragma: no cover - dotenv is an optional convenience
 
 DEFAULT_AGENT_ID = "skills-dev-profile"
 DEFAULT_RECALL_LIMIT = 8
-# No floor by default: Mira's information-theoretic retrieval already returns
+# No floor by default: Rivera's information-theoretic retrieval already returns
 # only relevant results, and its ITS scores live on a small, non-cosine scale
 # (top hits are often ~0.1-0.2), so a naive 0-1 floor would discard everything.
-# Advanced users can opt in via MIRA_MIN_SIMILARITY once they know the scale.
+# Advanced users can opt in via RIVERA_MIN_SIMILARITY once they know the scale.
 DEFAULT_MIN_SIMILARITY: float | None = None
 
 
@@ -57,11 +57,11 @@ class SkillsConfig:
             )
 
         agent_id = (
-            os.environ.get("MIRA_AGENT_ID") or DEFAULT_AGENT_ID
+            os.environ.get("RIVERA_AGENT_ID") or DEFAULT_AGENT_ID
         ).strip() or DEFAULT_AGENT_ID
 
-        recall_limit = _int_env("MIRA_RECALL_LIMIT", DEFAULT_RECALL_LIMIT)
-        min_similarity = _float_env("MIRA_MIN_SIMILARITY", DEFAULT_MIN_SIMILARITY)
+        recall_limit = _int_env("RIVERA_RECALL_LIMIT", DEFAULT_RECALL_LIMIT)
+        min_similarity = _float_env("RIVERA_MIN_SIMILARITY", DEFAULT_MIN_SIMILARITY)
 
         return cls(
             api_key=api_key,

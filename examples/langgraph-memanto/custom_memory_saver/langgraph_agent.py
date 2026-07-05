@@ -1,8 +1,8 @@
 """
-LangGraph + Mira: Customer Support Agent with Persistent Memory
+LangGraph + Rivera: Customer Support Agent with Persistent Memory
 
 This agent demonstrates Cross-Session Recall:
-  Session 1: User shares preferences → Agent stores them as Mira memories
+  Session 1: User shares preferences → Agent stores them as Rivera memories
   Session 2: User returns → Agent recalls those memories automatically
 
 Architecture:
@@ -38,7 +38,7 @@ from langgraph.graph import END, START, StateGraph
 from langgraph.graph.message import add_messages
 from typing_extensions import TypedDict
 
-from mira.cli.client.sdk_client import SdkClient
+from rivera.cli.client.sdk_client import SdkClient
 
 load_dotenv()
 
@@ -178,12 +178,12 @@ class _AnthropicLLM:
 
 
 # ---------------------------------------------------------------------------
-# Mira initialisation
+# Rivera initialisation
 # ---------------------------------------------------------------------------
 
 
 def get_client() -> SdkClient:
-    """Create a Mira SdkClient instance."""
+    """Create a Rivera SdkClient instance."""
     api_key = os.getenv("RIVERA_API_KEY", "")
     return SdkClient(api_key=api_key)
 
@@ -209,7 +209,7 @@ def recall_memory_node(state: AgentState, client: SdkClient) -> dict:
         pass
     client.activate_agent("langgraph-customer-support")
 
-    # Search Mira for relevant memories
+    # Search Rivera for relevant memories
     res = client.recall(agent_id="langgraph-customer-support", query=query, limit=10)
     memories = res.get("memories", [])
 
@@ -347,7 +347,7 @@ def remember_memory_node(state: AgentState, client: SdkClient) -> dict:
 
 
 def build_agent() -> tuple:
-    """Build the compiled LangGraph + Mira agent.
+    """Build the compiled LangGraph + Rivera agent.
 
     Returns:
         (compiled_graph, client)

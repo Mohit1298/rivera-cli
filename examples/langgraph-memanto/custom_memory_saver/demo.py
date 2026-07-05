@@ -1,10 +1,10 @@
 """
-Mira + LangGraph: Cross-Session Demo
+Rivera + LangGraph: Cross-Session Demo
 
 This script demonstrates the core cross-session recall capability by simulating
-two separate conversations with the Mira memory layer in between.
+two separate conversations with the Rivera memory layer in between.
 
-No LangGraph needed — uses Mira directly to show the memory primitive.
+No LangGraph needed — uses Rivera directly to show the memory primitive.
 
 Usage:
     export RIVERA_API_KEY="your-key-here"
@@ -22,7 +22,7 @@ if not API_KEY:
     print("   Get one at https://console.moorcheh.ai/api-keys")
     exit(1)
 
-DEMO_AGENT_ID = "mira-demo-alice"
+DEMO_AGENT_ID = "rivera-demo-alice"
 """Stable agent ID used for cross-session recall demo."""
 
 
@@ -36,14 +36,14 @@ def print_separator(title: str):
 
 # ─── Initialize Client ────────────────────────────────────────────────────────
 
-print("🔄 Initializing Mira client...")
+print("🔄 Initializing Rivera client...")
 try:
-    from mira.cli.client.sdk_client import SdkClient
+    from rivera.cli.client.sdk_client import SdkClient
 
     client = SdkClient(api_key=API_KEY)
 except ImportError as e:
-    print(f"❌ Failed to import mira: {e}")
-    print("   Run: pip install mira")
+    print(f"❌ Failed to import rivera: {e}")
+    print("   Run: pip install rivera")
     exit(1)
 except Exception as e:
     print(f"❌ Failed to initialize client: {e}")
@@ -83,7 +83,7 @@ print_separator("SESSION A — User Introduction (e.g., Monday)")
 print('\n👤 User: "Hi, I\'m Alice. I work at Acme Corp and prefer dark mode."')
 
 # Store each fact with appropriate memory types
-print("\n📝 Storing memories via Mira...")
+print("\n📝 Storing memories via Rivera...")
 
 result = client.remember(
     agent_id=AGENT_ID,
@@ -117,7 +117,7 @@ result = client.remember(
 )
 print(f"   ✓ Stored event: memory_id={result.get('memory_id')}")
 
-print("\n✅ Session A complete. Memories stored in Mira.")
+print("\n✅ Session A complete. Memories stored in Rivera.")
 time.sleep(1)
 
 
@@ -130,7 +130,7 @@ print_separator("⏳ Time passes... (hours/days) — LangGraph state is gone")
 print("""🧠 What happened:
   - The LangGraph thread state has been reset
   - No conversation history exists
-  - But Mira still has all the memories!
+  - But Rivera still has all the memories!
 """)
 time.sleep(1)
 
@@ -143,7 +143,7 @@ print_separator("SESSION B — Cross-Session Recall (e.g., Wednesday)")
 
 print('\n👤 User: "Hey, what do you remember about me? I need help with settings."')
 
-print("\n🔍 Recalling from Mira (cross-session)...")
+print("\n🔍 Recalling from Rivera (cross-session)...")
 recall_result = client.recall(
     agent_id=AGENT_ID,
     query="What do I know about this user — name, work, preferences?",
@@ -152,7 +152,7 @@ recall_result = client.recall(
 
 memories = recall_result.get("memories", [])
 
-print("\n📚 MIRA RECALL RESULTS:")
+print("\n📚 RIVERA RECALL RESULTS:")
 if memories:
     for i, mem in enumerate(memories, 1):
         content = mem.get("content", "N/A")[:150]
@@ -205,7 +205,7 @@ result = client.remember(
 )
 print(f"   ✓ Decision recorded: memory_id={result.get('memory_id')}")
 
-print("\n✅ Mira's versioned storage ensures no silent overwrites!")
+print("\n✅ Rivera's versioned storage ensures no silent overwrites!")
 print("   Both old and new preferences are retrievable with temporal queries.")
 
 
@@ -225,5 +225,5 @@ What was demonstrated:
 Next steps:
   1. Run agent.py for the full LangGraph integration
   2. Try with different memory types
-  3. Add mira_answer for RAG-grounded responses
+  3. Add rivera_answer for RAG-grounded responses
 """)

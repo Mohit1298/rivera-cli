@@ -3,7 +3,7 @@
 
 Run ``run_session_1.py`` first. Then run this. The thread_id is different,
 so LangGraph's checkpointer has no history - if the agent skips peanuts
-in its snack recommendations, that's MiraStore proving cross-session
+in its snack recommendations, that's RiveraStore proving cross-session
 recall.
 """
 
@@ -16,7 +16,7 @@ import sys
 
 from dotenv import load_dotenv
 from langchain_core.messages import HumanMessage
-from mira_base_store.graph import build_support_graph, latest_assistant_text
+from rivera_base_store.graph import build_support_graph, latest_assistant_text
 
 logging.basicConfig(level=logging.WARNING, format="%(levelname)s %(name)s: %(message)s")
 
@@ -44,12 +44,12 @@ async def main() -> None:
         )
         sys.exit(1)
 
-    # MiraStore automatically ensures the agent exists and activates a session.
+    # RiveraStore automatically ensures the agent exists and activates a session.
     bar = "=" * 64
     print(f"\n{bar}\n  Session 2 - user={USER_ID}, thread_id={THREAD_ID}\n{bar}\n")
     print(
         "  Checkpointer state for this thread_id is EMPTY. Any user knowledge\n"
-        "  the agent uses below comes from MiraStore (cross-thread).\n"
+        "  the agent uses below comes from RiveraStore (cross-thread).\n"
     )
     print(f"User: {USER_MESSAGE}\n")
 

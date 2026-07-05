@@ -1,6 +1,6 @@
 from datetime import timezone
 
-from mira.app.utils.temporal_helpers import parse_iso_timestamp
+from rivera.app.utils.temporal_helpers import parse_iso_timestamp
 
 
 def test_parse_iso_timestamp_normalizes_offset_to_utc():

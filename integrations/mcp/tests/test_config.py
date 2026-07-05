@@ -5,7 +5,7 @@ from __future__ import annotations
 import pytest
 from pydantic import ValidationError
 
-from mira_mcp.config import MCPServerSettings, TransportType
+from rivera_mcp.config import MCPServerSettings, TransportType
 
 
 def test_missing_api_key_raises() -> None:
@@ -40,7 +40,7 @@ def test_secret_key_not_in_repr(fake_api_key: str) -> None:
 def test_default_agent_loaded_from_env(
     fake_api_key: str, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    monkeypatch.setenv("MIRA_DEFAULT_AGENT_ID", "my-assistant")
+    monkeypatch.setenv("RIVERA_DEFAULT_AGENT_ID", "my-assistant")
     settings = MCPServerSettings()  # type: ignore[call-arg]
     assert settings.default_agent_id == "my-assistant"
 
@@ -49,14 +49,14 @@ def test_default_agent_loaded_from_env(
 def test_valid_agent_patterns(
     fake_api_key: str, monkeypatch: pytest.MonkeyPatch, pattern: str
 ) -> None:
-    monkeypatch.setenv("MIRA_AGENT_PATTERN", pattern)
+    monkeypatch.setenv("RIVERA_AGENT_PATTERN", pattern)
     assert MCPServerSettings().agent_pattern == pattern  # type: ignore[call-arg]
 
 
 def test_invalid_agent_pattern_rejected(
     fake_api_key: str, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    monkeypatch.setenv("MIRA_AGENT_PATTERN", "nonsense")
+    monkeypatch.setenv("RIVERA_AGENT_PATTERN", "nonsense")
     with pytest.raises(ValidationError) as exc:
         MCPServerSettings()  # type: ignore[call-arg]
     assert "agent_pattern" in str(exc.value).lower()
@@ -72,14 +72,14 @@ def test_log_level_normalized(
     level: str,
     expected: str,
 ) -> None:
-    monkeypatch.setenv("MIRA_MCP_LOG_LEVEL", level)
+    monkeypatch.setenv("RIVERA_MCP_LOG_LEVEL", level)
     assert MCPServerSettings().log_level == expected  # type: ignore[call-arg]
 
 
 def test_invalid_log_level_rejected(
     fake_api_key: str, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    monkeypatch.setenv("MIRA_MCP_LOG_LEVEL", "LOUD")
+    monkeypatch.setenv("RIVERA_MCP_LOG_LEVEL", "LOUD")
     with pytest.raises(ValidationError):
         MCPServerSettings()  # type: ignore[call-arg]
 
@@ -88,7 +88,7 @@ def test_invalid_log_level_rejected(
 def test_invalid_port_rejected(
     fake_api_key: str, monkeypatch: pytest.MonkeyPatch, port: int
 ) -> None:
-    monkeypatch.setenv("MIRA_MCP_PORT", str(port))
+    monkeypatch.setenv("RIVERA_MCP_PORT", str(port))
     with pytest.raises(ValidationError):
         MCPServerSettings()  # type: ignore[call-arg]
 
@@ -96,5 +96,5 @@ def test_invalid_port_rejected(
 def test_transport_enum_from_env(
     fake_api_key: str, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    monkeypatch.setenv("MIRA_MCP_TRANSPORT", "sse")
+    monkeypatch.setenv("RIVERA_MCP_TRANSPORT", "sse")
     assert MCPServerSettings().transport is TransportType.SSE  # type: ignore[call-arg]

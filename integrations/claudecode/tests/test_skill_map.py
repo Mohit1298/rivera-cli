@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from claudecode_mira import skill_map
+from claudecode_rivera import skill_map
 
 
 def test_known_skill_routes() -> None:

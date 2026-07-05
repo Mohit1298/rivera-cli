@@ -1,4 +1,4 @@
-"""Configuration for the Mira MCP server.
+"""Configuration for the Rivera MCP server.
 
 Loaded from environment variables (and optionally a ``.env`` file in the
 working directory). Validated via pydantic-settings so misconfiguration
@@ -21,8 +21,8 @@ class TransportType(str, Enum):
     STREAMABLE_HTTP = "streamable-http"
 
 
-# Patterns recognized by Mira's agent service. Kept in sync with
-# `mira.app.constants.VALID_PATTERNS`.
+# Patterns recognized by Rivera's agent service. Kept in sync with
+# `rivera.app.constants.VALID_PATTERNS`.
 _VALID_AGENT_PATTERNS = {"support", "project", "tool"}
 
 
@@ -41,7 +41,7 @@ class MCPServerSettings(BaseSettings):
         agent_auto_create: If True (default), the default agent is created
             on first use when missing.
         session_duration_hours: Override session lifetime (defaults to the
-            value baked into the Mira core config).
+            value baked into the Rivera core config).
         expose_admin_tools: If True, register ``create_agent``, ``list_agents``,
             ``get_agent``, and ``delete_agent`` tools. Off by default to keep
             the surface focused on memory operations.
@@ -57,7 +57,7 @@ class MCPServerSettings(BaseSettings):
         case_sensitive=False,
     )
 
-    # ---- Mira credentials & agent ----
+    # ---- Rivera credentials & agent ----
     moorcheh_api_key: SecretStr = Field(
         ...,
         validation_alias="RIVERA_API_KEY",
@@ -65,7 +65,7 @@ class MCPServerSettings(BaseSettings):
     )
     default_agent_id: str | None = Field(
         default=None,
-        validation_alias="MIRA_DEFAULT_AGENT_ID",
+        validation_alias="RIVERA_DEFAULT_AGENT_ID",
         description=(
             "Default agent used when a tool call omits agent_id. "
             "Set this to a stable per-project identifier."
@@ -73,50 +73,50 @@ class MCPServerSettings(BaseSettings):
     )
     agent_pattern: str = Field(
         default="tool",
-        validation_alias="MIRA_AGENT_PATTERN",
-        description="Mira pattern used when auto-creating the default agent.",
+        validation_alias="RIVERA_AGENT_PATTERN",
+        description="Rivera pattern used when auto-creating the default agent.",
     )
     agent_auto_create: bool = Field(
         default=True,
-        validation_alias="MIRA_AGENT_AUTO_CREATE",
+        validation_alias="RIVERA_AGENT_AUTO_CREATE",
         description="Auto-create the default agent if it does not exist.",
     )
     session_duration_hours: int | None = Field(
         default=None,
-        validation_alias="MIRA_SESSION_DURATION_HOURS",
+        validation_alias="RIVERA_SESSION_DURATION_HOURS",
         ge=1,
         le=24 * 30,
         description="Override session lifetime in hours.",
     )
     expose_admin_tools: bool = Field(
         default=False,
-        validation_alias="MIRA_EXPOSE_ADMIN",
+        validation_alias="RIVERA_EXPOSE_ADMIN",
         description="Register agent-management tools (create/list/get/delete).",
     )
 
     # ---- Transport ----
     transport: TransportType = Field(
         default=TransportType.STDIO,
-        validation_alias="MIRA_MCP_TRANSPORT",
+        validation_alias="RIVERA_MCP_TRANSPORT",
         description="MCP transport mode.",
     )
     host: str = Field(
         default="127.0.0.1",
-        validation_alias="MIRA_MCP_HOST",
+        validation_alias="RIVERA_MCP_HOST",
         description="Bind host for sse / streamable-http.",
     )
     port: int = Field(
         default=8765,
         ge=1,
         le=65535,
-        validation_alias="MIRA_MCP_PORT",
+        validation_alias="RIVERA_MCP_PORT",
         description="Bind port for sse / streamable-http.",
     )
 
     # ---- Logging ----
     log_level: str = Field(
         default="INFO",
-        validation_alias="MIRA_MCP_LOG_LEVEL",
+        validation_alias="RIVERA_MCP_LOG_LEVEL",
         description="Log level (DEBUG / INFO / WARNING / ERROR).",
     )
 

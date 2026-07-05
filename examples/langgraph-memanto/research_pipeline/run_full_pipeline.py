@@ -21,16 +21,16 @@ warnings.filterwarnings("ignore", module="langgraph")
 load_dotenv()
 
 TOPIC = os.getenv("RESEARCH_TOPIC", "AI agent framework market size and trends 2024")
-AGENT_ID = os.getenv("MIRA_AGENT_ID", "langgraph-research-team")
+AGENT_ID = os.getenv("RIVERA_AGENT_ID", "langgraph-research-team")
 
 
 def main():
-    print("Running full LangGraph + Mira pipeline...")
+    print("Running full LangGraph + Rivera pipeline...")
     print(f"Topic: {TOPIC}")
-    print(f"Mira Agent ID: {AGENT_ID}")
+    print(f"Rivera Agent ID: {AGENT_ID}")
     print("---")
 
-    result = run_research(topic=TOPIC, mira_agent_id=AGENT_ID)
+    result = run_research(topic=TOPIC, rivera_agent_id=AGENT_ID)
 
     print("\n=== Pipeline Complete ===")
     print(f"Total messages: {len(result.get('messages', []))}")

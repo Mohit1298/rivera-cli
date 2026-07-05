@@ -25,14 +25,14 @@ RUN uv pip compile pyproject.toml -o requirements.txt && \
     uv pip install --system --no-cache -r requirements.txt
 
 # ── Source layer ─────────────────────────────────────────────────────────────
-COPY mira/ ./mira/
+COPY rivera/ ./rivera/
 
 # Install the application itself without reinstalling dependencies
 RUN uv pip install --system --no-cache --no-deps .
 
 # ── Security: run as non-root ─────────────────────────────────────────────────
-RUN useradd -m --shell /bin/false --uid 1001 mira
-USER mira
+RUN useradd -m --shell /bin/false --uid 1001 rivera
+USER rivera
 
 EXPOSE 8000
 
@@ -42,4 +42,4 @@ EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=10s --start-period=15s --retries=3 \
     CMD python -c "import urllib.request; urllib.request.urlopen('http://localhost:8000/ready')" || exit 1
 
-CMD ["uvicorn", "mira.app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["uvicorn", "rivera.app.main:app", "--host", "0.0.0.0", "--port", "8000"]

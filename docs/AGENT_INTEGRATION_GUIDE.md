@@ -1,4 +1,4 @@
-# MIRA Agent Integration Guide
+# RIVERA Agent Integration Guide
 
 **For AI Coding Assistants, Chatbots, and Automation Agents**
 
@@ -6,9 +6,9 @@
 
 ---
 
-## Why MIRA for AI Agents?
+## Why RIVERA for AI Agents?
 
-AI agents need memory to provide context-aware, personalized responses. MIRA gives your agent:
+AI agents need memory to provide context-aware, personalized responses. RIVERA gives your agent:
 
 - **Instant memory** - Remember user preferences, decisions, and context
 - **Zero setup** - 3 commands to start using
@@ -21,15 +21,15 @@ AI agents need memory to provide context-aware, personalized responses. MIRA giv
 
 ```bash
 # 1. Create/Activate your agent
-mira agent create your-agent-id
+rivera agent create your-agent-id
 # OR if already created:
-# mira agent activate your-agent-id
+# rivera agent activate your-agent-id
 
 # 2. Remember something
-mira remember "User prefers dark mode" --type preference --source your-agent-id
+rivera remember "User prefers dark mode" --type preference --source your-agent-id
 
 # 3. Recall it later
-mira recall "dark mode"
+rivera recall "dark mode"
 ```
 
 **That's it!** Your agent now has persistent memory.
@@ -38,21 +38,21 @@ mira recall "dark mode"
 
 ## Installation
 
-### Users Install MIRA
+### Users Install RIVERA
 
 ```bash
-# Install MIRA
-pip install mira
+# Install RIVERA
+pip install rivera
 
 # Setup environment with Moorcheh API key
-mira
+rivera
 
-# Optional: Start MIRA REST API server
+# Optional: Start RIVERA REST API server
 # (Only needed if you want to use the REST API endpoints elsewhere)
-mira serve
+rivera serve
 ```
 
-**Note**: No local server is required for CLI commands. Your agent just calls `mira` commands directly.
+**Note**: No local server is required for CLI commands. Your agent just calls `rivera` commands directly.
 
 ---
 
@@ -65,19 +65,19 @@ import subprocess
 import json
 
 class AgentMemory:
-    """Simple MIRA integration for AI agents"""
+    """Simple RIVERA integration for AI agents"""
 
     def __init__(self, agent_id: str):
         self.agent_id = agent_id
         # Create/Activate agent session
         # Use 'create' if new, or 'activate' if existing.
         # This example assumes activation for an existing agent.
-        subprocess.run(["mira", "agent", "activate", agent_id], check=True)
+        subprocess.run(["rivera", "agent", "activate", agent_id], check=True)
 
     def remember(self, content: str, memory_type: str = "fact", tags: str = None, confidence: float = 0.8, provenance: str = "explicit_statement", source: str = None):
         """Store a memory"""
         source = source or self.agent_id
-        cmd = ["mira", "remember", content, "--type", memory_type, "--confidence", str(confidence), "--provenance", provenance, "--source", source]
+        cmd = ["rivera", "remember", content, "--type", memory_type, "--confidence", str(confidence), "--provenance", provenance, "--source", source]
         if tags:
             cmd.extend(["--tags", tags])
         subprocess.run(cmd, check=True)
@@ -85,7 +85,7 @@ class AgentMemory:
     def recall(self, query: str, limit: int = 5):
         """Search memories"""
         result = subprocess.run(
-            ["mira", "recall", query, "--limit", str(limit)],
+            ["rivera", "recall", query, "--limit", str(limit)],
             capture_output=True,
             text=True,
             check=True
@@ -95,7 +95,7 @@ class AgentMemory:
     def ask(self, question: str):
         """Ask a question (RAG)"""
         result = subprocess.run(
-            ["mira", "answer", question],
+            ["rivera", "answer", question],
             capture_output=True,
             text=True,
             check=True
@@ -242,20 +242,20 @@ class AsyncAgentMemory:
 
     async def _activate(self):
         proc = await asyncio.create_subprocess_exec(
-            "mira", "agent", "activate", self.agent_id
+            "rivera", "agent", "activate", self.agent_id
         )
         await proc.wait()
 
     async def remember(self, content: str, memory_type: str = "fact", confidence: float = 0.8, provenance: str = "explicit_statement", source: str = None):
         source = source or self.agent_id
         proc = await asyncio.create_subprocess_exec(
-            "mira", "remember", content, "--type", memory_type, "--confidence", str(confidence), "--provenance", provenance, "--source", source
+            "rivera", "remember", content, "--type", memory_type, "--confidence", str(confidence), "--provenance", provenance, "--source", source
         )
         await proc.wait()
 
     async def recall(self, query: str, limit: int = 5):
         proc = await asyncio.create_subprocess_exec(
-            "mira", "recall", query, "--limit", str(limit),
+            "rivera", "recall", query, "--limit", str(limit),
             stdout=asyncio.subprocess.PIPE
         )
         stdout, _ = await proc.communicate()
@@ -280,15 +280,15 @@ const { execSync } = require('child_process');
 class AgentMemory {
   constructor(agentId) {
     this.agentId = agentId;
-    execSync(`mira agent activate ${agentId}`);
+    execSync(`rivera agent activate ${agentId}`);
   }
 
   remember(content, type = 'fact', confidence = 0.8, provenance = 'explicit_statement', source = this.agentId) {
-    execSync(`mira remember "${content}" --type ${type} --confidence ${confidence} --provenance ${provenance} --source ${source}`);
+    execSync(`rivera remember "${content}" --type ${type} --confidence ${confidence} --provenance ${provenance} --source ${source}`);
   }
 
   recall(query, limit = 5) {
-    const output = execSync(`mira recall "${query}" --limit ${limit}`);
+    const output = execSync(`rivera recall "${query}" --limit ${limit}`);
     return output.toString();
   }
 }
@@ -305,16 +305,16 @@ const prefs = memory.recall('package manager');
 #!/bin/bash
 
 # Activate agent
-mira agent activate my-script
+rivera agent activate my-script
 
 # Remember something
-mira remember "Backup completed successfully" --type event --tags "backup,cron" --source "my-script"
+rivera remember "Backup completed successfully" --type event --tags "backup,cron" --source "my-script"
 
 # Recall recent backups
-mira recall "backup" --limit 5
+rivera recall "backup" --limit 5
 
 # Ask question
-mira answer "When was the last successful backup?"
+rivera answer "When was the last successful backup?"
 ```
 
 ---
@@ -329,7 +329,7 @@ from typing import List, Dict
 class SupportBot:
     def __init__(self, bot_id: str = "support-bot"):
         self.bot_id = bot_id
-        subprocess.run(["mira", "agent", "activate", bot_id], check=True)
+        subprocess.run(["rivera", "agent", "activate", bot_id], check=True)
 
     def handle_customer_message(self, customer_id: str, message: str) -> str:
         """Handle customer message with context awareness"""
@@ -367,7 +367,7 @@ class SupportBot:
     def learn_preference(self, customer_id: str, preference: str):
         """Store customer preference"""
         subprocess.run([
-            "mira", "remember",
+            "rivera", "remember",
             f"Customer {customer_id}: {preference}",
             "--type", "preference",
             "--tags", f"customer,{customer_id}"
@@ -376,7 +376,7 @@ class SupportBot:
     def _get_customer_context(self, customer_id: str) -> str:
         """Get customer context"""
         result = subprocess.run([
-            "mira", "recall",
+            "rivera", "recall",
             f"customer {customer_id}",
             "--limit", "10"
         ], capture_output=True, text=True, check=True)
@@ -386,7 +386,7 @@ class SupportBot:
     def _store_interaction(self, customer_id: str, message: str, response: str):
         """Store interaction"""
         subprocess.run([
-            "mira", "remember",
+            "rivera", "remember",
             f"Customer {customer_id} asked: {message}\nBot responded: {response}",
             "--type", "event",
             "--tags", f"customer,{customer_id},interaction"
@@ -417,7 +417,7 @@ def safe_remember(content: str, memory_type: str = "fact"):
     """Robust memory storage with error handling"""
     try:
         subprocess.run(
-            ["mira", "remember", content, "--type", memory_type],
+            ["rivera", "remember", content, "--type", memory_type],
             check=True,
             timeout=5,  # 5 second timeout
             capture_output=True
@@ -427,14 +427,14 @@ def safe_remember(content: str, memory_type: str = "fact"):
         print(f"Failed to store memory: {e.stderr.decode()}")
         return False
     except subprocess.TimeoutExpired:
-        print("MIRA timeout - is server running?")
+        print("RIVERA timeout - is server running?")
         return False
 
 def safe_recall(query: str, limit: int = 5):
     """Robust memory recall with error handling"""
     try:
         result = subprocess.run(
-            ["mira", "recall", query, "--limit", str(limit)],
+            ["rivera", "recall", query, "--limit", str(limit)],
             capture_output=True,
             text=True,
             check=True,
@@ -454,15 +454,15 @@ def safe_recall(query: str, limit: int = 5):
 ## Best Practices
 
 # Good
-subprocess.run(["mira", "agent", "create", "my-agent"], check=True) # Automatically activates
-subprocess.run(["mira", "remember", "content"], check=True)
+subprocess.run(["rivera", "agent", "create", "my-agent"], check=True) # Automatically activates
+subprocess.run(["rivera", "remember", "content"], check=True)
 
 # Also good (if already created)
-subprocess.run(["mira", "agent", "activate", "my-agent"], check=True)
-subprocess.run(["mira", "remember", "content"], check=True)
+subprocess.run(["rivera", "agent", "activate", "my-agent"], check=True)
+subprocess.run(["rivera", "remember", "content"], check=True)
 
 # Bad - no active agent
-subprocess.run(["mira", "remember", "content"], check=True)  # ERROR!
+subprocess.run(["rivera", "remember", "content"], check=True)  # ERROR!
 ```
 
 ### 2. Use Descriptive Tags
@@ -510,16 +510,16 @@ memory.remember(user_msg, "event")
 **Solution**:
 ```python
 # Create if it doesn't exist (auto-activates)
-subprocess.run(["mira", "agent", "create", "your-agent"], check=True)
+subprocess.run(["rivera", "agent", "create", "your-agent"], check=True)
 # OR activate if it already exists
-subprocess.run(["mira", "agent", "activate", "your-agent"], check=True)
+subprocess.run(["rivera", "agent", "activate", "your-agent"], check=True)
 ```
 
 ### "Connection failed" Error
 
-**Problem**: MIRA server not running
+**Problem**: RIVERA server not running
 
-**Solution**: User needs to run `mira serve` in a terminal
+**Solution**: User needs to run `rivera serve` in a terminal
 
 ### Empty Results
 
@@ -532,7 +532,7 @@ subprocess.run(["mira", "agent", "activate", "your-agent"], check=True)
 
 ```python
 # List all agents to verify
-result = subprocess.run(["mira", "agent", "list"], capture_output=True, text=True)
+result = subprocess.run(["rivera", "agent", "list"], capture_output=True, text=True)
 print(result.stdout)
 ```
 
@@ -556,7 +556,7 @@ print(result.stdout)
 
 - **[CLI User Guide](CLI_USER_GUIDE.md)** - Complete command reference
 - **[Quick Start](V2_QUICK_START.md)** - REST API (if you need HTTP)
-- **[Session Architecture](SESSION_ARCHITECTURE.md)** - How MIRA works
+- **[Session Architecture](SESSION_ARCHITECTURE.md)** - How RIVERA works
 
 ---
 

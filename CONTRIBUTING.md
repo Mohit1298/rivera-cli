@@ -1,6 +1,6 @@
-# Contributing to MIRA
+# Contributing to RIVERA
 
-Thank you for your interest in contributing to MIRA — the universal memory layer for agentic AI. This guide will help you get set up and understand how we work.
+Thank you for your interest in contributing to RIVERA — the universal memory layer for agentic AI. This guide will help you get set up and understand how we work.
 
 ---
 
@@ -42,14 +42,14 @@ Before opening an issue, please check that it hasn't been reported already.
 
 When filing a bug, include:
 
-1. **MIRA version** (`pip show mira`)
+1. **RIVERA version** (`pip show rivera`)
 2. **Python version** (`python --version`)
 3. **Operating system**
 4. **Steps to reproduce** — a minimal, self-contained script is ideal
 5. **Expected behavior** vs. **actual behavior**
 6. **Relevant logs or error output**
 
-Open a bug report at: https://github.com/moorcheh-ai/mira/issues
+Open a bug report at: https://github.com/moorcheh-ai/rivera/issues
 
 > **Security vulnerabilities** must **not** be reported as public issues. See [SECURITY.md](SECURITY.md) for responsible disclosure instructions.
 
@@ -57,7 +57,7 @@ Open a bug report at: https://github.com/moorcheh-ai/mira/issues
 
 ## Requesting Features
 
-Open a feature request at https://github.com/moorcheh-ai/mira/issues and include:
+Open a feature request at https://github.com/moorcheh-ai/rivera/issues and include:
 
 - A clear description of the problem you are trying to solve
 - Your proposed solution or API
@@ -77,8 +77,8 @@ Open a feature request at https://github.com/moorcheh-ai/mira/issues and include
 ### 1. Fork and clone
 
 ```bash
-git clone https://github.com/<your-username>/mira.git
-cd mira
+git clone https://github.com/<your-username>/rivera.git
+cd rivera
 ```
 
 ### 2. Create a virtual environment and install dependencies
@@ -117,8 +117,8 @@ The hooks run `uv run ruff check`, `uv run ruff format --check`, and `uv run myp
 ## Project Structure
 
 ```
-mira/
-├── mira/
+rivera/
+├── rivera/
 │   ├── app/          # FastAPI application, routes, models
 │   └── cli/          # Typer CLI commands
 ├── tests/            # pytest test suite
@@ -265,9 +265,9 @@ Rules:
 
 ## Community
 
-- **Discord**: [Join our server](https://mira.ai/discord) — the best place for quick questions and discussions
-- **GitHub Issues**: https://github.com/moorcheh-ai/mira/issues — bugs and feature requests
+- **Discord**: [Join our server](https://rivera.ai/discord) — the best place for quick questions and discussions
+- **GitHub Issues**: https://github.com/moorcheh-ai/rivera/issues — bugs and feature requests
 - **Email**: support@moorcheh.ai — for anything that doesn't fit the above
-- **Docs**: https://docs.mira.ai
+- **Docs**: https://docs.rivera.ai
 
-We appreciate every contribution, no matter how small. Thank you for helping make MIRA better.
+We appreciate every contribution, no matter how small. Thank you for helping make RIVERA better.

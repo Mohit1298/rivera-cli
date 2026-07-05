@@ -1,13 +1,13 @@
-"""MiraStore - a LangGraph BaseStore backed by Mira.
+"""RiveraStore - a LangGraph BaseStore backed by Rivera.
 
-Compile the graph with ``store=MiraStore(client, agent_id)`` and nodes
+Compile the graph with ``store=RiveraStore(client, agent_id)`` and nodes
 get cross-thread, cross-session memory through the official LangGraph store
 API (``store.aput`` / ``store.asearch``).
 
 Mapping between abstractions
 ----------------------------
 
-    BaseStore                         ->  Mira
+    BaseStore                         ->  Rivera
     namespace (tuple[str, ...])       ->  reserved tags  ``lg:ns:0:<p0>``, ...
     key (str)                         ->  reserved tag   ``lg:key:<key>``
     value["kind"] / value["type"]     ->  memory_type    (auto-parsed if absent)
@@ -22,9 +22,9 @@ Mapping between abstractions
 Documented limitations
 ----------------------
 
-* **Delete** (``PutOp`` with ``value=None``) routes to Mira's
-  conflict-resolution flow. Use ``mira conflicts resolve`` instead.
-* **TTL** on put is ignored - Mira does not expire memories on a timer.
+* **Delete** (``PutOp`` with ``value=None``) routes to Rivera's
+  conflict-resolution flow. Use ``rivera conflicts resolve`` instead.
+* **TTL** on put is ignored - Rivera does not expire memories on a timer.
 * **Pagination offset** in search is ignored - raise ``limit`` instead.
 * **_do_get** is best-effort: uses ``recall_recent`` (unbiased by query)
   up to the 100-result cap, then a semantic fallback. A key stored long
@@ -52,7 +52,7 @@ from langgraph.store.base import (
     SearchOp,
 )
 
-from mira.cli.client.sdk_client import SdkClient
+from rivera.cli.client.sdk_client import SdkClient
 
 logger = logging.getLogger(__name__)
 
@@ -76,31 +76,31 @@ _VALID_MEMORY_TYPES = {
 }
 
 
-class MiraStore(BaseStore):
-    """LangGraph ``BaseStore`` backed by Mira's typed semantic memory.
+class RiveraStore(BaseStore):
+    """LangGraph ``BaseStore`` backed by Rivera's typed semantic memory.
 
     Drop-in replacement for ``InMemoryStore`` / ``PostgresStore`` /
     ``RedisStore``. Memories persist across threads and sessions because
-    Mira persists them server-side, scoped by ``agent_id``.
+    Rivera persists them server-side, scoped by ``agent_id``.
 
     Example::
 
-        from mira_base_store.mira_setup import MiraSetup
-        from mira_base_store.mira_store import MiraStore
+        from rivera_base_store.rivera_setup import RiveraSetup
+        from rivera_base_store.rivera_store import RiveraStore
 
-        client = MiraSetup(api_key).setup(agent_id="my-app")
-        store = MiraStore(client, agent_id="my-app")
+        client = RiveraSetup(api_key).setup(agent_id="my-app")
+        store = RiveraStore(client, agent_id="my-app")
         graph = builder.compile(store=store, checkpointer=InMemorySaver())
     """
 
-    # Mira's recall is server-capped at 100 results.
-    _MIRA_RECALL_CAP = 100
+    # Rivera's recall is server-capped at 100 results.
+    _RIVERA_RECALL_CAP = 100
     # Cache TTL keeps short-interval polls (Streamlit reruns, multiple graph
     # nodes) from burning rate-limit budget on identical queries.
     _CACHE_TTL_S = 30.0
 
     def __init__(self, api_key: str) -> None:
-        """Initialize MiraStore with an API key."""
+        """Initialize RiveraStore with an API key."""
         self.api_key = api_key
         self._client_pool: dict[str, SdkClient] = {}
         self._agent_prefix = "langgraph_"
@@ -113,7 +113,7 @@ class MiraStore(BaseStore):
         ns_str = "_".join(namespace) or "default"
         agent_id = f"{self._agent_prefix}{ns_str}"
         if agent_id not in self._client_pool:
-            from mira.app.utils.errors import AgentAlreadyExistsError
+            from rivera.app.utils.errors import AgentAlreadyExistsError
 
             client = SdkClient(api_key=self.api_key)
             try:
@@ -172,7 +172,7 @@ class MiraStore(BaseStore):
         # recall_recent avoids semantic bias in key lookup
         result = client.recall_recent(
             agent_id=agent_id,
-            limit=self._MIRA_RECALL_CAP,
+            limit=self._RIVERA_RECALL_CAP,
         )
         for mem in result.get("memories", []):
             tags = mem.get("tags") or []
@@ -184,11 +184,11 @@ class MiraStore(BaseStore):
             result = client.recall(
                 agent_id=agent_id,
                 query=op.key or "*",
-                limit=self._MIRA_RECALL_CAP,
+                limit=self._RIVERA_RECALL_CAP,
                 tags=[key_tag],
             )
         except Exception as exc:
-            logger.warning("MiraStore._do_get fallback recall failed: %s", exc)
+            logger.warning("RiveraStore._do_get fallback recall failed: %s", exc)
             return None
 
         for mem in result.get("memories", []):
@@ -202,7 +202,7 @@ class MiraStore(BaseStore):
     # ------------------------------------------------------------------ #
 
     def _do_put(self, op: PutOp) -> None:
-        """Persist a ``PutOp.value`` as a Mira memory.
+        """Persist a ``PutOp.value`` as a Rivera memory.
 
         When no ``kind``/``type`` is given, passes ``memory_type=None`` so
         the server-side auto-parser (``MemoryParsingService``) infers the
@@ -210,9 +210,9 @@ class MiraStore(BaseStore):
         """
         if op.value is None:
             raise NotImplementedError(
-                "MiraStore does not support delete via PutOp(value=None). "
-                "Mira removals go through the conflict-resolution flow; "
-                "use `mira conflicts resolve` or the SdkClient's resolve API."
+                "RiveraStore does not support delete via PutOp(value=None). "
+                "Rivera removals go through the conflict-resolution flow; "
+                "use `rivera conflicts resolve` or the SdkClient's resolve API."
             )
 
         value: dict[str, Any] = dict(op.value)
@@ -299,7 +299,7 @@ class MiraStore(BaseStore):
             if time.time() - ts < self._CACHE_TTL_S:
                 return items
 
-        fetch_limit = max(1, min(op.limit, self._MIRA_RECALL_CAP))
+        fetch_limit = max(1, min(op.limit, self._RIVERA_RECALL_CAP))
         rate_limited = False
 
         client, agent_id = self._ensure_client(op.namespace_prefix)
@@ -309,7 +309,7 @@ class MiraStore(BaseStore):
                 # recall_recent: no semantic bias, returns newest memories first
                 result = client.recall_recent(
                     agent_id=agent_id,
-                    limit=self._MIRA_RECALL_CAP,
+                    limit=self._RIVERA_RECALL_CAP,
                     type=type_filter or None,
                 )
             else:
@@ -322,7 +322,7 @@ class MiraStore(BaseStore):
                     min_similarity=min_similarity,
                 )
         except Exception as exc:
-            logger.warning("MiraStore._do_search recall failed: %s", exc)
+            logger.warning("RiveraStore._do_search recall failed: %s", exc)
             err = str(exc)
             if any(
                 m in err
@@ -352,7 +352,7 @@ class MiraStore(BaseStore):
 
         if not out and rate_limited and op.namespace_prefix in self._last_good:
             logger.info(
-                "MiraStore: rate-limited, returning last-good for %r",
+                "RiveraStore: rate-limited, returning last-good for %r",
                 op.namespace_prefix,
             )
             return self._last_good[op.namespace_prefix]
@@ -368,12 +368,12 @@ class MiraStore(BaseStore):
     # ------------------------------------------------------------------ #
 
     def _do_list_namespaces(self, op: ListNamespacesOp) -> list[tuple[str, ...]]:
-        """List namespaces by fetching all Mira agents with the prefix."""
+        """List namespaces by fetching all Rivera agents with the prefix."""
         client = SdkClient(api_key=self.api_key)
         try:
             agents = client.list_agents()
         except Exception as e:
-            logger.warning("MiraStore: Failed to list agents: %s", e)
+            logger.warning("RiveraStore: Failed to list agents: %s", e)
             return []
 
         namespaces = []

@@ -8,8 +8,8 @@ import pytest
 def cleanup_test_sessions():
     """Clean up test-agent and test sessions after each test to prevent pollution."""
     yield
-    # After test completes, remove test session files from ~/.mira/sessions/
-    sessions_dir = Path.home() / ".mira" / "sessions"
+    # After test completes, remove test session files from ~/.rivera/sessions/
+    sessions_dir = Path.home() / ".rivera" / "sessions"
     if sessions_dir.exists():
         for agent_id in ["test-agent", "test"]:
             session_file = sessions_dir / f"{agent_id}.json"
@@ -32,17 +32,17 @@ def cleanup_test_sessions():
 @pytest.fixture(autouse=True)
 def reset_auto_parse(monkeypatch):
     """Ensure tests are not affected by the local smart_parse config setting."""
-    from mira.app.config import settings
+    from rivera.app.config import settings
 
     monkeypatch.setattr(settings, "AUTO_PARSE_ENABLED", True)
 
 
 @pytest.fixture(autouse=True)
 def force_cloud_backend(monkeypatch):
-    """Force ``settings.MIRA_BACKEND='cloud'`` and a placeholder API key so
+    """Force ``settings.RIVERA_BACKEND='cloud'`` and a placeholder API key so
     the dispatcher never tries to instantiate ``OnPremClient`` during
     cloud-focused tests, regardless of the developer's local
-    ``~/.mira/config.yaml``. Tests that explicitly exercise the on-prem
+    ``~/.rivera/config.yaml``. Tests that explicitly exercise the on-prem
     branch (see ``tests/test_backend.py``) do their own per-test save/restore
     and override this safely. Tests that explicitly verify the
     ``RIVERA_API_KEY``-missing branch (e.g.
@@ -50,10 +50,10 @@ def force_cloud_backend(monkeypatch):
     ``patch.object(settings, "RIVERA_API_KEY", "")`` which temporarily
     overrides this fixture's value.
     """
-    from mira.app.clients.moorcheh import moorcheh_client
-    from mira.app.config import settings
+    from rivera.app.clients.moorcheh import moorcheh_client
+    from rivera.app.config import settings
 
-    monkeypatch.setattr(settings, "MIRA_BACKEND", "cloud")
+    monkeypatch.setattr(settings, "RIVERA_BACKEND", "cloud")
     if not settings.RIVERA_API_KEY:
         monkeypatch.setattr(settings, "RIVERA_API_KEY", "test-api-key")
     moorcheh_client.reset_client()
@@ -80,11 +80,11 @@ def mock_moorcheh_for_tests():
 
     with (
         patch(
-            "mira.app.services.agent_service.get_moorcheh_client",
+            "rivera.app.services.agent_service.get_moorcheh_client",
             return_value=mock_instance,
         ),
         patch(
-            "mira.app.clients.moorcheh.MoorchehClient",
+            "rivera.app.clients.moorcheh.MoorchehClient",
             return_value=mock_instance,
         ),
     ):

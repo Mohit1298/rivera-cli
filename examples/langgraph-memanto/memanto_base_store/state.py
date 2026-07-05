@@ -12,7 +12,7 @@ class SupportState(TypedDict):
 
     Only ``messages`` actually flows through the graph - everything else
     we care about (user preferences, prior facts) lives in the
-    cross-thread ``MiraStore``, not in this state.
+    cross-thread ``RiveraStore``, not in this state.
 
     Note that ``user_id`` is intentionally NOT here. We read it from the
     LangGraph config (``config["configurable"]["user_id"]``) so it isn't

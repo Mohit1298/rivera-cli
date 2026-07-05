@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from mira_skills import extractor
+from rivera_skills import extractor
 
 
 class TestParseLlmMemories:

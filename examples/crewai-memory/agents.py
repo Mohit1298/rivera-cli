@@ -1,7 +1,7 @@
 """
-Agent definitions for the CrewAI + Mira integration example.
+Agent definitions for the CrewAI + Rivera integration example.
 
-Two agents share a single Mira memory namespace so the Writer
+Two agents share a single Rivera memory namespace so the Writer
 can retrieve memories stored by the Researcher.
 """
 
@@ -21,7 +21,7 @@ def create_research_agent(
         role="Senior Market Research Analyst",
         goal=(
             "Research the AI agent framework market thoroughly and store "
-            "every key finding as a structured memory using the mira_remember tool. "
+            "every key finding as a structured memory using the rivera_remember tool. "
             "Each memory must be concise and atomic, use the correct "
             "memory type, and include relevant tags."
         ),
@@ -47,8 +47,8 @@ def create_writer_agent(
     return Agent(
         role="Technical Briefing Writer",
         goal=(
-            "Retrieve all research findings from memory using the mira_recall tool "
-            "and write a clear, data-driven executive briefing. Use mira_answer "
+            "Retrieve all research findings from memory using the rivera_recall tool "
+            "and write a clear, data-driven executive briefing. Use rivera_answer "
             "for synthesizing insights from multiple memories."
         ),
         backstory=(

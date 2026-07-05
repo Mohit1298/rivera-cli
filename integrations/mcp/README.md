@@ -1,8 +1,8 @@
-# Mira MCP Server
+# Rivera MCP Server
 
 **Persistent semantic memory for any MCP-compatible agent.**
 
-This package exposes [Mira's](https://mira.ai) memory primitives —
+This package exposes [Rivera's](https://rivera.ai) memory primitives —
 `remember`, `recall`, `answer`, and friends — as
 [Model Context Protocol (MCP)](https://modelcontextprotocol.io) tools so any
 MCP client (Claude Desktop, Cursor, Windsurf, Cline, Continue, Goose,
@@ -17,7 +17,7 @@ custom agents, …) can plug into long-term memory in a single config line.
 ## Install
 
 ```bash
-pip install mira-mcp
+pip install rivera-mcp
 ```
 
 Requires Python 3.10+ and a [Moorcheh API key](https://console.moorcheh.ai/api-keys)
@@ -31,11 +31,11 @@ Requires Python 3.10+ and a [Moorcheh API key](https://console.moorcheh.ai/api-k
 ```json
 {
   "mcpServers": {
-    "mira": {
-      "command": "mira-mcp",
+    "rivera": {
+      "command": "rivera-mcp",
       "env": {
         "RIVERA_API_KEY": "mch_xxxxxxxxxxxxxxxxxx",
-        "MIRA_DEFAULT_AGENT_ID": "my-assistant"
+        "RIVERA_DEFAULT_AGENT_ID": "my-assistant"
       }
     }
   }
@@ -57,11 +57,11 @@ The same JSON snippet works almost verbatim:
 ```json
 {
   "mcpServers": {
-    "mira": {
-      "command": "mira-mcp",
+    "rivera": {
+      "command": "rivera-mcp",
       "env": {
         "RIVERA_API_KEY": "mch_xxxxxxxxxxxxxxxxxx",
-        "MIRA_DEFAULT_AGENT_ID": "cursor-workspace"
+        "RIVERA_DEFAULT_AGENT_ID": "cursor-workspace"
       }
     }
   }
@@ -80,7 +80,7 @@ The same JSON snippet works almost verbatim:
 ## Available tools
 
 The server registers **7 memory tools by default**. Set
-`MIRA_EXPOSE_ADMIN=true` to also expose **4 agent-management tools**.
+`RIVERA_EXPOSE_ADMIN=true` to also expose **4 agent-management tools**.
 
 ### Memory tools (always on)
 
@@ -96,7 +96,7 @@ The server registers **7 memory tools by default**. Set
 
 ### Agent admin tools (opt-in)
 
-Enabled when `MIRA_EXPOSE_ADMIN=true`:
+Enabled when `RIVERA_EXPOSE_ADMIN=true`:
 
 | Tool | Purpose |
 |---|---|
@@ -121,17 +121,17 @@ All config is via environment variables (load order: process env →
 | Variable | Required | Default | Description |
 |---|---|---|---|
 | `RIVERA_API_KEY` | **yes** | — | Moorcheh API key. |
-| `MIRA_DEFAULT_AGENT_ID` | recommended | _none_ | Default agent. When set, tool calls may omit `agent_id`. |
-| `MIRA_AGENT_PATTERN` | no | `tool` | Pattern (`support`/`project`/`tool`) used when auto-creating the default agent. |
-| `MIRA_AGENT_AUTO_CREATE` | no | `true` | Create the default agent on first use if missing. |
-| `MIRA_SESSION_DURATION_HOURS` | no | server default (6) | Session lifetime in hours. |
-| `MIRA_EXPOSE_ADMIN` | no | `false` | Register the 4 agent-management tools. |
-| `MIRA_MCP_TRANSPORT` | no | `stdio` | `stdio`, `sse`, or `streamable-http`. |
-| `MIRA_MCP_HOST` | no | `127.0.0.1` | Bind host for sse/http transports. |
-| `MIRA_MCP_PORT` | no | `8765` | Bind port for sse/http transports. |
-| `MIRA_MCP_LOG_LEVEL` | no | `INFO` | Log level (logs are always sent to stderr). |
+| `RIVERA_DEFAULT_AGENT_ID` | recommended | _none_ | Default agent. When set, tool calls may omit `agent_id`. |
+| `RIVERA_AGENT_PATTERN` | no | `tool` | Pattern (`support`/`project`/`tool`) used when auto-creating the default agent. |
+| `RIVERA_AGENT_AUTO_CREATE` | no | `true` | Create the default agent on first use if missing. |
+| `RIVERA_SESSION_DURATION_HOURS` | no | server default (6) | Session lifetime in hours. |
+| `RIVERA_EXPOSE_ADMIN` | no | `false` | Register the 4 agent-management tools. |
+| `RIVERA_MCP_TRANSPORT` | no | `stdio` | `stdio`, `sse`, or `streamable-http`. |
+| `RIVERA_MCP_HOST` | no | `127.0.0.1` | Bind host for sse/http transports. |
+| `RIVERA_MCP_PORT` | no | `8765` | Bind port for sse/http transports. |
+| `RIVERA_MCP_LOG_LEVEL` | no | `INFO` | Log level (logs are always sent to stderr). |
 
-CLI flags (`mira-mcp --transport sse --port 9000`) override env vars.
+CLI flags (`rivera-mcp --transport sse --port 9000`) override env vars.
 
 ## Running over HTTP / SSE
 
@@ -140,10 +140,10 @@ transport:
 
 ```bash
 # Streamable HTTP (recommended modern transport)
-mira-mcp --transport streamable-http --host 0.0.0.0 --port 8765
+rivera-mcp --transport streamable-http --host 0.0.0.0 --port 8765
 
 # Server-Sent Events (older, still widely supported)
-mira-mcp --transport sse --host 0.0.0.0 --port 8765
+rivera-mcp --transport sse --host 0.0.0.0 --port 8765
 ```
 
 Then point your client at `http://your-host:8765/mcp` (or whatever path the
@@ -156,12 +156,12 @@ clients.
 
 ```
 ┌──────────────┐    MCP/stdio    ┌──────────────────┐    Moorcheh API    ┌─────────────┐
-│ Claude / IDE │ ──────────────► │  mira-mcp     │ ────────────────► │   Moorcheh  │
+│ Claude / IDE │ ──────────────► │  rivera-mcp     │ ────────────────► │   Moorcheh  │
 │   (client)   │ ◄────────────── │  (this package)  │ ◄──────────────── │   Service   │
 └──────────────┘    tool calls   └──────────────────┘    HTTPS+API key   └─────────────┘
                                           │
-                                          └─ uses mira.cli.client.SdkClient
-                                             (same client the Mira CLI uses)
+                                          └─ uses rivera.cli.client.SdkClient
+                                             (same client the Rivera CLI uses)
 ```
 
 - On startup, settings are validated; the API key is verified lazily on
@@ -171,7 +171,7 @@ clients.
   session. Sessions auto-renew before expiry, so long-running MCP
   connections never hit a session-expired error mid-conversation.
 - The server intentionally keeps the session alive on shutdown: JWT
-  sessions are TTL-bound and other Mira clients (CLI, REST) may want
+  sessions are TTL-bound and other Rivera clients (CLI, REST) may want
   to share them.
 
 ## Programmatic embedding
@@ -180,12 +180,12 @@ If you're building a custom MCP host or wiring this server into a larger
 process, you can construct the FastMCP instance yourself:
 
 ```python
-from mira_mcp import MCPServerSettings, build_server
+from rivera_mcp import MCPServerSettings, build_server
 
 settings = MCPServerSettings()  # reads env / .env
 mcp = build_server(settings)
 
-# Add your own tools alongside Mira's, then run.
+# Add your own tools alongside Rivera's, then run.
 mcp.run(transport="stdio")
 ```
 
@@ -194,19 +194,19 @@ mcp.run(transport="stdio")
 | Symptom | Fix |
 |---|---|
 | `configuration error: RIVERA_API_KEY is required` | Set the env var in your MCP client config's `env` block. |
-| `Agent '…' does not exist and MIRA_AGENT_AUTO_CREATE is disabled` | Either re-enable auto-create or call `create_agent` (admin tools) / `mira agent create <id>` once. |
-| Tools never appear in the client | Confirm the client supports MCP and the config path matches. Look at the client's MCP log: the server's stderr lines (prefixed `mira_mcp`) will appear there on startup. |
+| `Agent '…' does not exist and RIVERA_AGENT_AUTO_CREATE is disabled` | Either re-enable auto-create or call `create_agent` (admin tools) / `rivera agent create <id>` once. |
+| Tools never appear in the client | Confirm the client supports MCP and the config path matches. Look at the client's MCP log: the server's stderr lines (prefixed `rivera_mcp`) will appear there on startup. |
 | Garbled output in stdio mode | Something on your side is writing to **stdout** — that channel is reserved for JSON-RPC. Move logs to stderr. The server itself only writes to stderr. |
 | Slow first call | Cold-start cost: SDK import + first session activation. Subsequent calls reuse the live session. |
 
 ## License
 
-MIT — same as the [Mira](https://github.com/moorcheh-ai/mira)
+MIT — same as the [Rivera](https://github.com/moorcheh-ai/rivera)
 project. See [LICENSE](../../LICENSE).
 
 ## Links
 
-- [Mira](https://mira.ai) — the memory agent itself
+- [Rivera](https://rivera.ai) — the memory agent itself
 - [Moorcheh](https://moorcheh.ai) — the no-indexing semantic DB underneath
 - [Model Context Protocol spec](https://modelcontextprotocol.io)
 - [Anthropic MCP Python SDK](https://github.com/modelcontextprotocol/python-sdk)

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from claudecode_mira import extractor
+from claudecode_rivera import extractor
 
 
 class TestParseLlmMemories:

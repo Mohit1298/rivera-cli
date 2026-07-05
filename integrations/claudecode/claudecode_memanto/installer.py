@@ -8,7 +8,7 @@ default, or ``~/.claude`` with ``--global``):
 * ``Stop``             -> hooks/on_stop.py          (async distill + store)
 
 The hook command uses the *current* Python interpreter (``sys.executable``) so
-the hooks run with the same environment that has ``mira`` installed. The
+the hooks run with the same environment that has ``rivera`` installed. The
 settings file is backed up before modification, and re-running cleanly replaces
 our previously-installed entries (matched by the hooks directory path) without
 touching anyone else's hooks.
@@ -158,7 +158,7 @@ def install_hooks(global_scope: bool = False) -> int:
 
     path.write_text(json.dumps(settings, indent=2) + "\n", encoding="utf-8")
 
-    print(f"✓ Installed Mira skill-memory hooks into {path}")
+    print(f"✓ Installed Rivera skill-memory hooks into {path}")
     if backup:
         print(f"  (backed up previous settings to {backup.name})")
     print("  Hooks: SessionStart, UserPromptExpansion, Stop")
@@ -182,7 +182,7 @@ def uninstall_hooks(global_scope: bool = False) -> int:
     hooks_section = settings.get("hooks")
     if not isinstance(hooks_section, dict):
         # Nothing of ours could possibly be here if the shape is wrong.
-        print(f"No Mira hooks found in {path}; nothing to remove.")
+        print(f"No Rivera hooks found in {path}; nothing to remove.")
         return 0
     removed = 0
     for event in _managed_hooks():
@@ -197,12 +197,12 @@ def uninstall_hooks(global_scope: bool = False) -> int:
             hooks_section.pop(event, None)
 
     if not removed:
-        print(f"No Mira hooks found in {path}; nothing to remove.")
+        print(f"No Rivera hooks found in {path}; nothing to remove.")
         return 0
 
     backup = _backup(path)
     path.write_text(json.dumps(settings, indent=2) + "\n", encoding="utf-8")
-    print(f"✓ Removed {removed} Mira hook(s) from {path}")
+    print(f"✓ Removed {removed} Rivera hook(s) from {path}")
     if backup:
         print(f"  (backed up previous settings to {backup.name})")
     return 0
@@ -226,16 +226,16 @@ def install_prompt(global_scope: bool = False) -> int:
 
     if target.exists():
         current = target.read_text(encoding="utf-8")
-        if "claudecode-mira recall" in current:
+        if "claudecode-rivera recall" in current:
             print(f"✓ Prompt injection is already present in {target}")
             return 0
         backup = _backup(target)
         target.write_text(current + "\n\n" + template_content, encoding="utf-8")
-        print(f"✓ Appended Mira prompt injection to {target}")
+        print(f"✓ Appended Rivera prompt injection to {target}")
         if backup:
             print(f"  (backed up previous CLAUDE.md to {backup.name})")
     else:
         target.write_text(template_content, encoding="utf-8")
-        print(f"✓ Created {target} with Mira prompt injection instructions")
+        print(f"✓ Created {target} with Rivera prompt injection instructions")
 
     return 0

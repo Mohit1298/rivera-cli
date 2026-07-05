@@ -1,1 +1,0 @@
-# MIRA Web UI Package

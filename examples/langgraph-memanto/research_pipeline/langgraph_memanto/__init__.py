@@ -1,7 +1,7 @@
 """
-LangGraph + Mira: Persistent Multi-Agent Memory Integration
+LangGraph + Rivera: Persistent Multi-Agent Memory Integration
 
-This package provides LangGraph-native tools for integrating Mira's
+This package provides LangGraph-native tools for integrating Rivera's
 persistent, cross-agent memory capabilities into LangGraph pipelines.
 """
 

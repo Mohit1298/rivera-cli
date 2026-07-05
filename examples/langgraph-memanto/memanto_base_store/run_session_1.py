@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Session 1: Bob shares preferences. The graph stores them in Mira.
+"""Session 1: Bob shares preferences. The graph stores them in Rivera.
 
 Run this first. Then run ``run_session_2.py`` (separately, fresh process)
 to prove cross-session recall - that script starts a brand new graph
@@ -15,7 +15,7 @@ import sys
 
 from dotenv import load_dotenv
 from langchain_core.messages import HumanMessage
-from mira_base_store.graph import build_support_graph, latest_assistant_text
+from rivera_base_store.graph import build_support_graph, latest_assistant_text
 
 logging.basicConfig(level=logging.WARNING, format="%(levelname)s %(name)s: %(message)s")
 
@@ -47,7 +47,7 @@ async def main() -> None:
         )
         sys.exit(1)
 
-    # MiraStore inside build_support_graph automatically handles client creation/activation.
+    # RiveraStore inside build_support_graph automatically handles client creation/activation.
     bar = "=" * 64
     print(f"\n{bar}\n  Session 1 - user={USER_ID}, thread_id={THREAD_ID}\n{bar}\n")
     print(f"User: {USER_MESSAGE}\n")
@@ -61,7 +61,7 @@ async def main() -> None:
         print(f"Agent: {latest_assistant_text(result['messages'])}\n")
         print(
             f"{bar}\n"
-            f"  Stored preferences/facts in Mira under namespace=({USER_ID!r}, 'memories')\n"
+            f"  Stored preferences/facts in Rivera under namespace=({USER_ID!r}, 'memories')\n"
             f"  Run `python run_session_2.py` (new process) to prove they persist.\n"
             f"{bar}\n"
         )

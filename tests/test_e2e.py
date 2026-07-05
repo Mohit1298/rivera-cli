@@ -1,7 +1,7 @@
 """
 End-to-end tests — real Moorcheh API, zero mocks.
 
-API key is loaded automatically from ~/.mira/.env by config.py.
+API key is loaded automatically from ~/.rivera/.env by config.py.
 Agent/session metadata is stored in a temporary directory that is
 cleaned up after the module finishes.
 
@@ -17,8 +17,8 @@ from pathlib import Path
 import pytest
 from httpx import ASGITransport, AsyncClient
 
-from mira.app.config import settings
-from mira.app.main import app
+from rivera.app.config import settings
+from rivera.app.main import app
 
 
 def _live_moorcheh_api_key_configured() -> bool:
@@ -36,7 +36,7 @@ pytestmark = pytest.mark.skipif(
     not _live_moorcheh_api_key_configured(),
     reason=(
         "Live Moorcheh E2E skipped: RIVERA_API_KEY missing or placeholder 'test-api-key'. "
-        "Use a real key locally (~/.mira/.env). In GitHub Actions, set the RIVERA_API_KEY "
+        "Use a real key locally (~/.rivera/.env). In GitHub Actions, set the RIVERA_API_KEY "
         "repository secret and pass it to the test job env to run E2E in CI."
     ),
 )
@@ -45,7 +45,7 @@ pytestmark = pytest.mark.skipif(
 # Constants
 # ---------------------------------------------------------------------------
 
-TEST_AGENT_ID = "e2e-mira-test"
+TEST_AGENT_ID = "e2e-rivera-test"
 AUTH = {"Authorization": f"Bearer {settings.RIVERA_API_KEY}"}
 
 # Mutable state shared across ordered tests in this module.
@@ -60,8 +60,8 @@ state: dict = {}
 @pytest.fixture(scope="module", autouse=True)
 def isolated_dirs():
     """Redirect agent/session storage to a temp dir for the whole E2E module."""
-    from mira.app.routes.sessions import agent_service
-    from mira.app.services.session_service import get_session_service
+    from rivera.app.routes.sessions import agent_service
+    from rivera.app.services.session_service import get_session_service
 
     svc = get_session_service()
     tmp = Path(tempfile.mkdtemp())
@@ -69,8 +69,8 @@ def isolated_dirs():
     orig_agents = agent_service.agents_dir
     orig_sessions = svc.sessions_dir
 
-    agent_service.agents_dir = tmp / ".mira" / "agents"
-    svc.sessions_dir = tmp / ".mira" / "sessions"
+    agent_service.agents_dir = tmp / ".rivera" / "agents"
+    svc.sessions_dir = tmp / ".rivera" / "sessions"
     agent_service.agents_dir.mkdir(parents=True, exist_ok=True)
     svc.sessions_dir.mkdir(parents=True, exist_ok=True)
 
@@ -96,7 +96,7 @@ async def http():
 
 
 class TestE2E:
-    """Sequential end-to-end coverage of all MIRA API v2 endpoints."""
+    """Sequential end-to-end coverage of all RIVERA API v2 endpoints."""
 
     # ------------------------------------------------------------------
     # Health
@@ -133,7 +133,7 @@ class TestE2E:
         data = resp.json()
         assert data["agent_id"] == TEST_AGENT_ID
         assert "namespace" in data
-        assert data["namespace"] == f"mira_agent_{TEST_AGENT_ID}"
+        assert data["namespace"] == f"rivera_agent_{TEST_AGENT_ID}"
 
     @pytest.mark.asyncio
     async def test_03_list_agents(self, http):
@@ -150,7 +150,7 @@ class TestE2E:
         assert resp.status_code == 200
         data = resp.json()
         assert data["agent_id"] == TEST_AGENT_ID
-        assert data["namespace"] == f"mira_agent_{TEST_AGENT_ID}"
+        assert data["namespace"] == f"rivera_agent_{TEST_AGENT_ID}"
 
     @pytest.mark.asyncio
     async def test_04b_get_nonexistent_agent(self, http):

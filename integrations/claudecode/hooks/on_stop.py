@@ -2,7 +2,7 @@
 """Stop hook — active extraction after a skill session finishes.
 
 Fires when Claude finishes responding. We read the conversation transcript,
-detect which skill was used, and hand the session summary to Mira's backend
+detect which skill was used, and hand the session summary to Rivera's backend
 LLM, which distills durable engineering memories and persists them. Future
 sessions then inherit those decisions automatically.
 

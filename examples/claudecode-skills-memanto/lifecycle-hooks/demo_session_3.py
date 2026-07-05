@@ -15,7 +15,7 @@ Run AFTER demo_session_1.py and demo_session_2.py:
 
 from __future__ import annotations
 
-from mira_skills import SkillMemory
+from rivera_skills import SkillMemory
 
 SESSION_3_TRANSCRIPT = """
 user: /handoff I'm handing the codebase to a new engineer. Here's what they must know.
@@ -40,7 +40,7 @@ def main() -> None:
     mem.setup()
 
     # --- Step 1: store /handoff decisions ---
-    print("Session 3a: distilling /handoff decisions into Mira…\n")
+    print("Session 3a: distilling /handoff decisions into Rivera…\n")
     stored = mem.distill_and_store("handoff", SESSION_3_TRANSCRIPT)
     if not stored:
         print("Nothing extracted. Check RIVERA_API_KEY and connectivity.")

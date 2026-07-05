@@ -9,10 +9,10 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 from httpx import ASGITransport, AsyncClient
 
-from mira.app.config import settings
-from mira.app.main import app
-from mira.app.models.session import Session
-from mira.app.routes.auth_deps import get_current_session
+from rivera.app.config import settings
+from rivera.app.main import app
+from rivera.app.models.session import Session
+from rivera.app.routes.auth_deps import get_current_session
 
 # Set test environment
 os.environ["RIVERA_API_KEY"] = "test-api-key"
@@ -27,11 +27,11 @@ def test_env_setup():
 
     # Patch all services/routes that use Path.home()
     with (
-        patch("mira.app.services.agent_service.Path.home", return_value=temp_path),
-        patch("mira.app.services.session_service.Path.home", return_value=temp_path),
+        patch("rivera.app.services.agent_service.Path.home", return_value=temp_path),
+        patch("rivera.app.services.session_service.Path.home", return_value=temp_path),
     ):
-        from mira.app.routes.sessions import agent_service
-        from mira.app.services import session_service as session_service_mod
+        from rivera.app.routes.sessions import agent_service
+        from rivera.app.services import session_service as session_service_mod
 
         # Force a fresh SessionService bound to the patched Path.home so the
         # singleton's sessions_dir always points inside this test's temp dir.
@@ -39,7 +39,7 @@ def test_env_setup():
         session_service = session_service_mod.get_session_service()
 
         orig_agent_dir = agent_service.agents_dir
-        agent_service.agents_dir = temp_path / ".mira" / "agents"
+        agent_service.agents_dir = temp_path / ".rivera" / "agents"
 
         agent_service.agents_dir.mkdir(parents=True, exist_ok=True)
         session_service.sessions_dir.mkdir(parents=True, exist_ok=True)
@@ -72,17 +72,17 @@ def auth_headers():
 def mock_moorcheh():
     """Mock the Moorcheh SDK client globally across services"""
     # Reset the singleton to ensure it picks up the patched class
-    from mira.app.clients.moorcheh import moorcheh_client
+    from rivera.app.clients.moorcheh import moorcheh_client
 
     moorcheh_client.reset_client()
 
     with (
         patch(
-            "mira.app.services.agent_service.get_moorcheh_client"
+            "rivera.app.services.agent_service.get_moorcheh_client"
         ) as mock_agent_client,
-        patch("mira.app.clients.moorcheh.MoorchehClient") as mock_moorcheh_cls,
+        patch("rivera.app.clients.moorcheh.MoorchehClient") as mock_moorcheh_cls,
         patch(
-            "mira.app.clients.moorcheh.AsyncMoorchehClient"
+            "rivera.app.clients.moorcheh.AsyncMoorchehClient"
         ) as mock_async_moorcheh_cls,
     ):
         # Setup mock instances
@@ -139,8 +139,8 @@ def mock_moorcheh():
         moorcheh_client.reset_client()
 
 
-class TestMIRAAPI:
-    """Contract tests for MIRA session-based API"""
+class TestRIVERAAPI:
+    """Contract tests for RIVERA session-based API"""
 
     TEST_AGENT_ID = "test-api-agent"
 
@@ -257,12 +257,12 @@ class TestMIRAAPI:
             session_id="sess-test",
             session_token="token-test",
             agent_id=self.TEST_AGENT_ID,
-            namespace=f"mira_agent_{self.TEST_AGENT_ID}",
+            namespace=f"rivera_agent_{self.TEST_AGENT_ID}",
             started_at=datetime.utcnow(),
             expires_at=datetime.utcnow() + timedelta(hours=1),
         )
         try:
-            with patch("mira.app.routes.memory.MemoryWriteService") as mock_cls:
+            with patch("rivera.app.routes.memory.MemoryWriteService") as mock_cls:
                 write_service = mock_cls.return_value
                 write_service.update_memory.return_value = {
                     "status": "success",
@@ -284,7 +284,7 @@ class TestMIRAAPI:
         assert data["updated_fields"] == ["title", "content"]
         write_service.update_memory.assert_called_once_with(
             "mem-123",
-            f"mira_agent_{self.TEST_AGENT_ID}",
+            f"rivera_agent_{self.TEST_AGENT_ID}",
             {"title": "New title", "content": "New content"},
         )
 
@@ -295,7 +295,7 @@ class TestMIRAAPI:
             session_id="sess-test",
             session_token="token-test",
             agent_id=self.TEST_AGENT_ID,
-            namespace=f"mira_agent_{self.TEST_AGENT_ID}",
+            namespace=f"rivera_agent_{self.TEST_AGENT_ID}",
             started_at=datetime.utcnow(),
             expires_at=datetime.utcnow() + timedelta(hours=1),
         )
@@ -326,12 +326,12 @@ class TestMIRAAPI:
             session_id="sess-test",
             session_token="token-test",
             agent_id=self.TEST_AGENT_ID,
-            namespace=f"mira_agent_{self.TEST_AGENT_ID}",
+            namespace=f"rivera_agent_{self.TEST_AGENT_ID}",
             started_at=datetime.utcnow(),
             expires_at=datetime.utcnow() + timedelta(hours=1),
         )
         try:
-            with patch("mira.app.routes.memory.MemoryWriteService") as mock_cls:
+            with patch("rivera.app.routes.memory.MemoryWriteService") as mock_cls:
                 write_service = mock_cls.return_value
                 write_service.update_memory.side_effect = Exception(
                     "memory mem-999 not found in namespace"
@@ -566,7 +566,7 @@ class TestMIRAAPI:
         )
         assert response.status_code == 200
         mock_moorcheh.namespaces.delete.assert_called_once_with(
-            namespace_name="mira_agent_to-delete-remote"
+            namespace_name="rivera_agent_to-delete-remote"
         )
 
     @pytest.mark.asyncio
@@ -772,7 +772,7 @@ class TestMIRAAPI:
         assert data["status"] == "deleted"
         assert data["memory_id"] == "mem-123"
         mock_moorcheh.documents.delete.assert_called_once_with(
-            namespace_name="mira_agent_test-api-agent", ids=["mem-123"]
+            namespace_name="rivera_agent_test-api-agent", ids=["mem-123"]
         )
 
     @pytest.mark.asyncio
@@ -1056,7 +1056,7 @@ class TestMIRAAPI:
         token = activate_resp.json()["session_token"]
         headers = {**auth_headers, "X-Session-Token": token}
 
-        with patch("mira.app.routes.memory.DirectClient") as mock_client_cls:
+        with patch("rivera.app.routes.memory.DirectClient") as mock_client_cls:
             mock_client = mock_client_cls.return_value
             mock_client.list_conflicts.return_value = [
                 {"type": "conflict", "id": "c-1"}
@@ -1087,7 +1087,7 @@ class TestMIRAAPI:
         token = activate_resp.json()["session_token"]
         headers = {**auth_headers, "X-Session-Token": token}
 
-        with patch("mira.app.routes.memory.DirectClient") as mock_client_cls:
+        with patch("rivera.app.routes.memory.DirectClient") as mock_client_cls:
             mock_client = mock_client_cls.return_value
             mock_client.resolve_conflict.return_value = {
                 "status": "resolved",
@@ -1119,7 +1119,7 @@ class TestMIRAAPI:
         token = activate_resp.json()["session_token"]
         headers = {**auth_headers, "X-Session-Token": token}
 
-        with patch("mira.app.routes.memory.DirectClient") as mock_client_cls:
+        with patch("rivera.app.routes.memory.DirectClient") as mock_client_cls:
             response = await client.post(
                 f"/api/v2/agents/{self.TEST_AGENT_ID}/conflicts/resolve",
                 headers=headers,
@@ -1149,7 +1149,7 @@ class TestMIRAAPI:
         token = activate_resp.json()["session_token"]
         headers = {**auth_headers, "X-Session-Token": token}
 
-        with patch("mira.app.routes.memory.DirectClient") as mock_client_cls:
+        with patch("rivera.app.routes.memory.DirectClient") as mock_client_cls:
             response = await client.post(
                 f"/api/v2/agents/{self.TEST_AGENT_ID}/conflicts/resolve",
                 headers=headers,
@@ -1260,9 +1260,9 @@ def _mock_ui_config_manager():
     mock_cm.get_active_session.return_value = ("agent-1", "tok_abc")
     mock_cm.get_backend.return_value = MagicMock(value="cloud")
     mock_cm.get_onprem_config.return_value = {}
-    mock_cm.get_data_dir.return_value = "/tmp/mira"
+    mock_cm.get_data_dir.return_value = "/tmp/rivera"
 
-    with patch("mira.app.ui.routes.ui_router._config_manager", mock_cm):
+    with patch("rivera.app.ui.routes.ui_router._config_manager", mock_cm):
         yield mock_cm
 
 

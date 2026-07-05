@@ -1,8 +1,8 @@
 """
-MiraMemory — A LangGraph-compatible memory integration for Mira.
+RiveraMemory — A LangGraph-compatible memory integration for Rivera.
 
 Provides tools to remember, recall, and get LLM-grounded answers
-from a Mira-powered long-term memory layer.
+from a Rivera-powered long-term memory layer.
 """
 
 from __future__ import annotations
@@ -15,7 +15,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # ---------------------------------------------------------------------------
-# Mira client wrapper
+# Rivera client wrapper
 # ---------------------------------------------------------------------------
 
 MEMORY_CATEGORIES = [
@@ -37,8 +37,8 @@ MEMORY_CATEGORIES = [
 MEMORY_TYPES_LITERAL = str  # one of the categories above
 
 
-class MiraMemory:
-    """A thin Pythonic wrapper around the Mira REST API.
+class RiveraMemory:
+    """A thin Pythonic wrapper around the Rivera REST API.
 
     This wraps the three core primitives:
         remember(text, type) → store a fact
@@ -55,7 +55,7 @@ class MiraMemory:
         agent_name: str = "langgraph-agent",
         base_url: str = "https://api.moorcheh.ai/v1",
     ):
-        from mira.cli.client.sdk_client import SdkClient
+        from rivera.cli.client.sdk_client import SdkClient
 
         self.api_key = api_key or os.getenv("RIVERA_API_KEY", "")
         self.agent_name = agent_name

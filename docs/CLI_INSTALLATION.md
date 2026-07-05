@@ -1,4 +1,4 @@
-# MIRA CLI Installation & Usage Guide
+# RIVERA CLI Installation & Usage Guide
 
 **Status**: Production Ready
 **Last Updated**: March 2025
@@ -21,26 +21,26 @@
 ### Option 1: Install from PyPI (Future - After Publishing)
 
 ```bash
-pip install mira
+pip install rivera
 ```
 
 ### Option 2: Install from Source (Current)
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-org/mira.git
-cd mira
+git clone https://github.com/your-org/rivera.git
+cd rivera
 
 # Install in development mode
 pip install -e .
 
 # Verify installation
-mira --help
+rivera --help
 ```
 
 **What gets installed:**
-- `mira` command-line tool
-- MIRA API server (`app/` package)
+- `rivera` command-line tool
+- RIVERA API server (`app/` package)
 - CLI interface (`cli/` package)
 - All dependencies (typer, rich, httpx, cryptography, fastapi, moorcheh-sdk, etc.)
 
@@ -61,19 +61,19 @@ mira --help
 #### Step 2: Initialize & Setup
 
 ```bash
-# Initialize MIRA (Sets up your API key)
-mira
+# Initialize RIVERA (Sets up your API key)
+rivera
 ```
 
 **That's it!** You are ready to use the CLI. No local server is required for CLI commands.
 
 ### Optional: Start the REST API Server
 
-If you want to use the MIRA REST API from other applications or via `curl`:
+If you want to use the RIVERA REST API from other applications or via `curl`:
 
 ```bash
 # Start the local FastAPI server
-mira serve
+rivera serve
 ```
 
 ### Alternative: Manual Server Management
@@ -85,37 +85,37 @@ If you prefer to manage the server separately:
 python -m app.main
 
 # Terminal 2: Initialize CLI
-mira
+rivera
 
 # Terminal 2: Use CLI commands
-mira agent create my-agent
+rivera agent create my-agent
 ```
 
 **Output:**
 ```
 +----------------------------------------+
-| MIRA CLI Initialization               |
-| Setting up your MIRA configuration... |
+| RIVERA CLI Initialization               |
+| Setting up your RIVERA configuration... |
 +----------------------------------------+
 
 Enter your Moorcheh API key: ********
 
-Testing connection to MIRA server...
+Testing connection to RIVERA server...
 OK Connection successful!
 Server version: 1.0.0
 
-Configuration saved to: ~/.mira/config.yaml
+Configuration saved to: ~/.rivera/config.yaml
 
 Next steps:
-  1. Create and activate an agent: mira agent create my-agent
-  2. Start storing memories: mira remember "Hello"
+  1. Create and activate an agent: rivera agent create my-agent
+  2. Start storing memories: rivera remember "Hello"
 
 Optional:
-  mira serve (starts local REST API server)
+  rivera serve (starts local REST API server)
 ```
 
 **What happens:**
-- API key is encrypted with Fernet and saved to `~/.mira/config.yaml`
+- API key is encrypted with Fernet and saved to `~/.rivera/config.yaml`
 - Connection to server is tested
 - CLI is ready to use!
 
@@ -123,20 +123,20 @@ Optional:
 
 ## REST API Management
 
-### Recommended: Embedded API Mode (`mira serve`)
+### Recommended: Embedded API Mode (`rivera serve`)
 
 **Basic CLI Usage (No server required):**
 ```bash
-mira agent create my-agent
-mira remember "First memory"
+rivera agent create my-agent
+rivera remember "First memory"
 ```
 
-**Using the REST API (requires `mira serve`):**
-If you need to access MIRA via HTTP (e.g., from a web app), start the server:
+**Using the REST API (requires `rivera serve`):**
+If you need to access RIVERA via HTTP (e.g., from a web app), start the server:
 
 ```bash
 # Terminal 1
-mira serve
+rivera serve
 
 # Terminal 2 (or from your app)
 curl -X POST "http://localhost:8000/api/v2/agents/my-agent/recall" \
@@ -153,9 +153,9 @@ curl -X POST "http://localhost:8000/api/v2/agents/my-agent/recall" \
 
 **Options:**
 ```bash
-mira serve --port 8080        # Use different port
-mira serve --reload           # Auto-reload for development
-mira serve --host 127.0.0.1   # Localhost only
+rivera serve --port 8080        # Use different port
+rivera serve --reload           # Auto-reload for development
+rivera serve --host 127.0.0.1   # Localhost only
 ```
 
 ### Alternative: Manual Server Management
@@ -169,8 +169,8 @@ python -m app.main
 
 **Terminal 2 - CLI:**
 ```bash
-mira agent create my-agent
-mira remember "First memory"
+rivera agent create my-agent
+rivera remember "First memory"
 ```
 
 **Use when:**
@@ -186,7 +186,7 @@ mira remember "First memory"
 
 ```bash
 # 1. Create and activate an agent (one-time)
-mira agent create my-assistant --pattern tool --description "My AI assistant"
+rivera agent create my-assistant --pattern tool --description "My AI assistant"
 
 # Output:
 # OK Agent 'my-assistant' created successfully!
@@ -196,7 +196,7 @@ mira agent create my-assistant --pattern tool --description "My AI assistant"
 # Session expires: 2025-12-28T16:30:00
 
 # 2. (Optional) Reactivate or change duration
-mira agent activate my-assistant --duration-hours 8
+rivera agent activate my-assistant --duration-hours 8
 
 # Output:
 # OK Agent 'my-assistant' activated!
@@ -204,8 +204,8 @@ mira agent activate my-assistant --duration-hours 8
 # Session expires: 2025-12-28T18:30:00
 
 # 3. Store memories
-mira remember "User prefers dark mode" --type preference --tags "ui,settings"
-mira remember "Implemented login feature" --type decision --tags "auth,feature"
+rivera remember "User prefers dark mode" --type preference --tags "ui,settings"
+rivera remember "Implemented login feature" --type decision --tags "auth,feature"
 
 # Output for each:
 # OK Memory stored successfully!
@@ -213,7 +213,7 @@ mira remember "Implemented login feature" --type decision --tags "auth,feature"
 # Type: preference | Confidence: 0.8
 
 # 4. Search memories
-mira recall "dark mode" --limit 5
+rivera recall "dark mode" --limit 5
 
 # Output:
 # Found 1 memories:
@@ -227,7 +227,7 @@ mira recall "dark mode" --limit 5
 # +-----------------------------------------------------------------------------+
 
 # 5. Ask questions (RAG)
-mira answer "What UI preferences does the user have?"
+rivera answer "What UI preferences does the user have?"
 
 # Output:
 # +------------------------------- RAG Response --------------------------------+
@@ -239,7 +239,7 @@ mira answer "What UI preferences does the user have?"
 # +-----------------------------------------------------------------------------+
 
 # 6. Check session status
-mira session info
+rivera session info
 
 # Output:
 # Active Session
@@ -249,7 +249,7 @@ mira session info
 # +-----------------------------------------+
 
 # 7. When done
-mira agent deactivate
+rivera agent deactivate
 
 # Output:
 # OK Agent 'my-assistant' deactivated
@@ -259,31 +259,31 @@ mira agent deactivate
 
 ```bash
 # Setup
-mira                                   # Setup CLI with API key
+rivera                                   # Setup CLI with API key
 
 # Agent Management
-mira agent create AGENT_ID             # Create and activate new agent
-mira agent list                        # List all agents
-mira agent activate AGENT_ID           # Activate (or reactivate) session
-mira agent deactivate                  # End session
-mira agent delete AGENT_ID            # Delete agent (prompts to keep/purge cloud memories)
+rivera agent create AGENT_ID             # Create and activate new agent
+rivera agent list                        # List all agents
+rivera agent activate AGENT_ID           # Activate (or reactivate) session
+rivera agent deactivate                  # End session
+rivera agent delete AGENT_ID            # Delete agent (prompts to keep/purge cloud memories)
 
 # Memory Operations
-mira remember "content"                # Store memory (fact)
-mira remember "content" --type TYPE    # Store with type
-mira remember "content" --tags "a,b"   # Store with tags
-mira recall "query"                    # Search memories
-mira answer "question"                    # RAG question answering
+rivera remember "content"                # Store memory (fact)
+rivera remember "content" --type TYPE    # Store with type
+rivera remember "content" --tags "a,b"   # Store with tags
+rivera recall "query"                    # Search memories
+rivera answer "question"                    # RAG question answering
 
 # Session Management
-mira session info                      # Show session details
+rivera session info                      # Show session details
 
 # Configuration
-mira config show                       # Display config
+rivera config show                       # Display config
 
 # Help
-mira --help                            # Show all commands
-mira COMMAND --help                    # Show command help
+rivera --help                            # Show all commands
+rivera COMMAND --help                    # Show command help
 ```
 
 ---
@@ -295,7 +295,7 @@ mira COMMAND --help                    # Show command help
 ```
 ┌─────────────────┐
 │   User Types    │
-│  mira          │
+│  rivera          │
 └────────┬────────┘
          │
          ▼
@@ -311,7 +311,7 @@ mira COMMAND --help                    # Show command help
          │ (X-Session-Token: JWT)
          ▼
 ┌─────────────────────────────────────┐
-│  MIRA Server (app/main.py)         │
+│  RIVERA Server (app/main.py)         │
 │  - FastAPI application              │
 │  - Session-based API                │
 │  - JWT token management             │
@@ -324,16 +324,16 @@ mira COMMAND --help                    # Show command help
 │  Moorcheh Cloud                     │
 │  - No-indexing semantic database    │
 │  - Instant write-to-search          │
-│  - Namespace: mira_agent_{id}      │
+│  - Namespace: rivera_agent_{id}      │
 └─────────────────────────────────────┘
 ```
 
 ### File Structure
 
 ```
-mira/
+rivera/
 ├── pyproject.toml          # Package definition, entry point
-├── app/                    # MIRA Server
+├── app/                    # RIVERA Server
 │   ├── main.py            # FastAPI app
 │   ├── routes/            # API endpoints
 │   └── services/          # Business logic
@@ -344,7 +344,7 @@ mira/
 │   └── config/            # Config management
 │       ├── models.py      # Pydantic models
 │       └── manager.py     # Encryption, persistence
-└── ~/.mira/               # User config (created at runtime)
+└── ~/.rivera/               # User config (created at runtime)
     ├── config.yaml        # User configuration
     └── .key               # Encryption key (0600 permissions)
 ```
@@ -354,14 +354,14 @@ mira/
 **[pyproject.toml:25](pyproject.toml#L25)**
 ```toml
 [project.scripts]
-mira = "cli.main:app"
+rivera = "cli.main:app"
 ```
 
-This creates the `mira` command that runs the Typer app in `cli/main.py`.
+This creates the `rivera` command that runs the Typer app in `cli/main.py`.
 
 ### Configuration File
 
-**Location:** `~/.mira/config.yaml` (Linux/Mac) or `C:\Users\<user>\.mira\config.yaml` (Windows)
+**Location:** `~/.rivera/config.yaml` (Linux/Mac) or `C:\Users\<user>\.rivera\config.yaml` (Windows)
 
 **Contents:**
 ```yaml
@@ -403,34 +403,34 @@ active_session_token: "eyJhbGciOiJIUzI1NiI..."
 
 **Security:**
 - API key encrypted with Fernet (symmetric encryption)
-- Encryption key in `~/.mira/.key` with 0600 permissions
+- Encryption key in `~/.rivera/.key` with 0600 permissions
 - Never commit config files to version control
 
 ---
 
 ## Troubleshooting
 
-### "mira: command not found"
+### "rivera: command not found"
 
 **Cause:** Package not installed or not in PATH
 
 **Solution:**
 ```bash
 # If installed with pip:
-pip install mira
+pip install rivera
 
 # If installed from source:
-cd mira
+cd rivera
 pip install -e .
 
 # Verify:
-which mira  # Should show path to command
-mira --help # Should work
+which rivera  # Should show path to command
+rivera --help # Should work
 ```
 
 ### "Connection failed" Error
 
-**Cause:** MIRA server not running
+**Cause:** RIVERA server not running
 
 **Check:**
 ```bash
@@ -438,13 +438,13 @@ mira --help # Should work
 curl http://localhost:8000/health
 
 # Should return:
-# {"status":"healthy","service":"MIRA","version":"1.0.0"}
+# {"status":"healthy","service":"RIVERA","version":"1.0.0"}
 ```
 
 **Solution:**
 ```bash
 # Start server in a separate terminal
-cd mira
+cd rivera
 python -m app.main
 ```
 
@@ -455,19 +455,19 @@ python -m app.main
 **Solution:**
 ```bash
 # List available agents
-mira agent list
+rivera agent list
 
 # Activate one
-mira agent activate AGENT_ID
+rivera agent activate AGENT_ID
 ```
 
-### "MIRA not configured" Error
+### "RIVERA not configured" Error
 
 **Cause:** CLI not configured
 
 **Solution:**
 ```bash
-mira
+rivera
 # Follow the prompts
 ```
 
@@ -478,7 +478,7 @@ mira
 **Solution:**
 ```bash
 # Reactivate
-mira agent activate AGENT_ID
+rivera agent activate AGENT_ID
 ```
 
 ### Windows Unicode Errors

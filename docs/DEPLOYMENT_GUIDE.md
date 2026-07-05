@@ -1,8 +1,8 @@
-# MIRA Production Deployment Guide
+# RIVERA Production Deployment Guide
 
 ## 🚀 Deployment Overview
 
-MIRA is production-ready with enterprise-grade security, observability, and scalability features. This guide covers deployment options and operational considerations.
+RIVERA is production-ready with enterprise-grade security, observability, and scalability features. This guide covers deployment options and operational considerations.
 
 ## 📋 Prerequisites
 
@@ -54,21 +54,21 @@ ALLOWED_ORIGINS=https://yourdomain.com,https://app.yourdomain.com
 
 ## 🐳 Docker Deployment
 
-Mira includes a production-ready `Dockerfile` and `docker-compose.yml` in the root of the repository.
+Rivera includes a production-ready `Dockerfile` and `docker-compose.yml` in the root of the repository.
 
 ### Docker Commands
 ```bash
 # 1. Build the image
-docker build -t mira:latest .
+docker build -t rivera:latest .
 
 # 2. Run the container
 docker run -d \
-  --name mira \
+  --name rivera \
   -p 8000:8000 \
   -e RIVERA_API_KEY=your_key \
   -e LOG_LEVEL=INFO \
   --restart unless-stopped \
-  mira:latest
+  rivera:latest
 
 # Check health
 curl http://localhost:8000/health
@@ -95,29 +95,29 @@ docker-compose logs -f
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: mira
+  name: rivera
   labels:
-    app: mira
+    app: rivera
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: mira
+      app: rivera
   template:
     metadata:
       labels:
-        app: mira
+        app: rivera
     spec:
       containers:
-      - name: mira
-        image: mira:latest
+      - name: rivera
+        image: rivera:latest
         ports:
         - containerPort: 8000
         env:
         - name: RIVERA_API_KEY
           valueFrom:
             secretKeyRef:
-              name: mira-secrets
+              name: rivera-secrets
               key: moorcheh-api-key
         - name: LOG_LEVEL
           value: "INFO"
@@ -144,10 +144,10 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: mira-service
+  name: rivera-service
 spec:
   selector:
-    app: mira
+    app: rivera
   ports:
   - protocol: TCP
     port: 80
@@ -157,7 +157,7 @@ spec:
 apiVersion: v1
 kind: Secret
 metadata:
-  name: mira-secrets
+  name: rivera-secrets
 type: Opaque
 data:
   moorcheh-api-key: <base64-encoded-api-key>
@@ -168,24 +168,24 @@ data:
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: mira-ingress
+  name: rivera-ingress
   annotations:
     kubernetes.io/ingress.class: nginx
     cert-manager.io/cluster-issuer: letsencrypt-prod
 spec:
   tls:
   - hosts:
-    - mira.yourdomain.com
-    secretName: mira-tls
+    - rivera.yourdomain.com
+    secretName: rivera-tls
   rules:
-  - host: mira.yourdomain.com
+  - host: rivera.yourdomain.com
     http:
       paths:
       - path: /
         pathType: Prefix
         backend:
           service:
-            name: mira-service
+            name: rivera-service
             port:
               number: 80
 ```
@@ -195,7 +195,7 @@ spec:
 ### AWS ECS
 ```json
 {
-  "family": "mira",
+  "family": "rivera",
   "networkMode": "awsvpc",
   "requiresCompatibilities": ["FARGATE"],
   "cpu": "512",
@@ -203,8 +203,8 @@ spec:
   "executionRoleArn": "arn:aws:iam::account:role/ecsTaskExecutionRole",
   "containerDefinitions": [
     {
-      "name": "mira",
-      "image": "your-account.dkr.ecr.region.amazonaws.com/mira:latest",
+      "name": "rivera",
+      "image": "your-account.dkr.ecr.region.amazonaws.com/rivera:latest",
       "portMappings": [
         {
           "containerPort": 8000,
@@ -220,7 +220,7 @@ spec:
       "secrets": [
         {
           "name": "RIVERA_API_KEY",
-          "valueFrom": "arn:aws:secretsmanager:region:account:secret:mira/moorcheh-api-key"
+          "valueFrom": "arn:aws:secretsmanager:region:account:secret:rivera/moorcheh-api-key"
         }
       ],
       "healthCheck": {
@@ -232,7 +232,7 @@ spec:
       "logConfiguration": {
         "logDriver": "awslogs",
         "options": {
-          "awslogs-group": "/ecs/mira",
+          "awslogs-group": "/ecs/rivera",
           "awslogs-region": "us-west-2",
           "awslogs-stream-prefix": "ecs"
         }
@@ -247,7 +247,7 @@ spec:
 apiVersion: serving.knative.dev/v1
 kind: Service
 metadata:
-  name: mira
+  name: rivera
   annotations:
     run.googleapis.com/ingress: all
 spec:
@@ -259,14 +259,14 @@ spec:
     spec:
       containerConcurrency: 100
       containers:
-      - image: gcr.io/your-project/mira:latest
+      - image: gcr.io/your-project/rivera:latest
         ports:
         - containerPort: 8000
         env:
         - name: RIVERA_API_KEY
           valueFrom:
             secretKeyRef:
-              name: mira-secrets
+              name: rivera-secrets
               key: moorcheh-api-key
         - name: LOG_LEVEL
           value: INFO
@@ -314,15 +314,15 @@ curl http://localhost:8000/docs
 ### Alerting Recommendations
 ```yaml
 # Suggested alerts:
-- name: MIRA High Error Rate
+- name: RIVERA High Error Rate
   condition: error_rate > 5%
   duration: 5m
 
-- name: MIRA High Latency
+- name: RIVERA High Latency
   condition: p95_latency > 500ms
   duration: 2m
 
-- name: MIRA Service Down
+- name: RIVERA Service Down
   condition: health_check_failed
   duration: 1m
 ```
@@ -380,7 +380,7 @@ ANSWERS_PER_MINUTE: 30
 
 ### GitHub Actions Example
 ```yaml
-name: Deploy MIRA
+name: Deploy RIVERA
 on:
   push:
     branches: [main]
@@ -400,9 +400,9 @@ jobs:
     steps:
     - name: Deploy to production
       run: |
-        docker build -t mira:${{ github.sha }} .
-        docker push your-registry/mira:${{ github.sha }}
-        kubectl set image deployment/mira mira=your-registry/mira:${{ github.sha }}
+        docker build -t rivera:${{ github.sha }} .
+        docker push your-registry/rivera:${{ github.sha }}
+        kubectl set image deployment/rivera rivera=your-registry/rivera:${{ github.sha }}
 ```
 
 ## 🚨 Troubleshooting

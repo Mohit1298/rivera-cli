@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from mira_skills import skill_map
+from rivera_skills import skill_map
 
 
 def test_known_skill_routes() -> None:

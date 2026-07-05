@@ -2,7 +2,7 @@
 """
 Full Pipeline: Research Agent -> Writer Agent in a single Crew run.
 
-Both agents share the same Mira memory namespace. The Research Agent
+Both agents share the same Rivera memory namespace. The Research Agent
 stores findings, then the Writer Agent retrieves and synthesizes them
 into an executive briefing -- all in one sequential pipeline.
 
@@ -16,7 +16,7 @@ import os
 import sys
 
 from crew import build_full_crew
-from crewai_mira import MiraSetup
+from crewai_rivera import RiveraSetup
 from dotenv import load_dotenv
 
 AGENT_ID = "crewai-research-team"
@@ -35,8 +35,8 @@ def main() -> None:
 
     llm = os.environ.get("CREWAI_LLM", "openrouter/baidu/cobuddy:free")
 
-    # Set up Mira
-    setup = MiraSetup(api_key)
+    # Set up Rivera
+    setup = RiveraSetup(api_key)
     client = setup.setup(
         agent_id=AGENT_ID,
         description="Shared memory for CrewAI research pipeline",

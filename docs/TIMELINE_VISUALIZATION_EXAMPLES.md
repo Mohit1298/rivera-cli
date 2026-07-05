@@ -7,7 +7,7 @@
 
 ## Introduction
 
-MIRA's hybrid timeline model (automatic timestamps + semantic timeline) enables powerful visualizations of agent activity, project progress, and memory patterns over time.
+RIVERA's hybrid timeline model (automatic timestamps + semantic timeline) enables powerful visualizations of agent activity, project progress, and memory patterns over time.
 
 This guide provides practical examples for visualizing timeline data.
 
@@ -511,7 +511,7 @@ POST /recall/changed-since
 
 ```
 ┌─────────────────────────────────────────────────────┐
-│  Agent: claude_mira_dev   Tenant: moorcheh_dev    │
+│  Agent: claude_rivera_dev   Tenant: moorcheh_dev    │
 ├─────────────────────────────────────────────────────┤
 │                                                     │
 │  This Week's Activity                               │
@@ -545,7 +545,7 @@ POST /recall/changed-since
 
 ## Resources
 
-- **MIRA API**: [AGENT_RUNTIME_GUIDE.md](AGENT_RUNTIME_GUIDE.md)
+- **RIVERA API**: [AGENT_RUNTIME_GUIDE.md](AGENT_RUNTIME_GUIDE.md)
 - **Temporal Helpers**: [app/utils/temporal_helpers.py](app/utils/temporal_helpers.py)
 - **Best Practices**: [AGENT_MEMORY_BEST_PRACTICES.md](AGENT_MEMORY_BEST_PRACTICES.md)
 

@@ -1,8 +1,8 @@
 services:
-  mira:
+  rivera:
     build: .
-    image: mira:latest
-    container_name: mira
+    image: rivera:latest
+    container_name: rivera
     ports:
       - "8000:8000"
     # Load RIVERA_API_KEY and any overrides from your local .env file.

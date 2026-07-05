@@ -1,12 +1,12 @@
-# CrewAI + Mira Example
+# CrewAI + Rivera Example
 
-This directory contains a real-world example of CrewAI agents using **Mira** as their shared, persistent memory layer. Two agents collaborate through a semantic memory database that survives across sessions, agents, and runs.
+This directory contains a real-world example of CrewAI agents using **Rivera** as their shared, persistent memory layer. Two agents collaborate through a semantic memory database that survives across sessions, agents, and runs.
 
-> **Note**: The core integration tools used in this example are published to PyPI as `crewai-mira`. For deep documentation on the architecture, setup instructions, and API details of the integration itself, please read the [crewai-mira package README](../../integrations/crewai/README.md).
+> **Note**: The core integration tools used in this example are published to PyPI as `crewai-rivera`. For deep documentation on the architecture, setup instructions, and API details of the integration itself, please read the [crewai-rivera package README](../../integrations/crewai/README.md).
 
 ## Architecture
 
-![CrewAI + Mira: Persistent Multi-Agent Memory](https://github.com/moorcheh-ai/mira/raw/main/assets/crewai-architecture.png)
+![CrewAI + Rivera: Persistent Multi-Agent Memory](https://github.com/moorcheh-ai/rivera/raw/main/assets/crewai-architecture.png)
 
 ## What This Demonstrates
 
@@ -37,7 +37,7 @@ cp .env.example .env
 This is the recommended flow for your terminal recording:
 
 ```bash
-# Step 1: Research Agent stores findings in Mira
+# Step 1: Research Agent stores findings in Rivera
 python run_research.py
 
 # Step 2: Writer Agent retrieves those memories in a NEW session
@@ -53,7 +53,7 @@ python run_contradiction.py
 ```text
 examples/crewai-memory/
 ├── README.md              # This file
-├── requirements.txt       # Python dependencies (includes crewai-mira)
+├── requirements.txt       # Python dependencies (includes crewai-rivera)
 ├── .env.example           # API key template
 ├── agents.py              # Research Agent + Writer Agent definitions
 ├── tasks.py               # Task definitions
@@ -69,10 +69,10 @@ examples/crewai-memory/
 After running the CrewAI pipeline, you can access the same memories from Cursor:
 
 ```bash
-mira connect cursor --global
+rivera connect cursor --global
 ```
 
-Open any project in Cursor and ask it to recall your research findings -- it accesses the same Mira memory namespace used by the CrewAI agents.
+Open any project in Cursor and ask it to recall your research findings -- it accesses the same Rivera memory namespace used by the CrewAI agents.
 
 **Example Cursor prompt after running the CrewAI pipeline:**
-> "Use mira recall to find what the research team stored about AI agent market size"
+> "Use rivera recall to find what the research team stored about AI agent market size"

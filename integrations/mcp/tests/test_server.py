@@ -8,8 +8,8 @@ from __future__ import annotations
 
 import pytest
 
-from mira_mcp.config import MCPServerSettings
-from mira_mcp.server import build_server
+from rivera_mcp.config import MCPServerSettings
+from rivera_mcp.server import build_server
 
 MAIN_TOOL_NAMES = {
     "remember",
@@ -41,7 +41,7 @@ async def test_build_server_registers_main_tools(fake_api_key: str) -> None:
 async def test_admin_tools_registered_when_enabled(
     fake_api_key: str, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    monkeypatch.setenv("MIRA_EXPOSE_ADMIN", "true")
+    monkeypatch.setenv("RIVERA_EXPOSE_ADMIN", "true")
     mcp = build_server(MCPServerSettings())  # type: ignore[call-arg]
     tools = {t.name for t in await mcp.list_tools()}
     assert ADMIN_TOOL_NAMES.issubset(tools), (
@@ -52,7 +52,7 @@ async def test_admin_tools_registered_when_enabled(
 @pytest.mark.asyncio
 async def test_server_name_and_instructions(fake_api_key: str) -> None:
     mcp = build_server(MCPServerSettings())  # type: ignore[call-arg]
-    assert mcp.name == "mira"
+    assert mcp.name == "rivera"
     # Instructions guide the model toward correct memory usage; they must be
     # non-empty and mention the core verbs so clients surface useful prompts.
     instructions = (mcp.instructions or "").lower()

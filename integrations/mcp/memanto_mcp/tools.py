@@ -1,6 +1,6 @@
-"""Mira MCP tools.
+"""Rivera MCP tools.
 
-Each tool is a thin, well-documented wrapper around the Mira ``SdkClient``.
+Each tool is a thin, well-documented wrapper around the Rivera ``SdkClient``.
 Tool descriptions are tuned for LLM tool-selection: they start with a verb,
 explain *when* to use the tool, and list its non-obvious constraints.
 
@@ -16,24 +16,24 @@ at tool-registration time, and we use closure-scoped type aliases (e.g.
 import logging
 from typing import Annotated, Any, Literal, TypeVar
 
-from mira.app.constants import (
+from rivera.app.constants import (
     VALID_MEMORY_TYPES,
     VALID_PROVENANCE_TYPES,
 )
-from mira.app.utils.errors import (
+from rivera.app.utils.errors import (
     AgentAlreadyExistsError,
     AgentNotFoundError,
-    MiraError,
+    RiveraError,
 )
-from mira.app.utils.validation import InputLimits
+from rivera.app.utils.validation import InputLimits
 from pydantic import BaseModel, Field
 
-from mira_mcp.lifecycle import MiraLifecycle, NoAgentConfiguredError
+from rivera_mcp.lifecycle import RiveraLifecycle, NoAgentConfiguredError
 
 logger = logging.getLogger(__name__)
 
 # ---------------------------------------------------------------------------
-# Type aliases pulled from Mira core so the JSON schema we expose matches
+# Type aliases pulled from Rivera core so the JSON schema we expose matches
 # what the server validates internally. Keeping these as Literals gives the
 # calling model a hard enum to pick from.
 # ---------------------------------------------------------------------------
@@ -63,7 +63,7 @@ ProvenanceLiteral = Literal[
     "imported",
 ]
 
-# Hard caps mirroring the Mira core service (see SdkClient).
+# Hard caps mirroring the Rivera core service (see SdkClient).
 _MAX_CONTENT_LENGTH = InputLimits.MAX_TEXT_LENGTH
 _MAX_TITLE_LENGTH = 100
 _MAX_BATCH_SIZE = 100
@@ -79,7 +79,7 @@ class RememberResult(BaseModel):
     """Outcome of storing a single memory."""
 
     status: str = Field(description="'ok' on success, 'error' otherwise.")
-    memory_id: str | None = Field(default=None, description="Mira-assigned ID.")
+    memory_id: str | None = Field(default=None, description="Rivera-assigned ID.")
     agent_id: str = Field(description="Agent the memory belongs to.")
     namespace: str | None = Field(default=None, description="Underlying namespace.")
     confidence: float | None = Field(default=None, description="Confidence stored.")
@@ -189,7 +189,7 @@ def _error_payload(model_cls: type[T], message: str, **defaults: Any) -> T:
 
 def _format_exception(exc: Exception) -> str:
     """Render an exception as a short human-readable string."""
-    if isinstance(exc, MiraError):
+    if isinstance(exc, RiveraError):
         return str(exc.message)
     return f"{type(exc).__name__}: {exc}"
 
@@ -199,8 +199,8 @@ def _format_exception(exc: Exception) -> str:
 # ---------------------------------------------------------------------------
 
 
-def register_tools(mcp: Any, lifecycle: MiraLifecycle) -> None:
-    """Register every Mira MCP tool against the given FastMCP instance.
+def register_tools(mcp: Any, lifecycle: RiveraLifecycle) -> None:
+    """Register every Rivera MCP tool against the given FastMCP instance.
 
     Imported lazily so tests can swap out the lifecycle implementation.
     """
@@ -209,7 +209,7 @@ def register_tools(mcp: Any, lifecycle: MiraLifecycle) -> None:
     default_hint = (
         f" (defaults to '{settings.default_agent_id}')"
         if settings.default_agent_id
-        else " (required: no MIRA_DEFAULT_AGENT_ID is configured)"
+        else " (required: no RIVERA_DEFAULT_AGENT_ID is configured)"
     )
 
     AgentIdField = Annotated[
@@ -217,7 +217,7 @@ def register_tools(mcp: Any, lifecycle: MiraLifecycle) -> None:
         Field(
             default=None,
             description=(
-                "Mira agent identifier the memory belongs to" + default_hint + "."
+                "Rivera agent identifier the memory belongs to" + default_hint + "."
             ),
         ),
     ]
@@ -760,13 +760,13 @@ def register_tools(mcp: Any, lifecycle: MiraLifecycle) -> None:
         _register_admin_tools(mcp, lifecycle)
 
 
-def _register_admin_tools(mcp: Any, lifecycle: MiraLifecycle) -> None:
-    """Optional agent lifecycle tools, gated by MIRA_EXPOSE_ADMIN."""
+def _register_admin_tools(mcp: Any, lifecycle: RiveraLifecycle) -> None:
+    """Optional agent lifecycle tools, gated by RIVERA_EXPOSE_ADMIN."""
 
     @mcp.tool(
         name="create_agent",
         description=(
-            "Create a new Mira agent (memory namespace). Most users only "
+            "Create a new Rivera agent (memory namespace). Most users only "
             "need one agent per project - it is fine to leave this disabled "
             "and rely on auto-create."
         ),
@@ -817,7 +817,7 @@ def _register_admin_tools(mcp: Any, lifecycle: MiraLifecycle) -> None:
 
     @mcp.tool(
         name="list_agents",
-        description="List every Mira agent visible to the current API key.",
+        description="List every Rivera agent visible to the current API key.",
     )
     def list_agents() -> AgentListResult:
         try:
@@ -863,7 +863,7 @@ def _register_admin_tools(mcp: Any, lifecycle: MiraLifecycle) -> None:
         description=(
             "Delete an agent's local metadata. Note: by default this does NOT "
             "delete the remote Moorcheh namespace - memories are retained "
-            "until explicitly purged via the Mira CLI/REST API."
+            "until explicitly purged via the Rivera CLI/REST API."
         ),
     )
     def delete_agent(
@@ -891,9 +891,9 @@ def _register_admin_tools(mcp: Any, lifecycle: MiraLifecycle) -> None:
 
 
 def _to_memory_hit(raw: dict[str, Any]) -> MemoryHit:
-    """Map a Mira recall result row into the MCP MemoryHit shape.
+    """Map a Rivera recall result row into the MCP MemoryHit shape.
 
-    Mira returns slightly different keys across endpoints (e.g. ``score``
+    Rivera returns slightly different keys across endpoints (e.g. ``score``
     vs ``similarity_score``). We coalesce them here so tool consumers see a
     stable schema.
     """

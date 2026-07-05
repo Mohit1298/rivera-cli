@@ -4,7 +4,7 @@ Tests for the backend abstraction (cloud vs on-prem dispatcher).
 
 from unittest.mock import patch
 
-from mira.app.clients.backend import (
+from rivera.app.clients.backend import (
     Backend,
     get_active_llm_model,
     parse_backend,
@@ -36,9 +36,9 @@ class TestActiveLlmModel:
     """
 
     def test_cloud_returns_cloud_default(self, monkeypatch):
-        from mira.app.config import settings
+        from rivera.app.config import settings
 
-        monkeypatch.setattr(settings, "MIRA_BACKEND", "cloud")
+        monkeypatch.setattr(settings, "RIVERA_BACKEND", "cloud")
         assert get_active_llm_model("anthropic.claude-sonnet-4-6") == (
             "anthropic.claude-sonnet-4-6"
         )
@@ -46,30 +46,30 @@ class TestActiveLlmModel:
     def test_on_prem_reads_state_llm_model(self, tmp_path, monkeypatch):
         import json
 
-        from mira.app.config import settings
+        from rivera.app.config import settings
 
-        monkeypatch.setattr(settings, "MIRA_BACKEND", "on-prem")
+        monkeypatch.setattr(settings, "RIVERA_BACKEND", "on-prem")
         # Redirect Path.home() so we don't depend on developer's real state.
         monkeypatch.setattr(
-            "mira.app.clients.backend.Path",
+            "rivera.app.clients.backend.Path",
             type(
                 "P",
                 (),
                 {"home": classmethod(lambda cls: tmp_path)},
             ),
         )
-        state_dir = tmp_path / ".mira" / "on-prem"
+        state_dir = tmp_path / ".rivera" / "on-prem"
         state_dir.mkdir(parents=True)
         (state_dir / "state.json").write_text(json.dumps({"llm_model": "qwen2.5"}))
         # On-prem must NOT fall back to the cloud default.
         assert get_active_llm_model("anthropic.claude-sonnet-4-6") == "qwen2.5"
 
     def test_on_prem_missing_state_returns_none(self, tmp_path, monkeypatch):
-        from mira.app.config import settings
+        from rivera.app.config import settings
 
-        monkeypatch.setattr(settings, "MIRA_BACKEND", "on-prem")
+        monkeypatch.setattr(settings, "RIVERA_BACKEND", "on-prem")
         monkeypatch.setattr(
-            "mira.app.clients.backend.Path",
+            "rivera.app.clients.backend.Path",
             type("P", (), {"home": classmethod(lambda cls: tmp_path)}),
         )
         # No state.json → return None so callers omit ai_model and let the
@@ -82,7 +82,7 @@ class TestOnPremClient:
         """OnPremClient.answer.generate must pass through to the on-prem
         ``moorcheh.MoorchehClient`` — answer is supported on-prem since
         moorcheh-client v0.1.3."""
-        from mira.app.clients import onprem
+        from rivera.app.clients import onprem
 
         class _FakeAnswer:
             def __init__(self):
@@ -112,27 +112,27 @@ class TestOnPremClient:
 class TestSingletonDispatch:
     def test_cloud_returns_cloud_client(self):
         """On cloud, the dispatcher must not return an OnPremClient."""
-        from mira.app.clients import moorcheh as mclients
-        from mira.app.clients import onprem
-        from mira.app.config import settings
+        from rivera.app.clients import moorcheh as mclients
+        from rivera.app.clients import onprem
+        from rivera.app.config import settings
 
-        original = settings.MIRA_BACKEND
-        settings.MIRA_BACKEND = "cloud"
+        original = settings.RIVERA_BACKEND
+        settings.RIVERA_BACKEND = "cloud"
         mclients.moorcheh_client.reset_client()
         try:
             client = mclients.moorcheh_client.get_client()
             assert not isinstance(client, onprem.OnPremClient)
         finally:
-            settings.MIRA_BACKEND = original
+            settings.RIVERA_BACKEND = original
             mclients.moorcheh_client.reset_client()
 
     def test_on_prem_returns_on_prem_client(self):
-        from mira.app.clients import moorcheh as mclients
-        from mira.app.clients import onprem
-        from mira.app.config import settings
+        from rivera.app.clients import moorcheh as mclients
+        from rivera.app.clients import onprem
+        from rivera.app.config import settings
 
-        original = settings.MIRA_BACKEND
-        settings.MIRA_BACKEND = "on-prem"
+        original = settings.RIVERA_BACKEND
+        settings.RIVERA_BACKEND = "on-prem"
         mclients.moorcheh_client.reset_client()
 
         class _FakeRaw:
@@ -153,26 +153,26 @@ class TestSingletonDispatch:
                 client = mclients.moorcheh_client.get_client()
                 assert isinstance(client, onprem.OnPremClient)
         finally:
-            settings.MIRA_BACKEND = original
+            settings.RIVERA_BACKEND = original
             mclients.moorcheh_client.reset_client()
 
 
 class TestDataDirRouting:
     def test_cloud_uses_default(self, tmp_path, monkeypatch):
-        from mira.app import config as app_config
+        from rivera.app import config as app_config
 
         monkeypatch.setenv("HOME", str(tmp_path))
-        monkeypatch.setattr(app_config.settings, "MIRA_BACKEND", "cloud")
+        monkeypatch.setattr(app_config.settings, "RIVERA_BACKEND", "cloud")
         # Path.home() is cached via os.path.expanduser in some envs; force it
         monkeypatch.setattr(app_config.Path, "home", classmethod(lambda cls: tmp_path))
-        assert app_config.get_data_dir() == tmp_path / ".mira"
+        assert app_config.get_data_dir() == tmp_path / ".rivera"
 
     def test_on_prem_uses_subdir(self, tmp_path, monkeypatch):
-        from mira.app import config as app_config
+        from rivera.app import config as app_config
 
         monkeypatch.setenv("HOME", str(tmp_path))
-        monkeypatch.setattr(app_config.settings, "MIRA_BACKEND", "on-prem")
+        monkeypatch.setattr(app_config.settings, "RIVERA_BACKEND", "on-prem")
         monkeypatch.setattr(app_config.Path, "home", classmethod(lambda cls: tmp_path))
         result = app_config.get_data_dir()
-        assert result == tmp_path / ".mira" / "on-prem"
+        assert result == tmp_path / ".rivera" / "on-prem"
         assert result.exists()

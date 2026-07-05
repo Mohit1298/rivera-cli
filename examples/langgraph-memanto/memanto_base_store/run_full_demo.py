@@ -2,7 +2,7 @@
 """Run Session 1 and Session 2 back-to-back in one process.
 
 This is the script the README's demo GIF records. Both sessions reuse
-the same Mira agent but each uses a *different* LangGraph thread_id,
+the same Rivera agent but each uses a *different* LangGraph thread_id,
 so cross-thread recall is what's being demonstrated, not within-thread
 checkpoint replay.
 """
@@ -16,7 +16,7 @@ import sys
 
 from dotenv import load_dotenv
 from langchain_core.messages import HumanMessage
-from mira_base_store.graph import build_support_graph, latest_assistant_text
+from rivera_base_store.graph import build_support_graph, latest_assistant_text
 
 logging.basicConfig(level=logging.WARNING, format="%(levelname)s %(name)s: %(message)s")
 
@@ -43,7 +43,7 @@ async def run_turn(graph, thread_id: str, message: str, user_id: str) -> str:
 
 async def main() -> None:
     load_dotenv()
-    os.environ["MIRA_BACKEND"] = "cloud"
+    os.environ["RIVERA_BACKEND"] = "cloud"
 
     api_key = os.environ.get("RIVERA_API_KEY")
     if not api_key:
@@ -66,12 +66,12 @@ async def main() -> None:
     print(f"User:  {SESSION_1_MESSAGE}\n")
     s1_reply = await run_turn(graph, SESSION_1_THREAD, SESSION_1_MESSAGE, USER_ID)
     print(f"Agent: {s1_reply}\n")
-    print("  -> Preferences extracted and stored in MiraStore.")
+    print("  -> Preferences extracted and stored in RiveraStore.")
 
     # ----------------------------- Session 2 (new thread)
     print(f"\n{bar}\n  Session 2 - thread_id={SESSION_2_THREAD}  (fresh thread)\n{bar}")
     print("  Checkpointer state for this thread_id is EMPTY.")
-    print("  Anything the agent 'knows' below came from MiraStore.\n")
+    print("  Anything the agent 'knows' below came from RiveraStore.\n")
     print(f"User:  {SESSION_2_MESSAGE}\n")
     s2_reply = await run_turn(graph, SESSION_2_THREAD, SESSION_2_MESSAGE, USER_ID)
     print(f"Agent: {s2_reply}\n")

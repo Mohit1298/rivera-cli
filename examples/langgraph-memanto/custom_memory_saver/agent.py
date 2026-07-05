@@ -1,14 +1,14 @@
 """
-Mira + LangGraph: Cross-Session Memory Agent
+Rivera + LangGraph: Cross-Session Memory Agent
 
-A LangGraph agent that uses Mira as a persistent long-term memory layer,
+A LangGraph agent that uses Rivera as a persistent long-term memory layer,
 enabling cross-session recall, typed semantic memory, and grounded RAG answers.
 
 Key Features:
   - Remembers user preferences/facts across completely separate graph sessions
-  - Uses Mira's three primitives: remember, recall, answer
+  - Uses Rivera's three primitives: remember, recall, answer
   - Demonstrates conflict detection via versioned memory updates
-  - Clean separation: LangGraph state for conversation, Mira for long-term memory
+  - Clean separation: LangGraph state for conversation, Rivera for long-term memory
 
 Architecture:
   ┌─────────────┐
@@ -23,7 +23,7 @@ Architecture:
          ▼                         │
   ┌─────────────┐                  │
   │ Recall from │                  │
-  │  Mira    │                  │
+  │  Rivera    │                  │
   └──────┬──────┘                  │
          │                         │
          └──────────┬──────────────┘
@@ -47,9 +47,9 @@ from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, Tool
 from langchain_openai import ChatOpenAI
 from langgraph.checkpoint.memory import MemorySaver
 from langgraph.graph import END, START, MessagesState, StateGraph
-from langgraph_mira import create_mira_tools
+from langgraph_rivera import create_rivera_tools
 
-from mira.cli.client.sdk_client import SdkClient
+from rivera.cli.client.sdk_client import SdkClient
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
 logger = logging.getLogger(__name__)
@@ -58,30 +58,30 @@ logger = logging.getLogger(__name__)
 # Configuration
 # ═══════════════════════════════════════════════════════════════════════════════
 
-# The agent name — used to namespace memories in Mira
-AGENT_NAME = "mira-customer-support"
+# The agent name — used to namespace memories in Rivera
+AGENT_NAME = "rivera-customer-support"
 
-# System prompt that instructs the LLM when and how to use Mira tools
+# System prompt that instructs the LLM when and how to use Rivera tools
 SYSTEM_PROMPT = f"""You are a helpful customer support agent named {AGENT_NAME}.
 
-You have access to three Mira memory tools that allow you to remember
+You have access to three Rivera memory tools that allow you to remember
 information across completely separate conversations:
 
 ## When to use each tool:
 
-### mira_recall(query, memory_type=None, limit=5)
+### rivera_recall(query, memory_type=None, limit=5)
 Call this at the START of EVERY conversation. Look up anything relevant about
 the user you're talking to — their name, preferences, past issues, etc.
 Example: "What do I know about this user?" or "What are the user's preferences?"
 
-### mira_remember(content, memory_type="observation")
+### rivera_remember(content, memory_type="observation")
 Call this whenever you learn something important:
 - The user's name → store as "fact"
 - The user's preferences → store as "preference"
 - A decision made → store as "decision"
 - A goal mentioned → store as "goal"
 
-### mira_answer(query)
+### rivera_answer(query)
 Call this when the user asks something that requires synthesis across multiple
 pieces of stored information. This uses RAG to produce a grounded answer.
 
@@ -90,7 +90,7 @@ instruction, fact, decision, goal, commitment, preference, relationship,
 context, event, learning, observation, artifact, error
 
 ## Important Rules
-1. ALWAYS start a new conversation by calling mira_recall to load context
+1. ALWAYS start a new conversation by calling rivera_recall to load context
 2. ALWAYS remember important user information
 3. If you detect a contradiction with stored memories, note it and update
 4. Be helpful, concise, and proactive about using stored knowledge
@@ -106,7 +106,7 @@ class AgentState(MessagesState):
     """Extended state with cross-session memory context."""
 
     memory_context: str = ""
-    """Pre-formatted context string from Mira recall, injected at start."""
+    """Pre-formatted context string from Rivera recall, injected at start."""
 
 
 # ═══════════════════════════════════════════════════════════════════════════════
@@ -118,16 +118,16 @@ _client = None
 _tools = None
 
 
-def get_mira_client_and_tools():
+def get_rivera_client_and_tools():
     global _client, _tools
     if _client is None:
         _client = SdkClient(api_key=os.environ.get("RIVERA_API_KEY", ""))
-        _tools = create_mira_tools(_client, AGENT_NAME)
+        _tools = create_rivera_tools(_client, AGENT_NAME)
     return _client, _tools
 
 
 def create_llm():
-    """Create the LLM with Mira tools bound."""
+    """Create the LLM with Rivera tools bound."""
     llm = ChatOpenAI(
         model=os.environ.get("LLM_MODEL", "openai/gpt-4o-mini"),
         temperature=0,
@@ -135,7 +135,7 @@ def create_llm():
         or os.environ.get("OPENAI_API_KEY"),
         base_url=os.environ.get("OPENAI_API_BASE", "https://openrouter.ai/api/v1"),
     )
-    _, tools = get_mira_client_and_tools()
+    _, tools = get_rivera_client_and_tools()
     return llm.bind_tools(tools)
 
 
@@ -145,9 +145,9 @@ def create_llm():
 
 
 def recall_memories(state: AgentState) -> AgentState:
-    """Node: Recall relevant memories from Mira at the start of a conversation.
+    """Node: Recall relevant memories from Rivera at the start of a conversation.
 
-    This is the key cross-session recall step. We search Mira for any
+    This is the key cross-session recall step. We search Rivera for any
     information about the user based on the current input, and inject the
     results into the state so the LLM has context from past conversations.
     """
@@ -157,12 +157,12 @@ def recall_memories(state: AgentState) -> AgentState:
 
     # Construct a search query from the user's message
     query = f"What do I know about the user based on: {last_message[:200]}"
-    _, tools = get_mira_client_and_tools()
-    mira_recall = next(t for t in tools if t.name == "mira_recall")
-    result = mira_recall.invoke({"query": query, "limit": 5})
+    _, tools = get_rivera_client_and_tools()
+    rivera_recall = next(t for t in tools if t.name == "rivera_recall")
+    result = rivera_recall.invoke({"query": query, "limit": 5})
 
     state["memory_context"] = result
-    logger.info(f"\n📚 MIRA RECALL:\n{result}\n")
+    logger.info(f"\n📚 RIVERA RECALL:\n{result}\n")
     return state
 
 
@@ -204,14 +204,14 @@ def tool_node(state: AgentState) -> AgentState:
     tool_calls = (last_message.additional_kwargs or {}).get("tool_calls", [])
 
     new_messages = []
-    _, tools = get_mira_client_and_tools()
+    _, tools = get_rivera_client_and_tools()
 
     for tc in tool_calls:
         tool_name = tc["function"]["name"]
         arguments = json.loads(tc["function"]["arguments"])
         tool_call_id = tc["id"]
 
-        logger.info(f"\n🔧 Calling Mira tool: {tool_name}({arguments})")
+        logger.info(f"\n🔧 Calling Rivera tool: {tool_name}({arguments})")
 
         for tool in tools:
             if tool.name == tool_name:
@@ -231,7 +231,7 @@ def tool_node(state: AgentState) -> AgentState:
 
 
 def build_agent() -> StateGraph:
-    """Build and compile the LangGraph agent with Mira integration."""
+    """Build and compile the LangGraph agent with Rivera integration."""
 
     builder = StateGraph(AgentState)
 
@@ -264,13 +264,13 @@ def main():
     """Run the interactive demo.
 
     Each conversation thread demonstrates independent cross-session recall
-    from Mira's global memory store.
+    from Rivera's global memory store.
     """
     import uuid
 
     agent = build_agent()
     print("=" * 60)
-    print(f"  {AGENT_NAME} — Mira-Powered LangGraph Agent")
+    print(f"  {AGENT_NAME} — Rivera-Powered LangGraph Agent")
     print("  Type 'quit' to exit, 'new' to start a new session")
     print("=" * 60)
 

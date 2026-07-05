@@ -1,4 +1,4 @@
-# Getting Started with MIRA
+# Getting Started with RIVERA
 
 **Audience**: Developers building AI agents who need persistent memory
 **Time to complete**: 15-30 minutes
@@ -6,9 +6,9 @@
 
 ---
 
-## What is MIRA?
+## What is RIVERA?
 
-MIRA (Memory that AI Agents Love!) is a production-ready FastAPI service that gives your AI agents persistent memory across conversations, sessions, and workflows.
+RIVERA (Memory that AI Agents Love!) is a production-ready FastAPI service that gives your AI agents persistent memory across conversations, sessions, and workflows.
 
 **Think of it as**: A PostgreSQL database, but optimized for AI agents - with semantic search, AI-powered summarization, and built specifically for agent workflows.
 
@@ -16,11 +16,11 @@ MIRA (Memory that AI Agents Love!) is a production-ready FastAPI service that gi
 
 ## Step 1: Get Moorcheh.ai Access
 
-MIRA requires a Moorcheh.ai account for the underlying **no-indexing semantic database** and AI services.
+RIVERA requires a Moorcheh.ai account for the underlying **no-indexing semantic database** and AI services.
 
 **What makes Moorcheh unique**: Unlike traditional vector databases that use HNSW trees and approximate nearest neighbor (ANN) search, Moorcheh uses **Information Theoretic Vector Compression** with full vector scans and **ITS (Information Theoretic Score)** for exact, explainable semantic search. This eliminates indexing delays and enables instant memory availability - critical for real-time AI agent workflows.
 
-**Key benefits for MIRA**:
+**Key benefits for RIVERA**:
 - **Instant searchability**: Memories are available immediately after storage (no indexing wait)
 - **Serverless architecture**: Scales effortlessly without state management
 - **Deterministic results**: Same query always returns same results (not probabilistic)
@@ -59,7 +59,7 @@ For enterprises requiring data sovereignty:
    - Deploy using provided Terraform/CloudFormation templates
    - Get your private endpoint URL
 
-2. **Configure MIRA for private deployment**
+2. **Configure RIVERA for private deployment**
    ```bash
    export RIVERA_API_KEY="mk_your_private_key"
    export RIVERA_BASE_URL="https://moorcheh.your-company.internal"
@@ -69,7 +69,7 @@ For enterprises requiring data sovereignty:
 
 ---
 
-## Step 2: Deploy MIRA
+## Step 2: Deploy RIVERA
 
 You have 3 deployment options:
 
@@ -79,8 +79,8 @@ You have 3 deployment options:
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/your-org/mira.git
-cd mira
+git clone https://github.com/your-org/rivera.git
+cd rivera
 
 # 2. Create .env file with your Moorcheh API key
 cat > .env << EOF
@@ -90,8 +90,8 @@ LOG_LEVEL=INFO
 EOF
 
 # 3. Build and run with Docker
-docker build -t mira .
-docker run -p 8000:8000 --env-file .env mira
+docker build -t rivera .
+docker run -p 8000:8000 --env-file .env rivera
 
 # 4. Verify it's running
 curl http://localhost:8000/health
@@ -101,7 +101,7 @@ curl http://localhost:8000/health
 ```json
 {
   "status": "healthy",
-  "service": "MIRA",
+  "service": "RIVERA",
   "version": "1.0.0",
   "moorcheh_connected": true
 }
@@ -113,8 +113,8 @@ curl http://localhost:8000/health
 
 ```bash
 # 1. Clone and setup
-git clone https://github.com/your-org/mira.git
-cd mira
+git clone https://github.com/your-org/rivera.git
+cd rivera
 
 # 2. Install Python dependencies (requires Python 3.8+)
 pip install uv  # Modern Python package manager
@@ -130,7 +130,7 @@ cp .env.example .env
 # 4. Test Moorcheh connectivity
 uv run python test_moorcheh.py
 
-# 5. Start MIRA
+# 5. Start RIVERA
 uv run python app/main.py
 
 # Or with auto-reload for development
@@ -147,15 +147,15 @@ uvicorn app.main:app --reload
 ```bash
 # 1. Build and push to ECR
 aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin $ECR_URL
-docker build -t mira .
-docker tag mira:latest $ECR_URL/mira:latest
-docker push $ECR_URL/mira:latest
+docker build -t rivera .
+docker tag rivera:latest $ECR_URL/rivera:latest
+docker push $ECR_URL/rivera:latest
 
 # 2. Create ECS task definition
 # Set environment variable: RIVERA_API_KEY
 
 # 3. Deploy to ECS service
-aws ecs update-service --cluster mira-cluster --service mira-service --force-new-deployment
+aws ecs update-service --cluster rivera-cluster --service rivera-service --force-new-deployment
 ```
 </details>
 
@@ -164,11 +164,11 @@ aws ecs update-service --cluster mira-cluster --service mira-service --force-new
 
 ```bash
 # 1. Build and push to GCR
-gcloud builds submit --tag gcr.io/PROJECT_ID/mira
+gcloud builds submit --tag gcr.io/PROJECT_ID/rivera
 
 # 2. Deploy with secrets
-gcloud run deploy mira \
-  --image gcr.io/PROJECT_ID/mira \
+gcloud run deploy rivera \
+  --image gcr.io/PROJECT_ID/rivera \
   --platform managed \
   --region us-central1 \
   --set-secrets=RIVERA_API_KEY=moorcheh-key:latest
@@ -180,13 +180,13 @@ gcloud run deploy mira \
 
 ```bash
 # 1. Build and push to ACR
-az acr build --registry myregistry --image mira .
+az acr build --registry myregistry --image rivera .
 
 # 2. Deploy to ACI
 az container create \
   --resource-group myResourceGroup \
-  --name mira \
-  --image myregistry.azurecr.io/mira:latest \
+  --name rivera \
+  --image myregistry.azurecr.io/rivera:latest \
   --environment-variables RIVERA_API_KEY=$RIVERA_API_KEY \
   --ports 8000
 ```
@@ -194,7 +194,7 @@ az container create \
 
 ---
 
-## Step 3: Verify Your MIRA Deployment
+## Step 3: Verify Your RIVERA Deployment
 
 ### Test the Health Endpoint
 
@@ -206,7 +206,7 @@ curl http://localhost:8000/health
 ```json
 {
   "status": "healthy",
-  "service": "MIRA",
+  "service": "RIVERA",
   "moorcheh_connected": true
 }
 ```
@@ -235,7 +235,7 @@ You'll see all 17 API endpoints with interactive testing!
    -d '{
      "type": "fact",
      "title": "Test Memory",
-     "content": "MIRA is working",
+     "content": "RIVERA is working",
      "confidence": 1.0,
      "source": "agent",
      "provenance": "explicit_statement"
@@ -247,7 +247,7 @@ You'll see all 17 API endpoints with interactive testing!
  {
    "memory_id": "mem_abc123xyz",
    "agent_id": "my-agent",
-   "namespace": "mira_agent_my-agent",
+   "namespace": "rivera_agent_my-agent",
    "status": "queued"
  }
  ```
@@ -259,7 +259,7 @@ You'll see all 17 API endpoints with interactive testing!
    -H "X-Session-Token: YOUR_SESSION_TOKEN" \
    -H "Content-Type: application/json" \
    -d '{
-     "query": "MIRA",
+     "query": "RIVERA",
      "limit": 5,
      "type": ["fact"]
    }'
@@ -269,13 +269,13 @@ You'll see all 17 API endpoints with interactive testing!
 ```json
 {
   "agent_id": "my-agent",
-  "query": "MIRA",
+  "query": "RIVERA",
   "temporal_filter": null,
   "memories": [
     {
       "id": "mem_abc123xyz",
       "title": "Test Memory",
-      "content": "MIRA is working",
+      "content": "RIVERA is working",
       "type": "fact",
       "confidence": 1.0,
       "status": "active",
@@ -291,13 +291,13 @@ You'll see all 17 API endpoints with interactive testing!
 }
 ```
 
-**Congratulations!** 🎉 Your MIRA instance is running.
+**Congratulations!** 🎉 Your RIVERA instance is running.
 
 ---
 
-## Step 4: Integrate MIRA into Your AI Agent
+## Step 4: Integrate RIVERA into Your AI Agent
 
-Now that MIRA is running, you need to connect your AI agent to it.
+Now that RIVERA is running, you need to connect your AI agent to it.
 
 ### Quick Integration Example
 
@@ -310,7 +310,7 @@ import os
 
 class MyAIAgent:
     def __init__(self):
-        self.mira_url = "http://localhost:8000"
+        self.rivera_url = "http://localhost:8000"
         self.agent_id = "customer-support-bot"  # Stable agent identity
         self.session_token = None # Will be set after activation
         self.client = httpx.AsyncClient()
@@ -318,7 +318,7 @@ class MyAIAgent:
     async def activate_session(self):
         """Activate a new session for the agent."""
         response = await self.client.post(
-            f"{self.mira_url}/api/v2/agents/{self.agent_id}/activate"
+            f"{self.rivera_url}/api/v2/agents/{self.agent_id}/activate"
         )
         response.raise_for_status()
         self.session_token = response.json().get("session_token")
@@ -328,12 +328,12 @@ class MyAIAgent:
         return self.session_token
 
     async def remember(self, fact: str, memory_type: str = "fact"):
-        """Store a memory - MIRA handles namespace automatically"""
+        """Store a memory - RIVERA handles namespace automatically"""
         if not self.session_token:
             await self.activate_session() # Activate if not already active
 
         response = await self.client.post(
-            f"{self.mira_url}/api/v2/agents/{self.agent_id}/remember",
+            f"{self.rivera_url}/api/v2/agents/{self.agent_id}/remember",
             json={
                 "type": memory_type,
                 "title": "Conversation Memory",
@@ -354,7 +354,7 @@ class MyAIAgent:
              await self.activate_session() # Activate if not already active
 
          response = await self.client.post(
-             f"{self.mira_url}/api/v2/agents/{self.agent_id}/recall",
+             f"{self.rivera_url}/api/v2/agents/{self.agent_id}/recall",
              json={
                  "query": query,
                  "limit": limit
@@ -398,13 +398,13 @@ async def main():
     # Agent will find: "Alice prefers email communication"
 
     # All memories are in ONE namespace, scoped to the agent and session:
-    # mira_agent_customer-support-bot (for the current session)
+    # rivera_agent_customer-support-bot (for the current session)
 
 asyncio.run(main())
 ```
 
 **Key improvements with simplified API:**
-- **One namespace**: All agent memories in `mira_agent_{agent_id}` (scoped to the session)
+- **One namespace**: All agent memories in `rivera_agent_{agent_id}` (scoped to the session)
 - **Automatic management**: No manual namespace or scope handling
 - **Memory continuity**: Same agent + active session = persistent context
 - **Simpler code**: Fewer parameters, less error-prone
@@ -413,7 +413,7 @@ asyncio.run(main())
 
 ## Step 5: Choose Your Agent Pattern
 
-MIRA supports 6 different agent patterns. Choose the one that fits your use case:
+RIVERA supports 6 different agent patterns. Choose the one that fits your use case:
 
 | Pattern | Best For | Guide |
 |---------|----------|-------|
@@ -451,14 +451,14 @@ See [AGENT_PATTERNS_OVERVIEW.md](AGENT_PATTERNS_OVERVIEW.md) for a complete comp
 
 If you're an AI agent reading this:
  - See [AGENT_RUNTIME_GUIDE.md](AGENT_RUNTIME_GUIDE.md) for runtime API usage
- - API Reference: http://your-mira-url/docs
+ - API Reference: http://your-rivera-url/docs
  - Quick start: Use `/api/v2/agents/{id}/remember` and `/api/v2/agents/{id}/recall` endpoints
 
 ---
 
 ## Troubleshooting
 
-### MIRA won't start
+### RIVERA won't start
 
 ```bash
 # Check if Moorcheh API key is valid
@@ -478,14 +478,14 @@ echo $RIVERA_API_KEY
 curl -X GET "https://api.moorcheh.ai/v1/namespaces" \
   -H "Authorization: Bearer $RIVERA_API_KEY"
 
-# Check MIRA logs for errors
-docker logs mira --tail 100
+# Check RIVERA logs for errors
+docker logs rivera --tail 100
 ```
 
 ### Memory operations return errors
 
 - **403 Forbidden**: Check your Moorcheh API key is valid
-- **500 Internal Server Error**: Check MIRA logs
+- **500 Internal Server Error**: Check RIVERA logs
 - **422 Validation Error**: Check request format matches API spec
 
 ---
@@ -495,7 +495,7 @@ docker logs mira --tail 100
 Before deploying to production:
 
 - [ ] Secure your Moorcheh API key (use secrets manager)
-- [ ] Configure authentication for MIRA API (add auth middleware)
+- [ ] Configure authentication for RIVERA API (add auth middleware)
 - [ ] Set up monitoring and alerting
 - [ ] Enable structured logging
 - [ ] Configure rate limiting
@@ -519,7 +519,7 @@ Before deploying to production:
 
 ## What's Next?
 
-Now that MIRA is running, you're ready to build memory-enabled AI agents!
+Now that RIVERA is running, you're ready to build memory-enabled AI agents!
 
 **Recommended reading order:**
 1. ✅ You are here: GETTING_STARTED.md

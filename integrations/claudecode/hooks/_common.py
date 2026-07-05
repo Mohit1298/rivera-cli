@@ -24,7 +24,7 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
-# Make the sibling ``claudecode_mira`` package importable whether or not the
+# Make the sibling ``claudecode_rivera`` package importable whether or not the
 # example has been pip-installed.
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
@@ -96,7 +96,7 @@ def memory_enabled() -> bool:
     """Cheap hot-path gate: is an API key present at all?
 
     This deliberately duplicates one line of ``SkillsConfig.from_env`` so that
-    hooks can no-op without importing the Mira SDK (a substantial import on
+    hooks can no-op without importing the Rivera SDK (a substantial import on
     a path that runs every prompt). ``get_memory`` remains the authoritative
     check — it returns None for any configuration problem.
     """
@@ -106,7 +106,7 @@ def memory_enabled() -> bool:
 def get_memory():
     """Construct a SkillMemory, or None if config/import fails."""
     try:
-        from claudecode_mira import SkillMemory
+        from claudecode_rivera import SkillMemory
 
         return SkillMemory()
     except Exception:

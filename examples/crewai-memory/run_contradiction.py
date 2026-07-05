@@ -2,7 +2,7 @@
 """
 Bonus: Contradictory Memory Handling
 
-Demonstrates Mira's conflict detection when an agent stores a new
+Demonstrates Rivera's conflict detection when an agent stores a new
 fact that contradicts a previously stored one. Shows how to detect
 and resolve memory conflicts programmatically.
 
@@ -16,7 +16,7 @@ import os
 import sys
 from datetime import datetime
 
-from crewai_mira import MiraSetup
+from crewai_rivera import RiveraSetup
 from dotenv import load_dotenv
 
 AGENT_ID = "crewai-contradiction-demo"
@@ -32,7 +32,7 @@ def main() -> None:
         )
         sys.exit(1)
 
-    setup = MiraSetup(api_key)
+    setup = RiveraSetup(api_key)
     client = setup.setup(
         agent_id=AGENT_ID,
         description="Demo agent for contradictory memory handling",

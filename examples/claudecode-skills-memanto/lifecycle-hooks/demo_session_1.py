@@ -2,7 +2,7 @@
 """Demo — Session 1: a developer makes engineering decisions via /grill-with-docs.
 
 Run this first. It simulates a finished ``/grill-with-docs`` session and lets
-Mira's backend LLM distill the durable engineering decisions into memory.
+Rivera's backend LLM distill the durable engineering decisions into memory.
 
     export RIVERA_API_KEY=mch_...
     python demo_session_1.py
@@ -13,7 +13,7 @@ recalled with zero shared in-process state.
 
 from __future__ import annotations
 
-from mira_skills import SkillMemory
+from rivera_skills import SkillMemory
 
 SESSION_1_TRANSCRIPT = """
 user: /grill-with-docs let's nail down the architecture for the orders service
@@ -34,7 +34,7 @@ assistant: Summary: CQRS for Orders, Postgres + Redis, Cart != Order, Money VO f
 def main() -> None:
     mem = SkillMemory()
     mem.setup()
-    print("Session 1: distilling /grill-with-docs decisions via Mira's LLM…\n")
+    print("Session 1: distilling /grill-with-docs decisions via Rivera's LLM…\n")
     stored = mem.distill_and_store("grill-with-docs", SESSION_1_TRANSCRIPT)
     if not stored:
         print("No memories were extracted. Check RIVERA_API_KEY and connectivity.")

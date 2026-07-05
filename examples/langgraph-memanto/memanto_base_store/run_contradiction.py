@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Bonus: contradictory memory handling for the LangGraph + Mira demo.
+"""Bonus: contradictory memory handling for the LangGraph + Rivera demo.
 
 Stores two contradictory preferences for the same user across two graph
-runs, then surfaces them through Mira's conflict detection and
-resolves programmatically. This shows a feature Mira has and most
+runs, then surfaces them through Rivera's conflict detection and
+resolves programmatically. This shows a feature Rivera has and most
 "memory store" libraries do not.
 """
 
@@ -16,9 +16,9 @@ import uuid
 from datetime import datetime
 
 from dotenv import load_dotenv
-from langgraph_mira import MiraStore
+from langgraph_rivera import RiveraStore
 
-from mira.cli.client.sdk_client import SdkClient
+from rivera.cli.client.sdk_client import SdkClient
 
 AGENT_ID = "langgraph-contradiction-demo"
 USER_ID = "alice"
@@ -50,14 +50,14 @@ async def main() -> None:
         print("Error: RIVERA_API_KEY not set. Copy .env.example to .env.")
         sys.exit(1)
 
-    store = MiraStore(api_key=api_key)
+    store = RiveraStore(api_key=api_key)
     bar = "=" * 64
     namespace = (USER_ID, "preferences")
 
-    print(f"\n{bar}\n  Contradictory Memory Demo (LangGraph + Mira)\n{bar}\n")
+    print(f"\n{bar}\n  Contradictory Memory Demo (LangGraph + Rivera)\n{bar}\n")
     # (try block removed)
 
-    # Step 1: Store the initial preference via MiraStore.
+    # Step 1: Store the initial preference via RiveraStore.
     print("Step 1: Store original preference (Alice loves spicy)...")
     await store.aput(namespace, str(uuid.uuid4()), OLD_MEMORY)
     print(f"  -> stored under namespace={namespace!r}\n")
@@ -80,7 +80,7 @@ async def main() -> None:
         print(f"       {item.value.get('content')}")
     print()
 
-    # Step 4: Trigger Mira's daily summary to compute conflicts.
+    # Step 4: Trigger Rivera's daily summary to compute conflicts.
     print("Step 4: Generate daily summary to detect conflicts...")
     today = datetime.now().strftime("%Y-%m-%d")
     client = SdkClient(api_key=api_key)
@@ -99,7 +99,7 @@ async def main() -> None:
     conflicts = client.list_conflicts(agent_id, today)
     if not conflicts:
         print(
-            "  No conflicts detected. (Mira's conflict detection runs "
+            "  No conflicts detected. (Rivera's conflict detection runs "
             "during daily summary generation and depends on semantic "
             "similarity between memories.)\n"
         )

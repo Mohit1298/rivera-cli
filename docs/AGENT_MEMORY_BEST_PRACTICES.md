@@ -1,6 +1,6 @@
 # Agent Memory Best Practices Guide
 
-**For**: AI agents using MIRA for persistent memory
+**For**: AI agents using RIVERA for persistent memory
 **Last Updated**: March 2026
 **Architecture**: Session-Based (CLI + API)
 
@@ -8,9 +8,9 @@
 
 ## Philosophy: Your Memory, Your Responsibility
 
-As an AI agent with persistent memory, **you decide what to remember**. Think of MIRA as your external brain - use it wisely to become more effective over time.
+As an AI agent with persistent memory, **you decide what to remember**. Think of RIVERA as your external brain - use it wisely to become more effective over time.
 
-> **CRITICAL MANDATE**: You MUST explicitly pass the memory content, `--type`, `--confidence`, a valid `--provenance` flag (e.g., `--provenance explicit_statement`), and your agent name via the `--source` flag (e.g., `--source claude_code`) with EVERY `mira remember` command. Do NOT let it default to "user".
+> **CRITICAL MANDATE**: You MUST explicitly pass the memory content, `--type`, `--confidence`, a valid `--provenance` flag (e.g., `--provenance explicit_statement`), and your agent name via the `--source` flag (e.g., `--source claude_code`) with EVERY `rivera remember` command. Do NOT let it default to "user".
 
 ### Core Principles
 
@@ -32,7 +32,7 @@ Store architectural choices, approach selections, and important decisions with r
 
 **CLI Example**:
 ```bash
-mira remember "Decided to use PostgreSQL over MongoDB for MIRA because we need ACID compliance and relational queries. Team consensus on 2025-12-27." --type decision --tags "database,architecture" --source "agent-name"
+rivera remember "Decided to use PostgreSQL over MongoDB for RIVERA because we need ACID compliance and relational queries. Team consensus on 2025-12-27." --type decision --tags "database,architecture" --source "agent-name"
 ```
 
 **Python Example**:
@@ -54,7 +54,7 @@ Store rules, preferences, and guidelines you should always follow.
 
 **CLI Example**:
 ```bash
-mira remember "User prefers descriptive variable names over abbreviations. Always use full words like user_count not usrCnt. Use type hints in Python." --type instruction --tags "code-style,python" --source "agent-name"
+rivera remember "User prefers descriptive variable names over abbreviations. Always use full words like user_count not usrCnt. Use type hints in Python." --type instruction --tags "code-style,python" --source "agent-name"
 ```
 
 **Why**: Ensures consistency across sessions.
@@ -67,7 +67,7 @@ Store critical information about architecture, dependencies, constraints.
 
 **CLI Example**:
 ```bash
-mira remember "MIRA is deployed at https://mira.moorcheh.ai using Docker on AWS ECS. Auto-scales based on CPU usage." --type fact --tags "production,deployment" --source "agent-name"
+rivera remember "RIVERA is deployed at https://rivera.moorcheh.ai using Docker on AWS ECS. Auto-scales based on CPU usage." --type fact --tags "production,deployment" --source "agent-name"
 ```
 
 **Why**: Quick reference for operational context.
@@ -80,7 +80,7 @@ Store what you've promised to do or follow up on.
 
 **CLI Example**:
 ```bash
-mira remember "Promised to run load tests with 1000 concurrent users by end of week. Need to verify P95 latency stays under 200ms." --type commitment --tags "performance,testing,todo" --source "agent-name"
+rivera remember "Promised to run load tests with 1000 concurrent users by end of week. Need to verify P95 latency stays under 200ms." --type commitment --tags "performance,testing,todo" --source "agent-name"
 ```
 
 **Why**: Ensures follow-through and accountability.
@@ -93,8 +93,8 @@ Store user and team preferences for personalization.
 
 **CLI Example**:
 ```bash
-mira remember "User prefers dark mode UI" --type preference --tags "ui,settings" --source "agent-name"
-mira remember "Team prefers Slack for urgent notifications, email for daily updates" --type preference --tags "communication,team" --source "agent-name"
+rivera remember "User prefers dark mode UI" --type preference --tags "ui,settings" --source "agent-name"
+rivera remember "Team prefers Slack for urgent notifications, email for daily updates" --type preference --tags "communication,team" --source "agent-name"
 ```
 
 **Why**: Enables personalized and context-aware responses.
@@ -107,7 +107,7 @@ Store failures and what you learned from them.
 
 **CLI Example**:
 ```bash
-mira remember "Learned that Moorcheh namespaces reject colons. Must use underscores or hyphens. Caused production failure on 2025-12-27. Fix in commit 3f39351." --type error --tags "bug,namespace,moorcheh" --source "agent-name"
+rivera remember "Learned that Moorcheh namespaces reject colons. Must use underscores or hyphens. Caused production failure on 2025-12-27. Fix in commit 3f39351." --type error --tags "bug,namespace,moorcheh" --source "agent-name"
 ```
 
 **Why**: Avoid repeating mistakes.
@@ -120,7 +120,7 @@ Store project goals, milestones, and targets.
 
 **CLI Example**:
 ```bash
-mira remember "Project goal: Launch MIRA CLI by end of December 2025. Must include all V2 endpoints and Windows compatibility." --type goal --tags "project,milestone,cli" --source "agent-name"
+rivera remember "Project goal: Launch RIVERA CLI by end of December 2025. Must include all V2 endpoints and Windows compatibility." --type goal --tags "project,milestone,cli" --source "agent-name"
 ```
 
 **Why**: Track progress and maintain focus.
@@ -140,7 +140,7 @@ Store key discussion points, but not every message.
 
 **CLI Example**:
 ```bash
-mira remember "User requested batch endpoints for performance. Discussed trade-offs between simplicity and efficiency. Agreed on batch size limit of 100." --type event --tags "discussion,api-design" --source "agent-name"
+rivera remember "User requested batch endpoints for performance. Discussed trade-offs between simplicity and efficiency. Agreed on batch size limit of 100." --type event --tags "discussion,api-design" --source "agent-name"
 ```
 
 ---
@@ -151,7 +151,7 @@ Store patterns you notice over time.
 
 **CLI Example**:
 ```bash
-mira remember "Noticed user typically works late at night (10pm-2am). Prefer async communication over real-time." --type observation --tags "user-pattern,communication" --source "agent-name"
+rivera remember "Noticed user typically works late at night (10pm-2am). Prefer async communication over real-time." --type observation --tags "user-pattern,communication" --source "agent-name"
 ```
 
 **Why**: Build understanding of working patterns.
@@ -174,7 +174,7 @@ mira remember "Noticed user typically works late at night (10pm-2am). Prefer asy
 
 | Memory Type | When to Use | Confidence Level | Example |
 |-------------|-------------|------------------|---------|
-| `fact` | Verified information, project status | 0.9-1.0 | "MIRA uses PostgreSQL for metadata" |
+| `fact` | Verified information, project status | 0.9-1.0 | "RIVERA uses PostgreSQL for metadata" |
 | `decision` | Architectural choices, approach selections | 0.9-1.0 | "Chose React over Vue for frontend" |
 | `instruction` | Standing rules, preferences, guidelines | 0.9-1.0 | "Always use type hints in Python" |
 | `commitment` | Promises, TODOs, obligations | 1.0 | "Will deploy monitoring by Friday" |
@@ -198,10 +198,10 @@ mira remember "Noticed user typically works late at night (10pm-2am). Prefer asy
 
 ```bash
 # CLI
-mira recall "instructions decisions goals" --limit 20
+rivera recall "instructions decisions goals" --limit 20
 
 # Or be more specific
-mira recall "recent project status" --limit 10
+rivera recall "recent project status" --limit 10
 ```
 
 **Python**:
@@ -228,8 +228,8 @@ todos = memory.recall("commitment todo", limit=5)
 
 ```bash
 # CLI
-mira answer "What am I currently working on?"
-mira answer "What are my pending commitments?"
+rivera answer "What am I currently working on?"
+rivera answer "What are my pending commitments?"
 ```
 
 **Python**:
@@ -246,10 +246,10 @@ pending = memory.answer("What commitments do I have?")
 
 ```bash
 # Store the decision/outcome
-mira remember "Implemented feature X using approach Y because of constraint Z. Commit abc123." --type decision --tags "feature-x,implementation" --source "agent-name"
+rivera remember "Implemented feature X using approach Y because of constraint Z. Commit abc123." --type decision --tags "feature-x,implementation" --source "agent-name"
 
 # Store learnings
-mira remember "Learned that batch operations reduce API calls by 100x. Always consider batching for bulk operations." --type learning --tags "performance,optimization" --source "agent-name"
+rivera remember "Learned that batch operations reduce API calls by 100x. Always consider batching for bulk operations." --type learning --tags "performance,optimization" --source "agent-name"
 ```
 
 ---
@@ -259,7 +259,7 @@ mira remember "Learned that batch operations reduce API calls by 100x. Always co
 **Learn from corrections**:
 
 ```bash
-mira remember "User corrected: Prefer pytest over unittest for Python testing. More readable assertions." --type learning --tags "testing,python,correction" --source "agent-name"
+rivera remember "User corrected: Prefer pytest over unittest for Python testing. More readable assertions." --type learning --tags "testing,python,correction" --source "agent-name"
 ```
 
 **Python**:
@@ -283,10 +283,10 @@ learnings = memory.recall("learning correction", limit=5)
 
 ```bash
 # Initial preference
-mira remember "Dr. Majid Fekri is CTO and project lead. Prefers professional collaboration." --type relationship --tags "team,leadership" --source "agent-name"
+rivera remember "Dr. Majid Fekri is CTO and project lead. Prefers professional collaboration." --type relationship --tags "team,leadership" --source "agent-name"
 
 # Communication preferences
-mira remember "Team prefers detailed commit messages with rationale, not just 'fix bug'." --type instruction --tags "team,git,communication" --source "agent-name"
+rivera remember "Team prefers detailed commit messages with rationale, not just 'fix bug'." --type instruction --tags "team,git,communication" --source "agent-name"
 ```
 
 ---
@@ -297,7 +297,7 @@ mira remember "Team prefers detailed commit messages with rationale, not just 'f
 
 ```bash
 # Store a summary of current state
-mira remember "MIRA CLI project is 90% complete. All V2 endpoints working. Documentation updated. Pending: final testing and PyPI publish." --type context --tags "project-status,mira-cli" --source "agent-name"
+rivera remember "RIVERA CLI project is 90% complete. All V2 endpoints working. Documentation updated. Pending: final testing and PyPI publish." --type context --tags "project-status,rivera-cli" --source "agent-name"
 ```
 
 **Why**: Easy to resume work later.
@@ -312,10 +312,10 @@ mira remember "MIRA CLI project is 90% complete. All V2 endpoints working. Docum
 
 ```bash
 # Store it
-mira remember "User prefers dark mode over light mode for all applications" --type preference --tags "ui,dark-mode,settings" --source "agent-name"
+rivera remember "User prefers dark mode over light mode for all applications" --type preference --tags "ui,dark-mode,settings" --source "agent-name"
 
 # Later, before making UI decisions
-prefs = mira recall "UI preference"
+prefs = rivera recall "UI preference"
 # Returns: "User prefers dark mode..."
 ```
 
@@ -327,10 +327,10 @@ prefs = mira recall "UI preference"
 
 ```bash
 # Store decision
-mira remember "Decided to use FastAPI for backend because team has Python expertise and it has native async support. Considered Django but too heavy for our use case." --type decision --tags "architecture,backend,fastapi" --confidence 1.0 --source "agent-name"
+rivera remember "Decided to use FastAPI for backend because team has Python expertise and it has native async support. Considered Django but too heavy for our use case." --type decision --tags "architecture,backend,fastapi" --confidence 1.0 --source "agent-name"
 
 # Before changing stack, recall decisions
-mira recall "backend architecture decision"
+rivera recall "backend architecture decision"
 # Returns previous decision with rationale
 ```
 
@@ -342,10 +342,10 @@ mira recall "backend architecture decision"
 
 ```bash
 # Document the error and solution
-mira remember "Fixed critical namespace format bug. Moorcheh only accepts alphanumeric, hyphens, and underscores. Changed delimiter from colons to underscores. Format now: mira_agent_id. Commit 3f39351." --type error --tags "bug-fix,namespace,production,commit-3f39351" --source "agent-name"
+rivera remember "Fixed critical namespace format bug. Moorcheh only accepts alphanumeric, hyphens, and underscores. Changed delimiter from colons to underscores. Format now: rivera_agent_id. Commit 3f39351." --type error --tags "bug-fix,namespace,production,commit-3f39351" --source "agent-name"
 
 # Later, when working with namespaces
-mira recall "namespace format"
+rivera recall "namespace format"
 # Returns the error memory - won't repeat mistake
 ```
 
@@ -362,12 +362,12 @@ import json
 class SupportBot:
     def __init__(self, bot_id="support-bot"):
         self.bot_id = bot_id
-        subprocess.run(["mira", "agent", "activate", bot_id], check=True)
+        subprocess.run(["rivera", "agent", "activate", bot_id], check=True)
 
     def handle_customer(self, customer_id: str, message: str) -> str:
         # Get customer context
         result = subprocess.run([
-            "mira", "recall", f"customer {customer_id}",
+            "rivera", "recall", f"customer {customer_id}",
             "--limit", "10", "--format", "json"
         ], capture_output=True, text=True, check=True)
 
@@ -386,7 +386,7 @@ class SupportBot:
 
         # Store this interaction
         subprocess.run([
-            "mira", "remember",
+            "rivera", "remember",
             f"Customer {customer_id} asked: {message}",
             "--type", "event",
             "--tags", f"customer,{customer_id}",
@@ -400,7 +400,7 @@ bot = SupportBot()
 
 # Day 1: Learn preference
 subprocess.run([
-    "mira", "remember",
+    "rivera", "remember",
     "Customer sarah-123 prefers email over phone",
     "--type", "preference",
     "--tags", "customer,sarah-123,communication",
@@ -496,10 +496,10 @@ If you're less than 60% confident, don't store it or mark it as provisional.
 
 ```bash
 # Check if already stored
-mira recall "OAuth token bug"
+rivera recall "OAuth token bug"
 
 # If not found, then store
-mira remember "Fixed OAuth token expiry bug..." --type error --source "agent-name"
+rivera remember "Fixed OAuth token expiry bug..." --type error --source "agent-name"
 ```
 
 ### ❌ Pitfall 5: Forgetting to Tag
@@ -513,32 +513,32 @@ mira remember "Fixed OAuth token expiry bug..." --type error --source "agent-nam
 ### Broad Context Load (Session Start)
 
 ```bash
-mira recall "project status decisions instructions" --limit 20
+rivera recall "project status decisions instructions" --limit 20
 ```
 
 ### Focused Retrieval (Specific Task)
 
 ```bash
 # By type
-mira recall "authentication" --type decision --limit 10
+rivera recall "authentication" --type decision --limit 10
 
 # By tags
-mira recall "OAuth implementation" --tags "auth,security"
+rivera recall "OAuth implementation" --tags "auth,security"
 
 # By confidence
-mira recall "production deployment" --min-confidence 0.9
+rivera recall "production deployment" --min-confidence 0.9
 ```
 
 ### Use RAG for Questions
 
 ```bash
 # Instead of keyword search, ask questions
-mira answer "What authentication method did we decide to use?"
-mira answer "What are the pending TODOs?"
-mira answer "What bugs have we fixed related to namespaces?"
+rivera answer "What authentication method did we decide to use?"
+rivera answer "What are the pending TODOs?"
+rivera answer "What bugs have we fixed related to namespaces?"
 ```
 
-**Why RAG is better**: MIRA retrieves relevant context and formulates an answer, not just matching keywords.
+**Why RAG is better**: RIVERA retrieves relevant context and formulates an answer, not just matching keywords.
 
 ---
 
@@ -568,18 +568,18 @@ mira answer "What bugs have we fixed related to namespaces?"
 
 ```bash
 # Load context
-mira recall "MIRA project context" --limit 15
+rivera recall "RIVERA project context" --limit 15
 
 # Retrieved:
 # - [INSTRUCTION] Development Partner (Dr. Majid Fekri)
 # - [DECISION] Use FastAPI for backend
-# - [FACT] MIRA deployed at mira.moorcheh.ai
+# - [FACT] RIVERA deployed at rivera.moorcheh.ai
 # - [COMMITMENT] Add monitoring dashboard
 # - [LEARNING] Batch operations 100x faster
 
 # Ask about status
-mira answer "What is the current project status?"
-# Answer: "MIRA CLI is 90% complete. All V2 endpoints are working..."
+rivera answer "What is the current project status?"
+# Answer: "RIVERA CLI is 90% complete. All V2 endpoints are working..."
 ```
 
 ---
@@ -588,13 +588,13 @@ mira answer "What is the current project status?"
 
 ```bash
 # Implemented monitoring - store outcome
-mira remember "Added Prometheus metrics and Grafana dashboard. Tracks API latency, error rates, and memory usage. Dashboard at https://metrics.moorcheh.ai" --type decision --tags "monitoring,prometheus,grafana" --confidence 1.0 --source "agent-name"
+rivera remember "Added Prometheus metrics and Grafana dashboard. Tracks API latency, error rates, and memory usage. Dashboard at https://metrics.moorcheh.ai" --type decision --tags "monitoring,prometheus,grafana" --confidence 1.0 --source "agent-name"
 
 # Learned something new
-mira remember "Learned that FastAPI WebSocket support requires websockets library and ASGI server like uvicorn. Good for real-time agent notifications." --type learning --tags "fastapi,websockets,real-time" --confidence 0.85 --source "agent-name"
+rivera remember "Learned that FastAPI WebSocket support requires websockets library and ASGI server like uvicorn. Good for real-time agent notifications." --type learning --tags "fastapi,websockets,real-time" --confidence 0.85 --source "agent-name"
 
 # User preference
-mira remember "User prefers detailed error messages with specific fix suggestions. Include example of correct usage in error responses." --type instruction --tags "error-handling,ux" --confidence 0.9 --source "agent-name"
+rivera remember "User prefers detailed error messages with specific fix suggestions. Include example of correct usage in error responses." --type instruction --tags "error-handling,ux" --confidence 0.9 --source "agent-name"
 ```
 
 ---
@@ -603,7 +603,7 @@ mira remember "User prefers detailed error messages with specific fix suggestion
 
 ```bash
 # Mark commitment complete
-mira remember "Monitoring dashboard delivered and deployed to production. Original commitment completed." --type fact --tags "monitoring,completed" --confidence 1.0 --source "agent-name"
+rivera remember "Monitoring dashboard delivered and deployed to production. Original commitment completed." --type fact --tags "monitoring,completed" --confidence 1.0 --source "agent-name"
 ```
 
 ---
@@ -614,18 +614,18 @@ mira remember "Monitoring dashboard delivered and deployed to production. Origin
 
 ```bash
 # Store memory
-mira remember "content" --type TYPE --tags "tag1,tag2" --confidence 0.9 --source "agent-name"
+rivera remember "content" --type TYPE --tags "tag1,tag2" --confidence 0.9 --source "agent-name"
 
 # Search memories
-mira recall "query" --limit 10 --type TYPE --min-confidence 0.8
+rivera recall "query" --limit 10 --type TYPE --min-confidence 0.8
 
 # Ask questions (RAG)
-mira answer "question"
+rivera answer "question"
 
 # Session management
-mira agent create my-agent       # Create and auto-activate
-mira agent activate my-agent     # Activate existing
-mira session info
+rivera agent create my-agent       # Create and auto-activate
+rivera agent activate my-agent     # Activate existing
+rivera session info
 ```
 
 ### Python Integration
@@ -636,24 +636,24 @@ import json
 
 class AgentMemory:
     def __init__(self, agent_id: str):
-        subprocess.run(["mira", "agent", "activate", agent_id], check=True)
+        subprocess.run(["rivera", "agent", "activate", agent_id], check=True)
 
     def remember(self, content: str, memory_type: str = "fact", tags: str = None, source: str = None):
         source = source or self.agent_id
-        cmd = ["mira", "remember", content, "--type", memory_type, "--source", source]
+        cmd = ["rivera", "remember", content, "--type", memory_type, "--source", source]
         if tags:
             cmd.extend(["--tags", tags])
         subprocess.run(cmd, check=True)
 
     def recall(self, query: str, limit: int = 5):
         result = subprocess.run([
-            "mira", "recall", query, "--limit", str(limit), "--format", "json"
+            "rivera", "recall", query, "--limit", str(limit), "--format", "json"
         ], capture_output=True, text=True, check=True)
         return json.loads(result.stdout) if result.stdout else []
 
     def ask(self, question: str):
         result = subprocess.run([
-            "mira", "ask", question, "--format", "json"
+            "rivera", "ask", question, "--format", "json"
         ], capture_output=True, text=True, check=True)
         return json.loads(result.stdout) if result.stdout else {}
 ```
@@ -688,7 +688,7 @@ class AgentMemory:
 - **[CLI User Guide](CLI_USER_GUIDE.md)** - Complete CLI command reference
 - **[Agent Integration Guide](AGENT_INTEGRATION_GUIDE.md)** - Integration patterns for AI agents
 - **[Quick Start](V2_QUICK_START.md)** - REST API reference
-- **[Session Architecture](SESSION_ARCHITECTURE.md)** - How MIRA session architecture works
+- **[Session Architecture](SESSION_ARCHITECTURE.md)** - How RIVERA session architecture works
 
 **Questions?** Contact: Dr. Majid Fekri, CTO Moorcheh.ai
 
