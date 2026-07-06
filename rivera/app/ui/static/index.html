@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Memanto Dashboard — Memory that AI Agents Love!</title>
-    <meta name="description" content="MEMANTO Web UI Dashboard for managing agentic AI memory">
+    <title>Rivera Dashboard — Memory that AI Agents Love!</title>
+    <meta name="description" content="RIVERA Web UI Dashboard for managing agentic AI memory">
     <link rel="icon" type="image/x-icon" href="/ui/static/favicon.ico">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
         rel="stylesheet">
@@ -2254,10 +2254,10 @@
             <div class="sidebar-logo">
                 <div class="logo-stack">
                     <a href="/" style="display: block;">
-                        <img src="/ui/static/logo.svg" alt="MEMANTO Logo"
+                        <img src="/ui/static/logo.svg" alt="RIVERA Logo"
                             style="width: 150px; height: auto; object-fit: contain; filter: none; opacity: 1;">
                     </a>
-                    <p>Memory Agent by <a href="https://moorcheh.ai" target="_blank">Moorcheh.ai</a></p>
+                    <p>Memory Engine by <a href="https://api.wirtel.ca" target="_blank">wirtel.ca</a></p>
                 </div>
             </div>
             <nav class="sidebar-nav">
@@ -2472,7 +2472,7 @@
                             accept=".pdf,.docx,.xlsx,.json,.txt,.csv,.md"></div>
                     <p style="color:var(--text-dim);font-size:12px;margin:-4px 0 16px">
                         Uploaded to the active agent's memory namespace. Supported: .pdf, .docx, .xlsx, .json,
-                        .txt, .csv, .md (max 5GB). Moorcheh extracts the text and makes it searchable via Recall &amp; Answer.
+                        .txt, .csv, .md (max 5GB). Rivera extracts the text and makes it searchable via Recall &amp; Answer.
                     </p>
                     <button class="btn btn-primary" id="btnUpload" onclick="doUpload()">Upload to Memory</button>
                     <div id="uploadResult" style="margin-top:16px"></div>
@@ -2565,7 +2565,7 @@
             <section class="page" id="page-connections">
                 <div class="page-header">
                     <h2>Connections</h2>
-                    <p>Manage AI tools connected to Memanto</p>
+                    <p>Manage AI tools connected to Rivera</p>
                 </div>
                 <div style="display:flex;gap:10px;margin-bottom:18px">
                     <button class="btn btn-primary btn-sm" onclick="openConnectModal()">+ Connect a Project</button>
@@ -2595,7 +2595,7 @@
             <section class="page" id="page-migrate">
                 <div class="page-header">
                     <h2>Migrate</h2>
-                    <p>Import memories from Mem0, Letta, or Supermemory into your active Memanto agent.</p>
+                    <p>Import memories from Mem0, Letta, or Supermemory into your active Rivera agent.</p>
                 </div>
                 <div id="migrateContent"></div>
             </section>
@@ -2604,7 +2604,7 @@
             <section class="page" id="page-config">
                 <div class="page-header">
                     <h2>Configuration</h2>
-                    <p>View and manage MEMANTO settings</p>
+                    <p>View and manage RIVERA settings</p>
                 </div>
                 <div id="configContent">
                     <div class="loading-overlay"><span class="spinner"></span> Loading configuration...</div>
@@ -2646,7 +2646,7 @@
     <div class="toast-container" id="toasts"></div>
     <script>
         /* ================================================================
-           MEMANTO Web UI — Application Logic
+           RIVERA Web UI — Application Logic
            ================================================================ */
 
         // State
@@ -2888,7 +2888,7 @@
                 const res = await api('GET', '/api/v2/agents');
                 const agents = res.agents || [];
                 if (!agents.length) {
-                    box.innerHTML = `<p style="color:var(--text-dim);padding:20px">No agents registered yet. Create one via CLI: <code style="color:var(--accent);font-family:var(--font-mono)">memanto agent create &lt;id&gt;</code></p>`;
+                    box.innerHTML = `<p style="color:var(--text-dim);padding:20px">No agents registered yet. Create one via CLI: <code style="color:var(--accent);font-family:var(--font-mono)">rivera agent create &lt;id&gt;</code></p>`;
                     return;
                 }
                 box.innerHTML = buildAgentsTable(agents);
@@ -2996,7 +2996,7 @@
             cards.innerHTML = `
         <div class="card"><div class="card-label">Active Agent</div><div class="card-value" style="font-size:18px;color:var(--accent)">${S.agentId || '—'}</div><div class="card-sub">${S.config?.has_active_session ? 'Session active' : 'No session'}</div></div>
         <div class="card" style="cursor:pointer" onclick="goToPage('agents')" title="View all agents"><div class="card-label">Agents</div><div class="card-value">${agentCount}</div><div class="card-sub">registered — click to manage</div></div>
-        <div class="card"><div class="card-label">System Health</div><div class="card-value" style="color:${healthColor};font-size:18px">${healthStatus}</div><div class="card-sub">Moorcheh connection</div></div>
+        <div class="card"><div class="card-label">System Health</div><div class="card-value" style="color:${healthColor};font-size:18px">${healthStatus}</div><div class="card-sub">Backend connection</div></div>
         ${isOnPrem()
             ? `<div class="card"><div class="card-label">Backend</div><div class="card-value" style="font-size:14px"><span style="color:var(--success)">On-Prem</span></div><div class="card-sub">${escHtml(S.config?.on_prem?.url || 'http://localhost:8080')}</div></div>`
             : `<div class="card"><div class="card-label">API Key</div><div class="card-value" style="font-size:14px">${S.config?.api_key_configured ? '<span style="color:var(--success)">✓ Configured</span>' : '<span style="color:var(--error)">✗ Missing</span>'}</div><div class="card-sub">${S.config?.api_key_preview || ''}</div></div>`}
@@ -3440,7 +3440,7 @@
         function toggleRow(id) { const r = document.getElementById(id); if (r) r.classList.toggle('open'); }
 
         // Delete a single memory from the active agent. Mirrors the CLI
-        // ``memanto forget`` command and the ``DELETE /api/v2/agents/{id}/
+        // ``rivera forget`` command and the ``DELETE /api/v2/agents/{id}/
         // memories/{mid}`` REST route. Removes both rows (data + expand) from
         // the DOM on success; also drops the entry from ``S.memories`` /
         // ``S.history`` so explorer/history views stay consistent without a
@@ -3564,7 +3564,7 @@
         // HISTORY (GitHub-style contribution graph + timeline)
         // ================================================================
 
-        // Parse a memanto created_at to a local Date. Backend emits naive UTC
+        // Parse a rivera created_at to a local Date. Backend emits naive UTC
         // timestamps (no Z/offset) — append Z so they aren't read as local time.
         function parseMemDate(s) {
             if (!s) return null;
@@ -3852,7 +3852,7 @@
                     toast('No sessions found on that day.', 'warning');
                     loadDaySummaryPanel(key);
                 } else if (status === 'skipped_on_prem') {
-                    toast('Daily summary is cloud-only — switch backend with: memanto config backend cloud', 'error');
+                    toast('Daily summary is cloud-only — switch backend with: rivera config backend cloud', 'error');
                     loadDaySummaryPanel(key);
                 } else {
                     toast(`Regeneration finished with status: ${status}`, 'warning');
@@ -3881,7 +3881,7 @@
                     toast('No sessions found on that day.', 'warning');
                     if (btn) { btn.disabled = false; btn.innerHTML = prev; }
                 } else if (status === 'skipped_on_prem') {
-                    toast('Daily summary is cloud-only — switch backend with: memanto config backend cloud', 'error');
+                    toast('Daily summary is cloud-only — switch backend with: rivera config backend cloud', 'error');
                     if (btn) { btn.disabled = false; btn.innerHTML = prev; }
                 } else {
                     toast(`Summary finished with status: ${status}`, 'warning');
@@ -4010,7 +4010,7 @@
                 <tr><td>Embedding</td><td>${onPremCfg.embedding_provider ? `<code style="font-family:var(--font-mono)">${escHtml(onPremCfg.embedding_provider)}${onPremCfg.embedding_model ? ' / ' + escHtml(onPremCfg.embedding_model) : ''}</code>` : '—'}</td></tr>
                 <tr><td>LLM</td><td>${onPremCfg.llm_provider ? `<code style="font-family:var(--font-mono)">${escHtml(onPremCfg.llm_provider)}${onPremCfg.llm_model ? ' / ' + escHtml(onPremCfg.llm_model) : ''}</code>` : '—'}</td></tr>
                 </tbody></table>
-                <p style="color:var(--text-dim);font-size:12px;margin-top:8px">Switch backends via CLI: <code style="color:var(--accent);font-family:var(--font-mono)">memanto config backend cloud</code></p>
+                <p style="color:var(--text-dim);font-size:12px;margin-top:8px">Switch backends via CLI: <code style="color:var(--accent);font-family:var(--font-mono)">rivera config backend cloud</code></p>
             </div>
             ` : `
             <div class="panel">
@@ -4038,7 +4038,7 @@
                 <table class="config-table" style="width:100%"><tbody>
                 <tr><td>Active Agent</td><td><strong style="color:var(--accent)">${c.active_agent_id || '—'}</strong></td></tr>
                 <tr><td>Active Session</td><td>${c.has_active_session ? '<span class="badge badge-success">Yes</span>' : '<span class="badge badge-warning">No</span>'}</td></tr>
-                <tr><td>Data Directory</td><td><code style="font-family:var(--font-mono);color:var(--text-dim)">${escHtml(c.data_dir || '~/.memanto/')}</code></td></tr>
+                <tr><td>Data Directory</td><td><code style="font-family:var(--font-mono);color:var(--text-dim)">${escHtml(c.data_dir || '~/.rivera/')}</code></td></tr>
                 </tbody></table>
             </div>
             <!-- SERVER -->
@@ -4090,7 +4090,7 @@
                     <button class="btn btn-secondary" id="btnRestartOnprem" onclick="restartOnpremBackend()">↻ Restart On-Prem Backend</button>
                 </div>
                 <p style="color:var(--text-dim);font-size:12px;margin-top:8px">
-                    Saving writes to <code style="font-family:var(--font-mono)">~/.memanto/on-prem/state.json</code> and <code style="font-family:var(--font-mono)">~/.moorcheh/config.json</code>. Click <strong>Restart</strong> to apply on the running server.
+                    Saving writes to <code style="font-family:var(--font-mono)">~/.rivera/on-prem/state.json</code> and <code style="font-family:var(--font-mono)">~/.moorcheh/config.json</code>. Click <strong>Restart</strong> to apply on the running server.
                 </p>
             </div>
             ` : `
@@ -4281,7 +4281,7 @@
                 } else if (status === 'no_sessions') {
                     toast('No sessions found for the selected date.', 'warning');
                 } else if (status === 'skipped_on_prem') {
-                    toast('Conflict detection is cloud-only — switch backend with: memanto config backend cloud', 'error');
+                    toast('Conflict detection is cloud-only — switch backend with: rivera config backend cloud', 'error');
                 } else {
                     toast(`Conflict detection finished with status: ${status}`, 'warning');
                 }
@@ -4337,7 +4337,7 @@
             title.style.cssText = 'color:var(--success);font-size:16px;font-weight:600;margin-bottom:8px';
             title.textContent = 'No Conflicts';
             const descTpl = document.createElement('template');
-            descTpl.innerHTML = '<p style="color:var(--text-dim);font-size:13px">All memories are consistent. Click <strong>Detect Conflicts Now</strong> above (or run <code style="font-family:var(--font-mono);color:var(--accent)">memanto detect-conflicts</code>) to scan for new conflicts.</p>';
+            descTpl.innerHTML = '<p style="color:var(--text-dim);font-size:13px">All memories are consistent. Click <strong>Detect Conflicts Now</strong> above (or run <code style="font-family:var(--font-mono);color:var(--accent)">rivera detect-conflicts</code>) to scan for new conflicts.</p>';
             wrap.append(icon, title, descTpl.content.cloneNode(true));
             container.appendChild(wrap);
         }
@@ -4908,7 +4908,7 @@
                 // Tiny pause so the orbit animation registers before the
                 // (often-cached) file load returns.
                 await new Promise(r => setTimeout(r, 250));
-                setMigStep('map', `Asking Memanto to map ${body.provider} records...`);
+                setMigStep('map', `Asking Rivera to map ${body.provider} records...`);
                 const res = await api('POST', '/api/ui/migrate/dry-run', body);
                 S.migrate.preview = res;
                 S.migrate.lastResult = null;
@@ -4924,7 +4924,7 @@
             const body = migrateBody();
             if (!body) return;
             const ok = await confirmDialog({
-                title: 'Import into Memanto?',
+                title: 'Import into Rivera?',
                 message: `This will write all mapped memories into agent "${S.agentId}". The mapped supporting data and original timestamps are preserved.`,
                 confirmLabel: 'Import',
             });
@@ -4932,7 +4932,7 @@
 
             setMigStep('load', `Loading ${body.provider} export...`);
             await new Promise(r => setTimeout(r, 200));
-            setMigStep('map', 'Mapping onto Memanto schema...');
+            setMigStep('map', 'Mapping onto Rivera schema...');
             await new Promise(r => setTimeout(r, 200));
             setMigStep('write', 'Sending batches of 100...');
 
@@ -4975,7 +4975,7 @@
                         <div class="mig-stat"><div class="label">Would import</div><div class="value accent">${preview.mapped_count.toLocaleString()}</div><div class="sub">${preview.skipped} skipped (empty)</div></div>
                         <div class="mig-stat"><div class="label">Batches</div><div class="value">${preview.batch_count}</div><div class="sub">100 / req</div></div>
                         <div class="mig-stat"><div class="label">Tokens saved</div><div class="value success">${(sv.tokens_saved || 0).toLocaleString()}</div><div class="sub">vs. ${escHtml(preview.provider)} extraction</div></div>
-                        <div class="mig-stat"><div class="label">Read latency</div><div class="value">${sv.read_ms_memanto || '—'} ms</div><div class="sub">~${sv.latency_speedup_x || '—'}× faster than ~${sv.read_ms_source || '—'}ms</div></div>
+                        <div class="mig-stat"><div class="label">Read latency</div><div class="value">${sv.read_ms_rivera || '—'} ms</div><div class="sub">~${sv.latency_speedup_x || '—'}× faster than ~${sv.read_ms_source || '—'}ms</div></div>
                         <div class="mig-stat"><div class="label">Storage saved</div><div class="value">${escHtml(sv.storage_saved_human || '—')}</div><div class="sub">~${sv.storage_compression_ratio || '—'}× smaller</div></div>
                     </div>
                     <div class="mig-type-chips">${chips || '<span style="color:var(--text-dim);font-size:12px">No type breakdown</span>'}</div>
@@ -5008,7 +5008,7 @@
                         <div class="mig-stat"><div class="label">Skipped</div><div class="value warning">${sum.skipped || 0}</div><div class="sub">empty content</div></div>
                         <div class="mig-stat"><div class="label">Batches</div><div class="value">${sum.batches || 0}</div><div class="sub">100 / req</div></div>
                         <div class="mig-stat"><div class="label">Tokens saved</div><div class="value">${(sv.tokens_saved || 0).toLocaleString()}</div><div class="sub">~$${Number(sv.extraction_cost_usd || 0).toFixed(2)}</div></div>
-                        <div class="mig-stat"><div class="label">Latency</div><div class="value accent">${sv.read_ms_memanto || '—'} ms</div><div class="sub">~${sv.latency_speedup_x || '—'}× faster than ${sv.read_ms_source || '—'}ms</div></div>
+                        <div class="mig-stat"><div class="label">Latency</div><div class="value accent">${sv.read_ms_rivera || '—'} ms</div><div class="sub">~${sv.latency_speedup_x || '—'}× faster than ${sv.read_ms_source || '—'}ms</div></div>
                     </div>
                     <div class="mig-type-chips">${chips}</div>
                     ${errBox}
@@ -5147,7 +5147,7 @@
             const box = document.getElementById('connMemories');
             if (!box) return;
             if (!S.agentId || !S.token) {
-                box.innerHTML = '<p style="color:var(--text-dim);padding:12px 0;font-size:13px">No active Memanto agent. <a href="#" onclick="goToPage(\'agents\');return false" style="color:var(--accent);text-decoration:none">Activate one</a> to see memories from this connection.</p>';
+                box.innerHTML = '<p style="color:var(--text-dim);padding:12px 0;font-size:13px">No active Rivera agent. <a href="#" onclick="goToPage(\'agents\');return false" style="color:var(--accent);text-decoration:none">Activate one</a> to see memories from this connection.</p>';
                 return;
             }
             try {
@@ -5363,7 +5363,7 @@
             const label = isGlobal ? 'global install' : projectDir;
             const confirmRow = document.createElement('div');
             confirmRow.className = 'conn-confirm conn-confirm-inline';
-            confirmRow.innerHTML = `<span>Remove Memanto from <strong>${escHtml(label)}</strong>?</span>
+            confirmRow.innerHTML = `<span>Remove Rivera from <strong>${escHtml(label)}</strong>?</span>
                 <button class="btn btn-sm btn-danger" id="confirmYesBtn">Confirm</button>
                 <button class="btn btn-sm btn-secondary" id="confirmNoBtn">Cancel</button>`;
             row.parentNode.insertBefore(confirmRow, row.nextSibling);
@@ -5406,7 +5406,7 @@
                     overlay.innerHTML = `
                         <div style="font-size:48px;margin-bottom:16px">🔌</div>
                         <h2 style="margin:0 0 8px 0;font-size:24px;font-weight:600">Server Disconnected</h2>
-                        <p style="color:var(--text-secondary);margin:0">The MEMANTO server was stopped.</p>
+                        <p style="color:var(--text-secondary);margin:0">The RIVERA server was stopped.</p>
                         <p style="color:var(--text-dim);margin:6px 0 0 0">You can safely close this window.</p>
                     `;
                     document.body.appendChild(overlay);
@@ -5417,7 +5417,7 @@
         // Boot
         init();
 
-        // Auto-shutdown server when UI tab/window is closed (only if started via 'memanto ui')
+        // Auto-shutdown server when UI tab/window is closed (only if started via 'rivera ui')
         window.addEventListener('beforeunload', () => {
             if (S.config && S.config.ui_mode) {
                 navigator.sendBeacon('/api/ui/shutdown');
