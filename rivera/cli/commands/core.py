@@ -106,7 +106,7 @@ def _prompt_backend_choice() -> Backend:
 def _cloud_setup() -> None:
     """Cloud branch: collect and verify Rivera API key."""
     console.print(f"[{BOLD_BRIGHT}]Rivera API Key[/{BOLD_BRIGHT}]")
-    console.print("[dim]Get yours free at https://console.moorcheh.ai[/dim]")
+    console.print("[dim]Get yours free at https://console.api.wirtel.ca[/dim]")
     api_key = typer.prompt("  Enter your Rivera API key", hide_input=True)
 
     if not api_key or not api_key.strip():
@@ -599,7 +599,7 @@ def main_callback(
         is_eager=True,
     ),
 ):
-    """RIVERA CLI - Memory that AI Agents Love!"""
+    """RIVERA CLI - Memory your AI agents never lose."""
     if ctx.invoked_subcommand is None:
         # Print logo
         print_logo()
@@ -630,7 +630,7 @@ def status():
     console.print(
         Panel.fit(
             f"[{BOLD_PRIMARY}]RIVERA Status Dashboard[/{BOLD_PRIMARY}]\n"
-            f"Memory that AI Agents Love!  •  v{rivera_version}",
+            f"Memory your AI agents never lose.  •  v{rivera_version}",
             border_style=PRIMARY,
         )
     )

@@ -1,3 +1,3 @@
 """
-Rivera - Memory that AI Agents Love!
+Rivera - Memory your AI agents never lose.
 """

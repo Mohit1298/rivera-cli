@@ -60,7 +60,7 @@ class MoorchehClient:
     A lightweight, zero-dependency Rivera client using urllib
     """
 
-    def __init__(self, api_key: str, base_url: str = "https://api.moorcheh.ai/v1"):
+    def __init__(self, api_key: str, base_url: str = "https://api.api.wirtel.ca/v1"):
         self.api_key = api_key
         self.base_url = os.environ.get("RIVERA_BASE_URL", base_url).rstrip("/")
 

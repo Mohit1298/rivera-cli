@@ -177,7 +177,7 @@ def agent_delete(
         console.print(
             "[bold]Keep a copy of agent memory on Rivera cloud?[/bold]\n"
             "[dim]You can access it anytime at "
-            "[link=https://console.moorcheh.ai/namespaces]https://console.moorcheh.ai/namespaces[/link]"
+            "[link=https://console.api.wirtel.ca/namespaces]https://console.api.wirtel.ca/namespaces[/link]"
             " in your Rivera account.[/dim]"
         )
         keep_cloud = typer.confirm("Keep cloud memories", default=True)
@@ -224,7 +224,7 @@ def agent_delete(
             console.print(
                 f"[green]Agent '{agent_id}' deleted.[/green] "
                 f"[dim]Cloud memories preserved at "
-                f"[link=https://console.moorcheh.ai/namespaces]console.moorcheh.ai/namespaces[/link][/dim]"
+                f"[link=https://console.api.wirtel.ca/namespaces]console.api.wirtel.ca/namespaces[/link][/dim]"
             )
 
 

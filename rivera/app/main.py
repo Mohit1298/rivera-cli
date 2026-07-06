@@ -64,7 +64,7 @@ async def lifespan(_: FastAPI):
 
 # Create FastAPI app
 app = FastAPI(
-    title="Rivera - Memory that AI Agents Love!",
+    title="Rivera - Memory your AI agents never lose.",
     description="A memory layer service for agentic AI systems using Rivera SDK",
     version=__version__,
     docs_url="/docs",

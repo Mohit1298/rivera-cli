@@ -53,7 +53,7 @@ from rivera.cli.ui.theme import (  # noqa: F401
 # Initialize Typer app and console
 app = typer.Typer(
     name="rivera",
-    help="RIVERA CLI - Memory that AI Agents Love!",
+    help="RIVERA CLI - Memory your AI agents never lose.",
     add_completion=False,
 )
 console = Console()

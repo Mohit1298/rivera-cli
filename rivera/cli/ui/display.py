@@ -22,24 +22,22 @@ from rivera.cli.ui.theme import (
     PRIMARY,
 )
 
-RIVERA_VERSION = "0.1.0"
+RIVERA_VERSION = "0.1.1"
 
-# ASCII art logo — clean block Rivera
+# ASCII art logo — RIVERA block letters with flowing waves
 LOGO = r"""
-          ███╗   ███╗ ███████╗ ███╗   ███╗  █████╗  ███╗   ██╗ ████████╗  ██████╗
- ▐▛██▜▌   ████╗ ████║ ██╔════╝ ████╗ ████║ ██╔══██╗ ████╗  ██║ ╚══██╔══╝ ██╔═══██╗
- ▌ ◈◈ ▐   ██╔████╔██║ █████╗   ██╔████╔██║ ███████║ ██╔██╗ ██║    ██║    ██║   ██║
- ▝▜██▛▘   ██║╚██╔╝██║ ██╔══╝   ██║╚██╔╝██║ ██╔══██║ ██║╚██╗██║    ██║    ██║   ██║
- ▌▌▘▝▐▐   ██║ ╚═╝ ██║ ███████╗ ██║ ╚═╝ ██║ ██║  ██║ ██║ ╚████║    ██║    ╚██████╔╝
- ▘    ▝   ╚═╝     ╚═╝ ╚══════╝ ╚═╝     ╚═╝ ╚═╝  ╚═╝ ╚═╝  ╚═══╝    ╚═╝     ╚═════╝
+          ██████╗  ██╗ ██╗   ██╗ ███████╗ ██████╗   █████╗ 
+ ≈≈ ≈≈    ██╔══██╗ ██║ ██║   ██║ ██╔════╝ ██╔══██╗ ██╔══██╗
+  ≈≈ ≈≈   ██████╔╝ ██║ ██║   ██║ █████╗   ██████╔╝ ███████║
+ ≈≈ ≈≈    ██╔══██╗ ██║ ╚██╗ ██╔╝ ██╔══╝   ██╔══██╗ ██╔══██║
+  ≈≈ ≈≈   ██║  ██║ ██║  ╚████╔╝  ███████╗ ██║  ██║ ██║  ██║
+          ╚═╝  ╚═╝ ╚═╝   ╚═══╝   ╚══════╝ ╚═╝  ╚═╝ ╚═╝  ╚═╝
                             remember · recall · answer
 """.strip("\n")
 
-# Animation frames
-ANT_WALK_1 = " ▌▌▘▝▐▐ "
-ANT_WALK_2 = " ▘▌▌▐▐▝ "
-EYES_NORMAL = "◈◈"
-EYES_WINK = "-◈"
+# Animation frames — waves drift back and forth
+WAVE_A = " ≈≈ ≈≈  "
+WAVE_B = "  ≈≈ ≈≈ "
 
 # All 13 RIVERA memory types
 MEMORY_TYPES = [
@@ -68,27 +66,24 @@ def print_logo() -> None:
     lines = LOGO.split("\n")
 
     with Live(console=console, refresh_per_second=10, transient=False) as live:
-        # Quick 1-second animation (10 frames)
+        # Quick 1-second animation: waves flow left/right
         for i in range(20):
-            # Walking legs (alternates every frame)
-            current_legs = ANT_WALK_2 if i % 2 == 0 else ANT_WALK_1
-            # Winking eyes (winks on frame 5 and 6)
-            current_eyes = EYES_WINK if i in [5, 6.15, 16] else EYES_NORMAL
-
-            # Rebuild the logo lines
             anim_lines = list(lines)
-            anim_lines[2] = anim_lines[2].replace(EYES_NORMAL, current_eyes)
-            anim_lines[4] = anim_lines[4].replace(ANT_WALK_1, current_legs)
-
+            if i % 2 == 0:
+                anim_lines = [
+                    ln.replace(WAVE_A, "\x00").replace(WAVE_B, WAVE_A).replace("\x00", WAVE_B)
+                    for ln in anim_lines
+                ]
             logo_text = Text("\n".join(anim_lines), style=BOLD_PRIMARY)
             live.update(logo_text)
             time.sleep(0.1)
 
     # Tagline
+    console.print()
     tagline = Text()
-    tagline.append("  Memory that AI Agents Love!\n", style="bold white")
-    tagline.append("  powered by ", style="dim")
-    tagline.append("moorcheh.ai", style=BOLD_PRIMARY)
+    tagline.append("  Memory your AI agents never lose.\n", style="bold white")
+    tagline.append("  ", style="dim")
+    tagline.append("api.wirtel.ca", style=BOLD_PRIMARY)
     console.print(tagline)
     console.print()
 
