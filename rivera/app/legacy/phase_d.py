@@ -201,7 +201,7 @@ class HealthResponse(BaseModel):
     status: str
     service: str
     version: str
-    moorcheh_connected: bool
+    rivera_connected: bool
 
 
 class ErrorResponse(BaseModel):

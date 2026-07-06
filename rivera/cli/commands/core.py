@@ -119,7 +119,9 @@ def _cloud_setup() -> None:
         from moorcheh_sdk import MoorchehClient
         from moorcheh_sdk.exceptions import AuthenticationError, NamespaceNotFound
 
-        client = MoorchehClient(api_key=api_key_clean)
+        from rivera.app.config import settings as _s
+
+        client = MoorchehClient(api_key=api_key_clean, base_url=_s.RIVERA_BASE_URL)
         try:
             client.documents.get(namespace_name="__rivera_auth_ping__", ids=["1"])
         except AuthenticationError:
@@ -719,7 +721,7 @@ def status():
 
         srv_table.add_row("Version", health.get("version", "unknown"))
 
-        moorcheh_ok = health.get("moorcheh_connected", False)
+        moorcheh_ok = health.get("rivera_connected", False)
         srv_table.add_row(
             "Rivera",
             "[green]● connected[/green]"

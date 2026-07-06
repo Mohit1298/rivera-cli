@@ -42,7 +42,7 @@ def _validate_startup_dependencies() -> None:
         )
 
     try:
-        client = MoorchehClient(api_key=api_key)
+        client = MoorchehClient(api_key=api_key, base_url=settings.RIVERA_BASE_URL)
         try:
             client.documents.get(namespace_name="__rivera_auth_ping__", ids=["1"])
         except NamespaceNotFound:

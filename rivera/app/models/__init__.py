@@ -332,7 +332,7 @@ class HealthResponse(BaseModel):
     status: str
     service: str
     version: str
-    moorcheh_connected: bool
+    rivera_connected: bool
 
 
 # Session-based v2 endpoint responses (typed for OpenAPI codegen)

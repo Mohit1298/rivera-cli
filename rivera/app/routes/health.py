@@ -18,16 +18,16 @@ router = APIRouter()
 async def health_check():
     """Health check endpoint"""
 
-    moorcheh_connected = False
+    rivera_connected = False
     backend = parse_backend(settings.RIVERA_BACKEND)
 
     if backend == Backend.ON_PREM:
         url = f"{settings.RIVERA_ONPREM_URL.rstrip('/')}/health"
         try:
             resp = httpx.get(url, timeout=3.0)
-            moorcheh_connected = resp.status_code == 200
+            rivera_connected = resp.status_code == 200
         except Exception:
-            moorcheh_connected = False
+            rivera_connected = False
     else:
         api_key = settings.RIVERA_API_KEY.strip()
         if api_key:
@@ -37,24 +37,24 @@ async def health_check():
                     NamespaceNotFound,
                 )
 
-                client = MoorchehClient(api_key=api_key)
+                client = MoorchehClient(api_key=api_key, base_url=settings.RIVERA_BASE_URL)
                 try:
                     client.documents.get(
                         namespace_name="__rivera_auth_ping__", ids=["1"]
                     )
-                    moorcheh_connected = True
+                    rivera_connected = True
                 except NamespaceNotFound:
-                    moorcheh_connected = True
+                    rivera_connected = True
                 except AuthenticationError:
-                    moorcheh_connected = False
+                    rivera_connected = False
             except Exception:
-                moorcheh_connected = False
+                rivera_connected = False
 
     return HealthResponse(
-        status="healthy" if moorcheh_connected else "unhealthy",
+        status="healthy" if rivera_connected else "unhealthy",
         service="RIVERA",
         version=__version__,
-        moorcheh_connected=moorcheh_connected,
+        rivera_connected=rivera_connected,
     )
 
 

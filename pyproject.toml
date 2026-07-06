@@ -1,6 +1,6 @@
 [project]
 name = "rivera-cli"
-version = "0.1.1"
+version = "0.1.2"
 description = "A companion memory agent that lets your agents focus and improve while you keep ownership of everything they learn."
 authors = [{ name = "Mohit Bendale", email = "mohitab2005@gmail.com" }]
 requires-python = ">=3.10,<4"
