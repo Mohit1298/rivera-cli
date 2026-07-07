@@ -159,94 +159,66 @@ def _prompt_onprem_setup_mode() -> bool:
 
 
 def _onprem_setup() -> None:
-    """On-prem branch: install moorcheh-client if missing, configure, start."""
+    """On-prem branch: point the CLI at a self-hosted Rivera engine.
+
+    The engine is the same service as Rivera Cloud (docker compose up -d in
+    github.com/Mohit1298/rivera) and speaks the identical wire protocol, so
+    setup is just: server URL + the API key the engine printed on first boot.
+    """
+    import httpx
+
     console.print(
         Panel.fit(
-            f"[{BOLD_PRIMARY}]Setting up Rivera On-Prem[/{BOLD_PRIMARY}]\n"
-            "[dim]This may take 5-10 minutes on first run.[/dim]",
+            f"[{BOLD_PRIMARY}]Rivera On-Prem[/{BOLD_PRIMARY}]\n"
+            "[dim]Self-hosted engine — run it with:  docker compose up -d\n"
+            "(repo: github.com/Mohit1298/rivera; the first boot prints your API key)[/dim]",
             border_style=PRIMARY,
         )
     )
     console.print()
 
-    _ensure_docker_available()
-    _ensure_moorcheh_client_installed()
-
-    existing_state = config_manager.get_onprem_state()
-    if (
-        existing_state.get("embedding_provider")
-        and existing_state.get("embedding_model")
-        and existing_state.get("llm_provider")
-        and existing_state.get("llm_model")
-    ):
-        embedding_provider = existing_state["embedding_provider"]
-        embedding_model = existing_state["embedding_model"]
-        embedding_key = _recover_moorcheh_api_key("embedding", embedding_provider)
-        llm_provider = existing_state["llm_provider"]
-        llm_model = existing_state["llm_model"]
-        llm_key = _recover_moorcheh_api_key("llm", llm_provider)
+    url = typer.prompt("  Server URL", default="http://localhost:8000").strip().rstrip("/")
+    try:
+        resp = httpx.get(f"{url}/health", timeout=8.0)
+        resp.raise_for_status()
+        console.print(f"  [green]✓[/green] Server healthy at {url}")
+    except Exception:
         console.print(
-            f"[dim]  Reusing previous on-prem setup: "
-            f"{embedding_provider} / {embedding_model} + {llm_provider} / {llm_model}[/dim]"
+            f"  [red]✗[/red] No Rivera server at {url} — start it first "
+            "(docker compose up -d) and re-run [bold]rivera[/bold]."
         )
-    else:
-        quick_setup = _prompt_onprem_setup_mode()
-        if quick_setup:
-            embedding_provider, embedding_model, embedding_key = (
-                "ollama",
-                "nomic-embed-text",
-                "",
-            )
-            llm_provider, llm_model, llm_key = "ollama", "qwen2.5", ""
-            console.print(
-                "[dim]  Quick Setup: Ollama with nomic-embed-text "
-                "(embedding) + qwen2.5 (LLM)[/dim]"
-            )
-        else:
-            embedding_provider, embedding_model, embedding_key = (
-                _prompt_embedding_provider()
-            )
-            llm_provider, llm_model, llm_key = _prompt_llm_provider(
-                embedding_provider, embedding_key
-            )
-    # Write the FULL config (embedding + LLM) to ~/.moorcheh/config.json BEFORE
-    # `moorcheh up`, so the server reads the complete config on first boot and
-    # we don't have to bounce the stack. `moorcheh up` itself only knows
-    # `--embedding-*` flags, so without this pre-write the LLM section would
-    # be missing until we restart.
-    _persist_moorcheh_llm_config(
-        embedding_provider,
-        embedding_model,
-        embedding_key,
-        llm_provider,
-        llm_model,
-        llm_key,
-    )
-    _moorcheh_up_and_wait(embedding_provider, embedding_model, embedding_key)
+        raise typer.Exit(1)
 
-    # Pull any Ollama models needed (embedding and/or LLM). `moorcheh up` uses
-    # native host Ollama when one is running and a bundled container otherwise;
-    # _pull_ollama_model handles both.
-    if embedding_provider == "ollama":
-        _pull_ollama_model(embedding_model)
-    if llm_provider == "ollama" and llm_model != embedding_model:
-        _pull_ollama_model(llm_model)
+    api_key = typer.prompt("  API key (from the server's first-boot logs)").strip()
+    console.print("  [dim]Verifying key...[/dim]")
+    try:
+        from moorcheh_sdk import MoorchehClient
+        from moorcheh_sdk.exceptions import AuthenticationError, NamespaceNotFound
 
-    # Persist everything on-prem in ~/.rivera/on-prem/state.json — the
-    # shared ~/.rivera/config.yaml belongs to the cloud backend; on-prem
-    # never writes into it. ``ConfigManager.get_answer_config()`` reads
-    # ``llm_model`` from this file when the active backend is on-prem, so
-    # ``rivera answer`` automatically picks the right LLM without any
-    # cross-backend pollution.
+        client = MoorchehClient(api_key=api_key, base_url=url)
+        try:
+            client.documents.get(namespace_name="__rivera_auth_ping__", ids=["1"])
+        except NamespaceNotFound:
+            pass  # auth OK; ping namespace intentionally absent
+        except AuthenticationError:
+            console.print("  [red]✗[/red] Key rejected by the server.")
+            raise typer.Exit(1)
+    except typer.Exit:
+        raise
+    except Exception as exc:
+        console.print(f"  [red]✗[/red] Could not verify key: {exc}")
+        raise typer.Exit(1)
+    console.print("  [green]✓[/green] Key verified")
+
+    config_manager.set_api_key(api_key)
     config_manager.set_onprem_state(
         installed_at=datetime.utcnow().isoformat() + "Z",
-        embedding_provider=embedding_provider,
-        embedding_model=embedding_model,
-        llm_provider=llm_provider,
-        llm_model=llm_model,
-        url="http://localhost:8080",
+        embedding_provider="server",
+        embedding_model="server-managed",
+        llm_provider="server",
+        llm_model="",
+        url=url,
     )
-
 
 def _ensure_docker_available() -> None:
     """Fail clearly if Docker is missing or daemon is not running."""

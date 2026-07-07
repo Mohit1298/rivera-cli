@@ -116,7 +116,7 @@ class Settings(BaseSettings):
 
     # Backend selection: "cloud" (default) or "on-prem".
     RIVERA_BACKEND: str = "cloud"
-    RIVERA_ONPREM_URL: str = "http://localhost:8080"
+    RIVERA_ONPREM_URL: str = "http://localhost:8000"
     RIVERA_ONPREM_EMBEDDING_PROVIDER: str = ""
     # HTTP read timeout (seconds) for the on-prem MoorchehClient. Default 300
     # so first-call LLM cold-starts on Ollama don't hit the SDK's 30s default.

@@ -31,7 +31,7 @@ def _validate_startup_dependencies() -> None:
         except Exception as exc:
             raise RuntimeError(
                 f"Rivera on-prem server not reachable at {url}. "
-                f"Start it with: moorcheh up"
+                f"Start it with: docker compose up -d  (github.com/Mohit1298/rivera)"
             ) from exc
         return
 

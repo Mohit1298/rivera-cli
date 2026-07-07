@@ -50,12 +50,12 @@ class MoorchehClientSingleton:
         ``api_key`` is honored only on the cloud backend; ignored on on-prem.
         """
         if self._backend() == Backend.ON_PREM:
+            # Self-hosted Rivera speaks the exact cloud wire protocol — same
+            # client, different base_url (+ the key minted on first boot).
             if self._client is None:
-                from rivera.app.clients.onprem import OnPremClient
-
-                self._client = OnPremClient(
+                self._client = MoorchehClient(
+                    api_key=api_key or settings.RIVERA_API_KEY,
                     base_url=settings.RIVERA_ONPREM_URL,
-                    timeout=settings.RIVERA_ONPREM_TIMEOUT,
                 )
             return self._client
 
@@ -71,11 +71,9 @@ class MoorchehClientSingleton:
         """Get or create the active async Rivera client."""
         if self._backend() == Backend.ON_PREM:
             if self._async_client is None:
-                from rivera.app.clients.onprem import AsyncOnPremClient
-
-                self._async_client = AsyncOnPremClient(
+                self._async_client = AsyncMoorchehClient(
+                    api_key=api_key or settings.RIVERA_API_KEY,
                     base_url=settings.RIVERA_ONPREM_URL,
-                    timeout=settings.RIVERA_ONPREM_TIMEOUT,
                 )
             return self._async_client
 
