@@ -22,7 +22,7 @@ from rivera.cli.ui.theme import (
     PRIMARY,
 )
 
-RIVERA_VERSION = "0.1.3"
+RIVERA_VERSION = "0.1.4"
 
 # ASCII art logo — RIVERA block letters with flowing waves
 LOGO = r"""

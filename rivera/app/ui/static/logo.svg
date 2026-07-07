@@ -1,17 +1,29 @@
-<svg width="420" height="108" viewBox="0 0 420 108" xmlns="http://www.w3.org/2000/svg">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
   <defs>
-    <linearGradient id="rg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#6366f1"/>
-      <stop offset="100%" stop-color="#22d3ee"/>
+    <linearGradient id="tile" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#151f38"/><stop offset="1" stop-color="#0a0f1d"/>
+    </linearGradient>
+    <linearGradient id="ink" x1="0.1" y1="0.05" x2="0.95" y2="1">
+      <stop offset="0" stop-color="#a5b4fc"/><stop offset="0.5" stop-color="#60a5fa"/><stop offset="1" stop-color="#22d3ee"/>
+    </linearGradient>
+    <linearGradient id="sheen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.15"/><stop offset="0.5" stop-color="#ffffff" stop-opacity="0"/>
+    </linearGradient>
+    <linearGradient id="edge" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#818cf8" stop-opacity="0.75"/><stop offset="1" stop-color="#22d3ee" stop-opacity="0.6"/>
     </linearGradient>
   </defs>
-  <rect x="6" y="10" width="88" height="88" rx="22" fill="url(#rg)"/>
-  <g stroke="#ffffff" stroke-width="5.5" stroke-linecap="round" fill="none">
-    <path d="M 19 42 C 23 34.5, 29 34.5, 33 42 C 37 49.5, 43 49.5, 47 42" transform="rotate(16 33 42)"/>
-    <path d="M 53 30 C 57 22.5, 63 22.5, 67 30 C 71 37.5, 77 37.5, 81 30" transform="rotate(16 67 30)"/>
-    <path d="M 23 74 C 27 66.5, 33 66.5, 37 74 C 41 81.5, 47 81.5, 51 74" transform="rotate(16 37 74)"/>
-    <path d="M 57 62 C 61 54.5, 67 54.5, 71 62 C 75 69.5, 81 69.5, 85 62" transform="rotate(16 71 62)"/>
+  <rect x="6" y="6" width="108" height="108" rx="30" fill="url(#tile)"/>
+  <rect x="6" y="6" width="108" height="108" rx="30" fill="url(#sheen)"/>
+  <rect x="6.75" y="6.75" width="106.5" height="106.5" rx="29.25" fill="none" stroke="url(#edge)" stroke-width="1.5"/>
+  <g fill="url(#ink)">
+    <!-- stem -->
+    <rect x="40" y="31" width="15" height="58" rx="4"/>
+    <!-- bowl with counter (evenodd hole) -->
+    <path fill-rule="evenodd" d="M49 31 H70 C82.7 31 90 39.4 90 49.5 C90 59.6 82.7 68 70 68 H49 Z M55 42 H69 C74.7 42 78 45.4 78 49.5 C78 53.6 74.7 57 69 57 H55 Z"/>
+    <!-- leg -->
+    <path d="M56 59 H70.5 L89 89 H74 Z"/>
   </g>
-  <text x="112" y="72" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
-        font-size="52" font-weight="700" fill="#e6ecf7">Rivera</text>
+  <!-- river accent flowing through the base -->
+  <path d="M31 80 C 45 73, 58 87, 72 80 C 82 75, 86 77, 90 75" fill="none" stroke="#22d3ee" stroke-width="3.2" stroke-linecap="round" opacity="0.9"/>
 </svg>

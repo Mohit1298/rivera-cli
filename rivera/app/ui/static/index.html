@@ -2241,13 +2241,34 @@
             color: var(--error);
             font-size: 13px;
         }
-    </style>
+    
+.ic{width:1.05em;height:1.05em;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:-2px}
+.panel-title .ic{width:17px;height:17px;margin-right:7px;color:var(--accent,#22d3ee);vertical-align:-3px}
+</style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked@12.0.0/marked.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3.0.11/dist/purify.min.js"></script>
 </head>
 
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="ic-cpu" viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3"/></symbol>
+<symbol id="ic-dashboard" viewBox="0 0 24 24"><rect x="3" y="3" width="7.5" height="7.5" rx="1.6"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.6"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.6"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.6"/></symbol>
+<symbol id="ic-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5.2l3.4 2"/></symbol>
+<symbol id="ic-bolt" viewBox="0 0 24 24"><path d="M13 2 4 14h7l-1 8 9-12h-7Z"/></symbol>
+<symbol id="ic-refresh" viewBox="0 0 24 24"><path d="M20.5 12a8.5 8.5 0 1 1-2.5-6"/><path d="M20.5 3v5h-5"/></symbol>
+<symbol id="ic-doc" viewBox="0 0 24 24"><path d="M14 3H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9Z"/><path d="M14 3v6h6M8 13h8M8 17h6"/></symbol>
+<symbol id="ic-warn" viewBox="0 0 24 24"><path d="M12 3 2 20h20Z"/><path d="M12 9.5v4.5M12 17.5v.01"/></symbol>
+<symbol id="ic-server" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="7" rx="2"/><rect x="3" y="13" width="18" height="7" rx="2"/><path d="M7 7.5h.01M7 16.5h.01"/></symbol>
+<symbol id="ic-key" viewBox="0 0 24 24"><circle cx="8" cy="15.5" r="4.8"/><path d="M11.4 12.1 21 2.5"/><path d="M16.5 7 20 10.5"/><path d="M18.5 5 21.5 8"/></symbol>
+<symbol id="ic-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/></symbol>
+<symbol id="ic-calendar" viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="16" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></symbol>
+<symbol id="ic-save" viewBox="0 0 24 24"><path d="M5 3h11l3 3v13a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z"/><path d="M8 3v5h7M8 21v-7h8v7"/></symbol>
+<symbol id="ic-folder" viewBox="0 0 24 24"><path d="M3.5 6.5a2 2 0 0 1 2-2H9l2 2.5h7.5a2 2 0 0 1 2 2V17a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2Z"/></symbol>
+<symbol id="ic-plug" viewBox="0 0 24 24"><path d="M9 2v6M15 2v6M7 8h10v2.5a5 5 0 0 1-10 0Z"/><path d="M12 15.5V22"/></symbol>
+<symbol id="ic-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4.2"/><path d="M4.5 20.5v-.8a6 6 0 0 1 6-6h3a6 6 0 0 1 6 6v.8"/></symbol>
+</defs></svg>
+
     <div class="app">
         <!-- Sidebar -->
         <aside class="sidebar">
@@ -2352,13 +2373,13 @@
                 </div>
                 <div class="cards-row" id="dashCards"></div>
                 <div class="panel">
-                    <div class="panel-title">🧠 Agent Profile</div>
+                    <div class="panel-title"><svg class="ic"><use href="#ic-user"/></svg>Agent Profile</div>
                     <div id="agentProfile">
                         <div class="loading-overlay"><span class="spinner"></span> Loading...</div>
                     </div>
                 </div>
                 <div class="panel">
-                    <div class="panel-title">📊 Session Info</div>
+                    <div class="panel-title"><svg class="ic"><use href="#ic-dashboard"/></svg>Session Info</div>
                     <div id="sessionInfo">
                         <div class="loading-overlay"><span class="spinner"></span> Loading...</div>
                     </div>
@@ -2505,7 +2526,7 @@
                     <p>Browse, search, and filter all stored memories</p>
                 </div>
                 <div class="time-machine-bar">
-                    <span>🕰️</span>
+                    <span><svg class="ic"><use href="#ic-clock"/></svg></span>
                     <label>Time Machine:</label>
                     <input type="date" id="tmDate">
                     <button class="btn btn-sm btn-secondary" onclick="doTimeMachine()">Travel</button>
@@ -2549,7 +2570,7 @@
                     <p>Review and resolve contradicting memories</p>
                 </div>
                 <div style="display:flex;gap:10px;margin-bottom:18px;align-items:center;flex-wrap:wrap">
-                    <button class="btn btn-primary btn-sm" id="btnDetectConflicts" onclick="detectConflictsNow()">⚡ Detect Conflicts Now</button>
+                    <button class="btn btn-primary btn-sm" id="btnDetectConflicts" onclick="detectConflictsNow()"><svg class="ic"><use href="#ic-bolt"/></svg>Detect Conflicts Now</button>
                     <button class="btn btn-secondary btn-sm" onclick="loadConflicts()">Refresh</button>
                     <div style="margin-left:auto;display:flex;align-items:center;gap:8px">
                         <label for="conflictsDateInput" style="color:var(--text-dim);font-size:13px">Date</label>
@@ -3768,7 +3789,7 @@
                                 <div class="hh-summary-header">
                                     <span>Summary — ${S.historyFilter}</span>
                                     <div style="display:flex;align-items:center;gap:6px">
-                                        <button class="hh-summary-action" id="btnRegenSummary" onclick="regenerateDaySummary('${S.historyFilter}')" title="Regenerate from latest sessions" style="display:none">↻ Regenerate</button>
+                                        <button class="hh-summary-action" id="btnRegenSummary" onclick="regenerateDaySummary('${S.historyFilter}')" title="Regenerate from latest sessions" style="display:none"><svg class="ic"><use href="#ic-refresh"/></svg>Regenerate</button>
                                         <button class="hh-summary-close" onclick="closeHistorySummary()" title="Close">×</button>
                                     </div>
                                 </div>
@@ -3827,9 +3848,9 @@
             } else {
                 body.innerHTML = `
                     <div style="padding:24px 12px;text-align:center;color:var(--text-dim)">
-                        <div style="font-size:36px;margin-bottom:12px;opacity:0.4">📝</div>
+                        <div style="font-size:34px;margin-bottom:12px;opacity:0.4"><svg class="ic"><use href="#ic-doc"/></svg></div>
                         <p style="font-size:13px;margin-bottom:16px">No summary for <strong style="color:var(--text-secondary)">${escHtml(key)}</strong> yet.</p>
-                        <button class="btn btn-primary btn-sm" id="btnGenSummary" onclick="generateDaySummary('${escHtml(key)}')">⚡ Generate Summary</button>
+                        <button class="btn btn-primary btn-sm" id="btnGenSummary" onclick="generateDaySummary('${escHtml(key)}')"><svg class="ic"><use href="#ic-bolt"/></svg>Generate Summary</button>
                     </div>`;
                 if (regenBtn) regenBtn.style.display = 'none';
             }
@@ -3838,7 +3859,7 @@
         async function regenerateDaySummary(key) {
             const btn = document.getElementById('btnRegenSummary');
             const prev = btn ? btn.innerHTML : null;
-            if (btn) { btn.disabled = true; btn.innerHTML = '↻ …'; }
+            if (btn) { btn.disabled = true; btn.innerHTML = '<svg class="ic"><use href="#ic-refresh"/></svg> …'; }
             const body = document.getElementById('historySummaryBody');
             if (body) body.innerHTML = '<div class="loading-overlay"><span class="spinner"></span> Regenerating…</div>';
             try {
@@ -3910,7 +3931,7 @@
                         ? `${staleCount} ${staleCount === 1 ? 'memory was' : 'memories were'} stored after the last conflict scan (${fmtDate(scan.scanned_at)})`
                         : `${staleCount} ${staleCount === 1 ? 'memory has' : 'memories have'} never been scanned`;
                     html += `<div style="background:rgba(239,68,68,0.12);border:1px solid var(--error);border-radius:8px;padding:12px 14px;margin-bottom:14px;font-size:13px;color:var(--text-secondary);display:flex;align-items:center;gap:12px;flex-wrap:wrap">
-                        <span>⚠ ${reason} for <strong>${filter}</strong>. Run conflict detection to review.</span>
+                        <span><svg class="ic"><use href="#ic-warn"/></svg> ${reason} for <strong>${filter}</strong>. Run conflict detection to review.</span>
                         <button class="btn btn-primary btn-sm" style="margin-left:auto" onclick="goToConflictsForDay('${filter}')">Run Detect Conflicts</button>
                     </div>`;
                 }
@@ -4003,7 +4024,7 @@
             <!-- BACKEND / API KEY -->
             ${onPrem ? `
             <div class="panel">
-                <div class="panel-title">🖥️ Backend</div>
+                <div class="panel-title"><svg class="ic"><use href="#ic-server"/></svg>Backend</div>
                 <table class="config-table" style="width:100%"><tbody>
                 <tr><td>Mode</td><td><span class="badge badge-success">On-Prem</span></td></tr>
                 <tr><td>Server URL</td><td><code style="font-family:var(--font-mono)">${escHtml(onPremCfg.url || 'http://localhost:8080')}</code></td></tr>
@@ -4014,7 +4035,7 @@
             </div>
             ` : `
             <div class="panel">
-                <div class="panel-title">🔑 API Key</div>
+                <div class="panel-title"><svg class="ic"><use href="#ic-key"/></svg>API Key</div>
                 <div id="apiKeyRow">
                     ${c.api_key_configured ?
                         `<div class="api-key-display">
@@ -4034,7 +4055,7 @@
             `}
             <!-- STATUS (read-only) -->
             <div class="panel">
-                <div class="panel-title">📊 Status</div>
+                <div class="panel-title"><svg class="ic"><use href="#ic-dashboard"/></svg>Status</div>
                 <table class="config-table" style="width:100%"><tbody>
                 <tr><td>Active Agent</td><td><strong style="color:var(--accent)">${c.active_agent_id || '—'}</strong></td></tr>
                 <tr><td>Active Session</td><td>${c.has_active_session ? '<span class="badge badge-success">Yes</span>' : '<span class="badge badge-warning">No</span>'}</td></tr>
@@ -4043,7 +4064,7 @@
             </div>
             <!-- SERVER -->
             <div class="panel">
-                <div class="panel-title">🖥️ Server</div>
+                <div class="panel-title"><svg class="ic"><use href="#ic-server"/></svg>Server</div>
                 <div class="form-row">
                     <div class="form-group"><label>Host / URL</label><input id="cfgServerUrl" value="${srv.url || 'localhost'}"></div>
                     <div class="form-group"><label>Port</label><input type="number" id="cfgServerPort" value="${srv.port || 8000}" min="1" max="65535"></div>
@@ -4051,7 +4072,7 @@
             </div>
             <!-- SESSION MANAGEMENT -->
             <div class="panel">
-                <div class="panel-title">⏱️ Session Management</div>
+                <div class="panel-title"><svg class="ic"><use href="#ic-clock"/></svg>Session Management</div>
                 <div class="form-row">
                     <div class="form-group"><label>Default Duration (hours)</label><input type="number" id="cfgSessDuration" value="${sess.default_duration_hours ?? 6}" min="1" max="72"></div>
                     <div class="form-group"><label>Extend Threshold (minutes)</label><input type="number" id="cfgSessExtendThreshold" value="${sess.extend_threshold_minutes ?? 30}" min="1" max="120"></div>
@@ -4067,7 +4088,7 @@
             <!-- ANSWER CONFIG -->
             ${onPrem ? `
             <div class="panel">
-                <div class="panel-title">🤖 LLM Config (On-Prem)</div>
+                <div class="panel-title"><svg class="ic"><use href="#ic-cpu"/></svg>LLM Config (On-Prem)</div>
                 <div class="form-row">
                     <div class="form-group">
                         <label>Provider</label>
@@ -4087,7 +4108,7 @@
                     <input id="cfgOnpremApiKey" type="password" placeholder="Leave blank to keep existing key">
                 </div>
                 <div style="display:flex;gap:12px;margin-top:8px">
-                    <button class="btn btn-secondary" id="btnRestartOnprem" onclick="restartOnpremBackend()">↻ Restart On-Prem Backend</button>
+                    <button class="btn btn-secondary" id="btnRestartOnprem" onclick="restartOnpremBackend()"><svg class="ic"><use href="#ic-refresh"/></svg>Restart On-Prem Backend</button>
                 </div>
                 <p style="color:var(--text-dim);font-size:12px;margin-top:8px">
                     Saving writes to <code style="font-family:var(--font-mono)">~/.rivera/on-prem/state.json</code> and <code style="font-family:var(--font-mono)">~/.moorcheh/config.json</code>. Click <strong>Restart</strong> to apply on the running server.
@@ -4095,7 +4116,7 @@
             </div>
             ` : `
             <div class="panel">
-                <div class="panel-title">🤖 Answer Config</div>
+                <div class="panel-title"><svg class="ic"><use href="#ic-cpu"/></svg>Answer Config</div>
                 <div class="form-group"><label>Model</label><input id="cfgAiModel" value="${ans.model || 'anthropic.claude-sonnet-4-20250514-v1:0'}" placeholder="e.g. anthropic.claude-sonnet-4-20250514-v1:0"></div>
                 <div class="form-row">
                     <div class="form-group"><label>Temperature</label><input type="number" id="cfgAiTemp" value="${ans.temperature ?? 0.7}" min="0" max="2" step="0.05"></div>
@@ -4112,7 +4133,7 @@
             `}
             <!-- TOP N LIMIT -->
             <div class="panel">
-                <div class="panel-title">🎯 Search & Retrieval</div>
+                <div class="panel-title"><svg class="ic"><use href="#ic-target"/></svg>Search &amp; Retrieval</div>
                 <div class="form-row">
                     <div class="form-group"><label>Recall Limit (search results)</label><input type="number" id="cfgRecallLimit" value="${rec.limit ?? 10}" min="1" max="100"></div>
                     <div class="form-group"><label>Recall Min Similarity (0.0-1.0)</label><input type="number" step="0.01" id="cfgRecallMinSimilarity" value="${rec.min_similarity ?? 0}" min="0" max="1"></div>
@@ -4120,20 +4141,20 @@
             </div>
             <!-- CLI BEHAVIOR -->
             <div class="panel">
-                <div class="panel-title">⚡ CLI Behavior</div>
+                <div class="panel-title"><svg class="ic"><use href="#ic-bolt"/></svg>CLI Behavior</div>
                 <div style="display:flex;flex-direction:column;gap:12px">
                     ${cfgToggle('cfgCliSmartParse', 'Smart parse (auto-assign memory type for raw input)', cli.smart_parse ?? true)}
                 </div>
             </div>
             <!-- SCHEDULE -->
             <div class="panel">
-                <div class="panel-title">📅 Schedule</div>
+                <div class="panel-title"><svg class="ic"><use href="#ic-calendar"/></svg>Schedule</div>
                 <div class="form-group"><label>Daily Summary + Conflict Scan Time (HH:MM)</label><input id="cfgSchedule" value="${c.schedule_time || '23:55'}" placeholder="HH:MM" style="width:120px"></div>
             </div>
             <!-- SAVE -->
             <div style="display:flex;gap:12px;margin-top:8px">
-                <button class="btn btn-primary" id="btnSaveCfg" onclick="saveAllConfig()">💾 Save All Settings</button>
-                <button class="btn btn-secondary" onclick="loadConfig()">↺ Reset</button>
+                <button class="btn btn-primary" id="btnSaveCfg" onclick="saveAllConfig()"><svg class="ic"><use href="#ic-save"/></svg>Save All Settings</button>
+                <button class="btn btn-secondary" onclick="loadConfig()"><svg class="ic"><use href="#ic-refresh"/></svg>Reset</button>
             </div>`;
 
                 // Wire up toggle switches for visual feedback
@@ -4226,7 +4247,7 @@
                 toast('All settings saved successfully!');
                 S.config = await api('GET', '/api/ui/config');
             } catch (e) { toast('Save failed: ' + e.message, 'error'); }
-            btn.disabled = false; btn.innerHTML = '💾 Save All Settings';
+            btn.disabled = false; btn.innerHTML = '<svg class="ic"><use href="#ic-save"/></svg>Save All Settings';
         }
 
         // Legacy alias
@@ -4252,7 +4273,7 @@
             } catch (e) {
                 toast('Restart failed: ' + e.message, 'error');
             } finally {
-                if (btn) { btn.disabled = false; btn.innerHTML = '↻ Restart On-Prem Backend'; }
+                if (btn) { btn.disabled = false; btn.innerHTML = '<svg class="ic"><use href="#ic-refresh"/></svg>Restart On-Prem Backend'; }
             }
         }
 
@@ -5284,7 +5305,7 @@
             const list = (data.children && data.children.length)
                 ? data.children.map(c =>
                     `<div class="browser-list-item" data-browse-path="${attrEsc(c.path)}">
-                        <span class="folder-ico">📁</span>
+                        <span class="folder-ico"><svg class="ic"><use href="#ic-folder"/></svg></span>
                         <span>${escHtml(c.name)}</span>
                     </div>`
                 ).join('')
@@ -5404,7 +5425,7 @@
                     overlay.id = 'disconnected-overlay';
                     overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:10000;display:flex;flex-direction:column;align-items:center;justify-content:center;color:white;font-family:var(--font-sans)';
                     overlay.innerHTML = `
-                        <div style="font-size:48px;margin-bottom:16px">🔌</div>
+                        <div style="font-size:40px;margin-bottom:16px;opacity:.5"><svg class="ic"><use href="#ic-plug"/></svg></div>
                         <h2 style="margin:0 0 8px 0;font-size:24px;font-weight:600">Server Disconnected</h2>
                         <p style="color:var(--text-secondary);margin:0">The RIVERA server was stopped.</p>
                         <p style="color:var(--text-dim);margin:6px 0 0 0">You can safely close this window.</p>
