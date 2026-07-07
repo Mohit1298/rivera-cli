@@ -1,29 +1,24 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
   <defs>
-    <linearGradient id="tile" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#151f38"/><stop offset="1" stop-color="#0a0f1d"/>
-    </linearGradient>
-    <linearGradient id="ink" x1="0.1" y1="0.05" x2="0.95" y2="1">
-      <stop offset="0" stop-color="#a5b4fc"/><stop offset="0.5" stop-color="#60a5fa"/><stop offset="1" stop-color="#22d3ee"/>
+    <linearGradient id="g" x1="0.08" y1="0.05" x2="0.95" y2="1">
+      <stop offset="0" stop-color="#8b93ff"/>
+      <stop offset="0.5" stop-color="#4f7bf7"/>
+      <stop offset="1" stop-color="#22d3ee"/>
     </linearGradient>
     <linearGradient id="sheen" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#ffffff" stop-opacity="0.15"/><stop offset="0.5" stop-color="#ffffff" stop-opacity="0"/>
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.28"/>
+      <stop offset="0.42" stop-color="#ffffff" stop-opacity="0"/>
     </linearGradient>
-    <linearGradient id="edge" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#818cf8" stop-opacity="0.75"/><stop offset="1" stop-color="#22d3ee" stop-opacity="0.6"/>
-    </linearGradient>
+    <mask id="cut">
+      <rect x="6" y="6" width="108" height="108" rx="32" fill="#fff"/>
+      <g fill="#000">
+        <rect x="41" y="32" width="14" height="56" rx="3"/>
+        <path fill-rule="evenodd" d="M49 32 H70 C80.5 32 87 39 87 48.5 C87 58 80.5 65 70 65 H49 Z
+                                     M55 42 H69 C74.2 42 77 45 77 48.5 C77 52 74.2 55 69 55 H55 Z"/>
+        <path d="M55 58 H71 L86 88 H70 Z"/>
+      </g>
+    </mask>
   </defs>
-  <rect x="6" y="6" width="108" height="108" rx="30" fill="url(#tile)"/>
-  <rect x="6" y="6" width="108" height="108" rx="30" fill="url(#sheen)"/>
-  <rect x="6.75" y="6.75" width="106.5" height="106.5" rx="29.25" fill="none" stroke="url(#edge)" stroke-width="1.5"/>
-  <g fill="url(#ink)">
-    <!-- stem -->
-    <rect x="40" y="31" width="15" height="58" rx="4"/>
-    <!-- bowl with counter (evenodd hole) -->
-    <path fill-rule="evenodd" d="M49 31 H70 C82.7 31 90 39.4 90 49.5 C90 59.6 82.7 68 70 68 H49 Z M55 42 H69 C74.7 42 78 45.4 78 49.5 C78 53.6 74.7 57 69 57 H55 Z"/>
-    <!-- leg -->
-    <path d="M56 59 H70.5 L89 89 H74 Z"/>
-  </g>
-  <!-- river accent flowing through the base -->
-  <path d="M31 80 C 45 73, 58 87, 72 80 C 82 75, 86 77, 90 75" fill="none" stroke="#22d3ee" stroke-width="3.2" stroke-linecap="round" opacity="0.9"/>
+  <rect x="6" y="6" width="108" height="108" rx="32" fill="url(#g)" mask="url(#cut)"/>
+  <rect x="6" y="6" width="108" height="108" rx="32" fill="url(#sheen)" mask="url(#cut)"/>
 </svg>
