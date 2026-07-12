@@ -1,0 +1,851 @@
+<title>Pilot — the store that runs itself</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root{
+    --bg:#0A0D13; --panel:#121722; --panel2:#171E2C; --panel3:#1D2536;
+    --line:rgba(233,237,245,.09); --line2:rgba(233,237,245,.16);
+    --ink:#E9EDF5; --mut:#8B94A7; --dim:#5C6478;
+    --amber:#FFB45C; --amber-deep:#E89A3C; --amber-ink:#1A1205;
+    --good:#57D9A3; --bad:#F27D72;
+    --paper:#F4F0E8; --paper2:#ECE6DA; --s-ink:#2A2118; --s-mut:#6E6152;
+    --pine:#3D6156; --tan:#C39B6A;
+    --sans:"Avenir Next","Helvetica Neue","Segoe UI",system-ui,sans-serif;
+    --mono:ui-monospace,"SF Mono","Cascadia Code","JetBrains Mono",Menlo,Consolas,monospace;
+    --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+    color-scheme: dark;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0; background:var(--bg); color:var(--ink);
+    font-family:var(--sans); font-size:15px; line-height:1.5;
+    overflow:hidden;
+  }
+  button{font:inherit; cursor:pointer}
+
+  /* ---------- App shell ---------- */
+  #app{height:100vh; display:flex; flex-direction:column}
+  header{
+    flex:none; display:flex; align-items:center; gap:20px;
+    padding:0 20px; height:52px; border-bottom:1px solid var(--line);
+    background:linear-gradient(180deg, rgba(233,237,245,.02), transparent);
+  }
+  .wordmark{display:flex; align-items:center; gap:9px; font-weight:600; letter-spacing:.14em; font-size:13px}
+  .wordmark .mk{
+    width:20px;height:20px;border-radius:5px;flex:none;
+    background:conic-gradient(from 210deg, var(--amber), var(--amber-deep) 55%, #7a4d16);
+    position:relative;
+  }
+  .wordmark .mk::after{
+    content:""; position:absolute; inset:5px;
+    background:var(--bg); clip-path:polygon(50% 0, 100% 100%, 50% 78%, 0 100%);
+  }
+  nav{display:flex; gap:4px; margin-left:8px}
+  nav button{
+    background:none; border:1px solid transparent; color:var(--dim);
+    padding:5px 12px; border-radius:99px; font-size:12.5px; letter-spacing:.02em;
+  }
+  nav button .n{font-family:var(--mono); font-size:10.5px; color:var(--dim); margin-right:7px}
+  nav button.on{color:var(--ink); border-color:var(--line2); background:var(--panel)}
+  nav button.on .n{color:var(--amber)}
+  nav button:not(.on):hover{color:var(--mut)}
+  nav button:disabled{opacity:.35; cursor:default}
+  .spacer{flex:1}
+  .save-chip{
+    font-family:var(--mono); font-size:12px; color:var(--good);
+    border:1px solid rgba(87,217,163,.25); background:rgba(87,217,163,.07);
+    padding:5px 12px; border-radius:99px; font-variant-numeric:tabular-nums;
+    opacity:0; transition:opacity .5s;
+  }
+  .save-chip.show{opacity:1}
+  #resetBtn{background:none;border:1px solid var(--line);color:var(--dim);border-radius:8px;padding:5px 10px;font-size:12px}
+  #resetBtn:hover{color:var(--mut);border-color:var(--line2)}
+
+  main{flex:1; position:relative; overflow:hidden}
+  .scene{
+    position:absolute; inset:0; overflow:auto; padding:32px 28px 60px;
+    opacity:0; transform:translateX(24px); pointer-events:none;
+    transition:opacity .38s ease, transform .38s ease;
+  }
+  .scene.on{opacity:1; transform:none; pointer-events:auto}
+  .scene.left{transform:translateX(-24px)}
+  @media (prefers-reduced-motion: reduce){
+    .scene{transition:opacity .15s; transform:none!important}
+    *{animation-duration:.01ms!important; animation-iteration-count:1!important}
+  }
+
+  .hint{
+    position:fixed; left:20px; bottom:14px; z-index:5;
+    font-size:11.5px; color:var(--dim); display:flex; gap:8px; align-items:center;
+  }
+  kbd{
+    font-family:var(--mono); font-size:10.5px; color:var(--mut);
+    border:1px solid var(--line2); border-bottom-width:2px; border-radius:5px;
+    padding:1px 6px; background:var(--panel);
+  }
+  .sim-note{position:fixed; right:20px; bottom:14px; font-size:11px; color:var(--dim)}
+
+  /* ---------- Scene 1 · Connect ---------- */
+  #s-connect{display:flex; align-items:center; justify-content:center}
+  .connect-inner{max-width:640px; width:100%; text-align:center; margin-top:-4vh}
+  .eyebrow{
+    font-family:var(--mono); font-size:11.5px; letter-spacing:.22em; color:var(--amber);
+    text-transform:uppercase; margin-bottom:22px;
+  }
+  h1.big{
+    font-size:clamp(34px, 5vw, 54px); line-height:1.08; font-weight:600;
+    letter-spacing:-.015em; margin:0 0 18px; text-wrap:balance;
+  }
+  .connect-inner p.sub{color:var(--mut); max-width:46ch; margin:0 auto 36px; font-size:16px}
+  .urlrow{
+    display:flex; gap:10px; max-width:560px; margin:0 auto;
+    background:var(--panel); border:1px solid var(--line2); border-radius:14px; padding:8px;
+    box-shadow:0 20px 60px rgba(0,0,0,.45);
+  }
+  .urlrow input{
+    flex:1; background:none; border:none; outline:none; color:var(--ink);
+    font-family:var(--mono); font-size:14px; padding:10px 12px; min-width:0;
+  }
+  .urlrow input::placeholder{color:var(--dim)}
+  .btn-amber{
+    background:linear-gradient(180deg, var(--amber), var(--amber-deep));
+    color:var(--amber-ink); border:none; border-radius:9px; padding:10px 20px;
+    font-weight:600; font-size:14px; white-space:nowrap;
+    box-shadow:0 4px 18px rgba(255,180,92,.25);
+  }
+  .btn-amber:hover{filter:brightness(1.06)}
+  .connect-foot{margin-top:26px; font-size:12.5px; color:var(--dim)}
+  .connect-foot b{color:var(--mut); font-weight:500}
+
+  /* ---------- Scene 2 · Migrate ---------- */
+  #s-migrate .wrap{max-width:1060px; margin:0 auto; display:grid; grid-template-columns:1.6fr 1fr; gap:22px; align-items:start}
+  .panel{
+    background:var(--panel); border:1px solid var(--line); border-radius:16px; overflow:hidden;
+  }
+  .panel-h{
+    display:flex; align-items:center; gap:10px; padding:12px 16px;
+    border-bottom:1px solid var(--line); font-size:12px; letter-spacing:.08em;
+    text-transform:uppercase; color:var(--mut);
+  }
+  .dotlive{width:7px;height:7px;border-radius:99px;background:var(--amber);box-shadow:0 0 10px var(--amber);animation:pulse 1.6s infinite}
+  @keyframes pulse{50%{opacity:.4}}
+  #term{
+    font-family:var(--mono); font-size:12.8px; line-height:1.75; padding:16px 18px 20px;
+    min-height:380px; max-height:56vh; overflow:auto; color:var(--mut);
+    font-variant-numeric:tabular-nums;
+  }
+  #term .ln{opacity:0; animation:fadein .3s forwards}
+  @keyframes fadein{to{opacity:1}}
+  #term .t{color:var(--dim); margin-right:10px}
+  #term .ok{color:var(--good)}
+  #term .hl{color:var(--ink)}
+  #term .am{color:var(--amber)}
+  .prog{
+    height:4px; background:var(--panel3); border-radius:99px; overflow:hidden; margin:14px 18px 18px;
+  }
+  .prog i{display:block; height:100%; width:0%; background:linear-gradient(90deg,var(--amber-deep),var(--amber)); transition:width .5s ease}
+  .apps{padding:8px 6px 12px}
+  .app{
+    display:flex; align-items:center; gap:12px; padding:9px 12px; border-radius:10px;
+    font-size:13.5px; color:var(--mut); transition:background .3s;
+  }
+  .app .nm{flex:1}
+  .app .pr{font-family:var(--mono); font-size:12.5px; font-variant-numeric:tabular-nums; color:var(--dim)}
+  .app .st{font-family:var(--mono); font-size:11px; width:82px; text-align:right; color:var(--dim)}
+  .app.done{background:rgba(87,217,163,.05)}
+  .app.done .nm{color:var(--ink); text-decoration:line-through; text-decoration-color:rgba(233,237,245,.35); text-decoration-thickness:1px}
+  .app.done .pr{text-decoration:line-through; }
+  .app.done .st{color:var(--good)}
+  .tally{
+    border-top:1px solid var(--line); padding:16px; display:flex; align-items:baseline; justify-content:space-between;
+  }
+  .tally .lbl{font-size:12px; color:var(--mut); letter-spacing:.06em; text-transform:uppercase}
+  .tally .amt{font-family:var(--mono); font-size:26px; color:var(--good); font-variant-numeric:tabular-nums}
+  .tally .amt small{font-size:13px; color:var(--mut)}
+  .cta-row{grid-column:1 / -1; text-align:center; padding-top:6px; opacity:0; transition:opacity .6s}
+  .cta-row.show{opacity:1}
+
+  /* ---------- Scene 3 · Storefront ---------- */
+  #s-store .wrap{max-width:1080px; margin:0 auto}
+  .store-tools{display:flex; align-items:center; gap:14px; margin-bottom:14px}
+  .store-tools .note{font-size:12.5px; color:var(--dim)}
+  .toggle{
+    display:flex; border:1px solid var(--line2); border-radius:99px; overflow:hidden; font-size:12px;
+  }
+  .toggle button{background:none; border:none; color:var(--dim); padding:6px 14px}
+  .toggle button.on{background:var(--panel3); color:var(--ink)}
+  .browser{
+    border:1px solid var(--line2); border-radius:16px; overflow:hidden;
+    box-shadow:0 30px 80px rgba(0,0,0,.55);
+  }
+  .browser-bar{
+    display:flex; align-items:center; gap:10px; padding:10px 14px;
+    background:var(--panel2); border-bottom:1px solid var(--line);
+  }
+  .lights{display:flex; gap:6px}
+  .lights i{width:10px;height:10px;border-radius:99px;background:var(--panel3);border:1px solid var(--line2)}
+  .addr{
+    flex:1; max-width:420px; margin:0 auto; text-align:center;
+    font-family:var(--mono); font-size:11.5px; color:var(--mut);
+    background:var(--bg); border:1px solid var(--line); border-radius:8px; padding:5px 12px;
+  }
+  .addr .lock{color:var(--good)}
+
+  /* --- inside the browser: Driftwood storefront (light world) --- */
+  .store{
+    background:var(--paper); color:var(--s-ink); font-family:var(--serif);
+    max-height:62vh; overflow:auto;
+  }
+  .store *{font-variant-numeric:normal}
+  .store-nav{
+    display:flex; align-items:center; gap:26px; padding:18px 34px;
+    border-bottom:1px solid rgba(42,33,24,.14); font-family:var(--sans);
+    font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--s-mut);
+    position:sticky; top:0; background:var(--paper); z-index:2;
+  }
+  .store-nav .brand{
+    font-family:var(--serif); font-size:19px; letter-spacing:.01em; text-transform:none;
+    color:var(--s-ink); font-weight:600; margin-right:auto;
+  }
+  .store-hero{
+    padding:64px 34px 58px; text-align:center;
+    background:
+      radial-gradient(700px 300px at 50% -80px, rgba(195,155,106,.22), transparent 70%),
+      linear-gradient(180deg, var(--paper), var(--paper2));
+  }
+  .store-hero .k{
+    font-family:var(--sans); font-size:11px; letter-spacing:.26em; text-transform:uppercase;
+    color:var(--pine); margin-bottom:18px;
+  }
+  .store-hero h2{
+    font-size:clamp(30px, 4.2vw, 46px); font-weight:500; line-height:1.12;
+    margin:0 auto 16px; max-width:18ch; letter-spacing:-.01em; text-wrap:balance;
+    transition:opacity .25s;
+  }
+  .store-hero h2.swap{opacity:0}
+  .store-hero p{color:var(--s-mut); max-width:52ch; margin:0 auto 28px; font-size:16.5px}
+  .btn-pine{
+    font-family:var(--sans); background:var(--pine); color:var(--paper); border:none;
+    padding:12px 26px; border-radius:3px; font-size:13px; letter-spacing:.1em; text-transform:uppercase;
+  }
+  .shelf{padding:44px 34px 60px}
+  .shelf .sh-h{
+    display:flex; align-items:baseline; gap:16px; margin-bottom:26px;
+  }
+  .shelf .sh-h h3{font-size:22px; font-weight:500; margin:0}
+  .shelf .sh-h span{font-family:var(--sans); font-size:12px; color:var(--s-mut); letter-spacing:.08em; text-transform:uppercase}
+  .grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:22px}
+  .card{background:transparent}
+  .ph{
+    aspect-ratio:4/4.6; border-radius:4px; margin-bottom:14px; position:relative; overflow:hidden;
+    border:1px solid rgba(42,33,24,.1);
+  }
+  .ph .bag{
+    position:absolute; left:50%; bottom:-4%; transform:translateX(-50%);
+    width:56%; height:74%; border-radius:12px 12px 8px 8px;
+  }
+  .ph .bag::before{
+    content:""; position:absolute; left:0; right:0; top:0; height:14%;
+    background:rgba(255,255,255,.28); border-radius:12px 12px 0 0;
+  }
+  .ph .bag::after{
+    content:attr(data-m); position:absolute; left:50%; top:44%; transform:translate(-50%,-50%);
+    font-family:var(--serif); font-size:30px; color:rgba(244,240,232,.92);
+  }
+  .card h4{font-size:16.5px; font-weight:600; margin:0 0 3px}
+  .card .desc{font-family:var(--sans); font-size:12.8px; color:var(--s-mut); line-height:1.5; margin:0 0 8px; min-height:3.9em}
+  .card .price{
+    font-family:var(--sans); font-size:14px; color:var(--s-ink); font-weight:600;
+    display:inline-block; padding:2px 0; border-radius:4px; transition:background .4s;
+  }
+  .card .price.flash{background:rgba(255,180,92,.5)}
+  .card .badge{
+    font-family:var(--sans); font-size:10px; letter-spacing:.1em; text-transform:uppercase;
+    color:var(--pine); border:1px solid rgba(61,97,86,.4); padding:2px 8px; border-radius:99px; margin-left:8px;
+  }
+  .store-foot{
+    font-family:var(--sans); text-align:center; padding:26px; font-size:11.5px; color:var(--s-mut);
+    border-top:1px solid rgba(42,33,24,.12); letter-spacing:.06em;
+  }
+  .built-line{
+    display:flex; align-items:center; justify-content:center; gap:8px; margin-top:16px;
+    font-size:12px; color:var(--dim); font-family:var(--mono);
+  }
+  .built-line b{color:var(--amber); font-weight:500}
+
+  /* ---------- Scene 4 · Mission Control ---------- */
+  #s-ops .wrap{max-width:1220px; margin:0 auto}
+  .kpis{display:grid; grid-template-columns:repeat(4, 1fr); gap:14px; margin-bottom:16px}
+  .kpi{
+    background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:14px 16px 12px;
+  }
+  .kpi .l{font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--dim); margin-bottom:6px}
+  .kpi .v{font-family:var(--mono); font-size:24px; font-variant-numeric:tabular-nums; letter-spacing:-.01em}
+  .kpi .d{font-family:var(--mono); font-size:11px; color:var(--good); margin-top:3px}
+  .kpi .v .u{font-size:13px; color:var(--mut)}
+  .ops-grid{display:grid; grid-template-columns:1.35fr 1fr 1fr; gap:14px; align-items:start}
+  .feed{max-height:52vh; overflow:auto; padding:6px}
+  .ev{
+    display:grid; grid-template-columns:auto 1fr; gap:10px; padding:10px 12px; border-radius:10px;
+    opacity:0; transform:translateY(-6px); animation:evin .4s forwards;
+  }
+  @keyframes evin{to{opacity:1; transform:none}}
+  .ev + .ev{border-top:1px solid var(--line)}
+  .ev .tag{
+    font-family:var(--mono); font-size:9.5px; letter-spacing:.08em; align-self:start;
+    padding:3px 7px; border-radius:5px; margin-top:2px; white-space:nowrap;
+  }
+  .tag.pricing{color:var(--amber); background:rgba(255,180,92,.1)}
+  .tag.growth{color:#8FB7FF; background:rgba(143,183,255,.1)}
+  .tag.support{color:var(--good); background:rgba(87,217,163,.1)}
+  .tag.stock{color:#D8A6FF; background:rgba(216,166,255,.1)}
+  .tag.system{color:var(--mut); background:rgba(139,148,167,.12)}
+  .ev .b{font-size:13px; color:var(--mut); line-height:1.45}
+  .ev .b b{color:var(--ink); font-weight:500}
+  .ev .b .ts{font-family:var(--mono); font-size:10.5px; color:var(--dim); margin-left:8px}
+  .col{display:flex; flex-direction:column; gap:14px}
+  .ap{
+    padding:14px 16px; border-bottom:1px solid var(--line);
+  }
+  .ap:last-child{border-bottom:none}
+  .ap .why{font-size:12.3px; color:var(--mut); margin:6px 0 12px; line-height:1.5}
+  .ap .ttl{font-size:13.5px; color:var(--ink); font-weight:500; line-height:1.4}
+  .ap .est{font-family:var(--mono); font-size:11px; color:var(--amber); margin-left:6px; white-space:nowrap}
+  .ap .row{display:flex; gap:8px}
+  .ap button{border-radius:8px; padding:7px 14px; font-size:12.5px; border:1px solid var(--line2); background:none}
+  .ap .yes{background:rgba(87,217,163,.12); border-color:rgba(87,217,163,.35); color:var(--good); font-weight:600}
+  .ap .yes:hover{background:rgba(87,217,163,.2)}
+  .ap .no{color:var(--mut)}
+  .ap .no:hover{color:var(--bad); border-color:rgba(242,125,114,.4)}
+  .ap.applied .row, .ap.applied .why{display:none}
+  .ap.applied .ttl{color:var(--dim); text-decoration:line-through; text-decoration-thickness:1px}
+  .ap .done-note{display:none; font-family:var(--mono); font-size:11.5px; color:var(--good); margin-top:6px}
+  .ap.applied .done-note{display:block}
+  .ap.declined .done-note{display:block; color:var(--bad)}
+  .ap.declined .row, .ap.declined .why{display:none}
+  .ap.declined .ttl{color:var(--dim)}
+
+  .ab{padding:14px 16px}
+  .ab .vs{display:flex; flex-direction:column; gap:10px; margin:10px 0 12px}
+  .ab .var{font-size:12.5px}
+  .ab .var .nm{display:flex; justify-content:space-between; color:var(--mut); margin-bottom:4px}
+  .ab .var .nm b{color:var(--ink); font-weight:500; font-style:italic; font-family:var(--serif)}
+  .ab .var .nm span{font-family:var(--mono); font-size:11px; font-variant-numeric:tabular-nums}
+  .bar{height:5px; background:var(--panel3); border-radius:99px; overflow:hidden}
+  .bar i{display:block; height:100%; border-radius:99px; transition:width .8s ease}
+  .bar .a{background:var(--dim)}
+  .bar .b{background:var(--amber)}
+  .ab .conf{font-family:var(--mono); font-size:11.5px; color:var(--mut); font-variant-numeric:tabular-nums}
+  .ab .conf b{color:var(--amber); font-weight:500}
+
+  .tick{padding:14px 16px; font-size:12.8px}
+  .tick .msg{
+    background:var(--panel3); border:1px solid var(--line); border-radius:10px 10px 10px 3px;
+    padding:10px 12px; color:var(--mut); margin-bottom:10px;
+  }
+  .tick .msg .who{font-size:11px; color:var(--dim); margin-bottom:3px}
+  .tick .reply{
+    background:rgba(255,180,92,.07); border:1px solid rgba(255,180,92,.22);
+    border-radius:10px 10px 3px 10px; padding:10px 12px; color:var(--mut); min-height:64px;
+  }
+  .tick .reply .who{font-size:11px; color:var(--amber); margin-bottom:3px}
+  .tick .sent{font-family:var(--mono); font-size:11px; color:var(--good); margin-top:8px; text-align:right; opacity:0; transition:opacity .4s}
+  .tick .sent.show{opacity:1}
+  .caret{display:inline-block; width:7px; height:13px; background:var(--amber); vertical-align:-2px; animation:pulse 1s infinite}
+
+  .cost{padding:6px 16px 14px; font-size:13px}
+  .cost table{width:100%; border-collapse:collapse; font-variant-numeric:tabular-nums}
+  .cost td{padding:7px 0; border-bottom:1px solid var(--line); color:var(--mut)}
+  .cost td:last-child{text-align:right; font-family:var(--mono); font-size:12px; color:var(--dim)}
+  .cost tr.strike td{text-decoration:line-through; text-decoration-color:rgba(233,237,245,.3)}
+  .cost tr.total td{border-bottom:none; color:var(--ink); font-weight:600; padding-top:10px}
+  .cost tr.total td:last-child{color:var(--good); font-size:15px}
+
+  /* toast */
+  #toasts{position:fixed; right:18px; top:64px; z-index:50; display:flex; flex-direction:column; gap:8px}
+  .toast{
+    background:var(--panel3); border:1px solid var(--line2); border-left:3px solid var(--amber);
+    color:var(--ink); font-size:13px; padding:11px 16px; border-radius:10px;
+    box-shadow:0 12px 40px rgba(0,0,0,.5); max-width:340px;
+    animation:evin .35s forwards;
+  }
+  .toast small{display:block; color:var(--mut); font-size:11.5px; margin-top:2px}
+
+  @media (max-width: 980px){
+    #s-migrate .wrap{grid-template-columns:1fr}
+    .ops-grid{grid-template-columns:1fr 1fr}
+    .kpis{grid-template-columns:repeat(2,1fr)}
+  }
+  @media (max-width: 680px){
+    .ops-grid{grid-template-columns:1fr}
+    nav button span.t-label{display:none}
+    body{overflow:auto}
+  }
+</style>
+
+<div id="app">
+  <header>
+    <div class="wordmark"><span class="mk"></span>PILOT</div>
+    <nav id="tabs">
+      <button data-s="0" class="on"><span class="n">01</span><span class="t-label">Connect</span></button>
+      <button data-s="1"><span class="n">02</span><span class="t-label">Takeover</span></button>
+      <button data-s="2" disabled><span class="n">03</span><span class="t-label">Your store</span></button>
+      <button data-s="3" disabled><span class="n">04</span><span class="t-label">Mission Control</span></button>
+    </nav>
+    <div class="spacer"></div>
+    <div class="save-chip" id="saveChip">saving $466/mo vs. app stack</div>
+    <button id="resetBtn" title="Restart demo">↺ Reset</button>
+  </header>
+
+  <main>
+    <!-- ================= SCENE 1 ================= -->
+    <section class="scene on" id="s-connect">
+      <div class="connect-inner">
+        <div class="eyebrow">Pilot · autonomous commerce</div>
+        <h1 class="big">Your store,<br>on autopilot.</h1>
+        <p class="sub">Point Pilot at any Shopify store. It migrates everything, rebuilds the storefront, replaces the app stack — then runs the business while you approve the calls that matter.</p>
+        <div class="urlrow">
+          <input id="urlInput" value="driftwood-coffee.myshopify.com" spellcheck="false" aria-label="Store URL">
+          <button class="btn-amber" id="goBtn">Take over my store</button>
+        </div>
+        <div class="connect-foot">Replaces <b>Shopify + 7 paid apps</b> · one flat price · your margin stays yours</div>
+      </div>
+    </section>
+
+    <!-- ================= SCENE 2 ================= -->
+    <section class="scene" id="s-migrate">
+      <div class="wrap">
+        <div class="panel">
+          <div class="panel-h"><span class="dotlive"></span>Migration agent · driftwood-coffee.myshopify.com</div>
+          <div id="term" aria-live="polite"></div>
+          <div class="prog"><i id="progBar"></i></div>
+        </div>
+        <div class="panel">
+          <div class="panel-h">App stack being replaced</div>
+          <div class="apps" id="appList">
+            <div class="app"><span class="nm">Klaviyo <small style="color:var(--dim)">· email &amp; SMS</small></span><span class="pr">$150/mo</span><span class="st">running</span></div>
+            <div class="app"><span class="nm">Recharge <small style="color:var(--dim)">· subscriptions</small></span><span class="pr">$99/mo</span><span class="st">running</span></div>
+            <div class="app"><span class="nm">Rebuy <small style="color:var(--dim)">· upsells</small></span><span class="pr">$99/mo</span><span class="st">running</span></div>
+            <div class="app"><span class="nm">Gorgias <small style="color:var(--dim)">· support desk</small></span><span class="pr">$60/mo</span><span class="st">running</span></div>
+            <div class="app"><span class="nm">Loox <small style="color:var(--dim)">· reviews</small></span><span class="pr">$35/mo</span><span class="st">running</span></div>
+            <div class="app"><span class="nm">PageFly <small style="color:var(--dim)">· page builder</small></span><span class="pr">$24/mo</span><span class="st">running</span></div>
+            <div class="app"><span class="nm">Back in Stock</span><span class="pr">$19/mo</span><span class="st">running</span></div>
+            <div class="app"><span class="nm">Shopify <small style="color:var(--dim)">· platform</small></span><span class="pr">$79/mo</span><span class="st">running</span></div>
+          </div>
+          <div class="tally">
+            <span class="lbl">Replaced so far</span>
+            <span class="amt">$<span id="savedAmt">0</span><small>/mo</small></span>
+          </div>
+        </div>
+        <div class="cta-row" id="migrateCta">
+          <button class="btn-amber" id="toStoreBtn">See your new store →</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= SCENE 3 ================= -->
+    <section class="scene" id="s-store">
+      <div class="wrap">
+        <div class="store-tools">
+          <div class="toggle" role="group" aria-label="Copy version">
+            <button class="on" id="tgAfter">Pilot's rewrite</button>
+            <button id="tgBefore">Original copy</button>
+          </div>
+          <span class="note">Every word below was rewritten to match the brand voice Pilot inferred from 312 reviews.</span>
+          <div class="spacer"></div>
+          <button class="btn-amber" id="toOpsBtn">Open Mission Control →</button>
+        </div>
+
+        <div class="browser">
+          <div class="browser-bar">
+            <div class="lights"><i></i><i></i><i></i></div>
+            <div class="addr"><span class="lock">●</span>&nbsp; driftwoodcoffee.com — rebuilt by Pilot</div>
+            <div style="width:52px"></div>
+          </div>
+          <div class="store" id="storefront">
+            <div class="store-nav">
+              <span class="brand">Driftwood Coffee Co.</span>
+              <span>Shop</span><span>Subscriptions</span><span>Our Roastery</span><span>Cart · 0</span>
+            </div>
+            <div class="store-hero">
+              <div class="k">Small-batch · roasted on the Oregon coast</div>
+              <h2 id="heroHead" data-after="Coffee worth slowing down for." data-before="Welcome to our online store!" data-winner="Slow mornings, honest coffee.">Coffee worth slowing down for.</h2>
+              <p id="heroSub" data-after="We roast in eight-kilo batches a hundred yards from the Pacific, and ship within 48 hours of roast. No blends hiding stale beans. No subscriptions that trap you." data-before="We sell high quality coffee products at great prices. Check out our products below and don't forget to sign up for our newsletter for deals!">We roast in eight-kilo batches a hundred yards from the Pacific, and ship within 48 hours of roast. No blends hiding stale beans. No subscriptions that trap you.</p>
+              <button class="btn-pine">Shop the roasts</button>
+            </div>
+            <div class="shelf">
+              <div class="sh-h"><h3>This week's roasts</h3><span>Shipped within 48h of roast</span></div>
+              <div class="grid">
+                <div class="card">
+                  <div class="ph" style="background:radial-gradient(140% 100% at 30% 0%, #E5DCCB, #D8CBB2)"><div class="bag" data-m="E" style="background:linear-gradient(170deg,#4E6E62,#33493F)"></div></div>
+                  <h4>Ethiopia Gedeb <span class="badge">Best seller</span></h4>
+                  <p class="desc" data-after="Natural process. Blueberry jam up front, jasmine on the finish. The one our regulars panic-buy when stock runs low." data-before="Ethiopian coffee with fruity notes. Natural process. 12oz bag.">Natural process. Blueberry jam up front, jasmine on the finish. The one our regulars panic-buy when stock runs low.</p>
+                  <span class="price" id="priceEthiopia">$22.00</span>
+                </div>
+                <div class="card">
+                  <div class="ph" style="background:radial-gradient(140% 100% at 30% 0%, #E2D6C4, #D2C2A6)"><div class="bag" data-m="L" style="background:linear-gradient(170deg,#8A6844,#5C4128)"></div></div>
+                  <h4>Longshore House Blend</h4>
+                  <p class="desc" data-after="Our everyday workhorse — cocoa, toasted hazelnut, and a clean, heavy body that stands up to milk. Roasted Mondays." data-before="Our house blend. Smooth and balanced, good for espresso or drip. 12oz bag.">Our everyday workhorse — cocoa, toasted hazelnut, and a clean, heavy body that stands up to milk. Roasted Mondays.</p>
+                  <span class="price">$18.00</span>
+                </div>
+                <div class="card">
+                  <div class="ph" style="background:radial-gradient(140% 100% at 30% 0%, #DFE3DE, #C9D2C9)"><div class="bag" data-m="C" style="background:linear-gradient(170deg,#3F566B,#28394A)"></div></div>
+                  <h4>Cold Brew Kit</h4>
+                  <p class="desc" data-after="A coarse-ground kilo of our Longshore blend plus the steeping bag we use at the roastery. Twelve liters of cold brew, zero guesswork." data-before="Everything you need to make cold brew at home. Includes coffee and filter bag.">A coarse-ground kilo of our Longshore blend plus the steeping bag we use at the roastery. Twelve liters of cold brew, zero guesswork.</p>
+                  <span class="price">$34.00</span>
+                </div>
+                <div class="card">
+                  <div class="ph" style="background:radial-gradient(140% 100% at 30% 0%, #E8DFD2, #DACDB9)"><div class="bag" data-m="R" style="background:linear-gradient(170deg,#B0793F,#7C4E22)"></div></div>
+                  <h4>Roaster's Subscription <span class="badge">Save 15%</span></h4>
+                  <p class="desc" data-after="Whatever's best off the roaster that week, at your door before it peaks. Pause or cancel in one tap — we mean it." data-before="Monthly coffee subscription. Cancel anytime. Free shipping included.">Whatever's best off the roaster that week, at your door before it peaks. Pause or cancel in one tap — we mean it.</p>
+                  <span class="price">$19.00<span style="color:var(--s-mut); font-weight:400">/mo</span></span>
+                </div>
+              </div>
+            </div>
+            <div class="store-foot">DRIFTWOOD COFFEE CO. · NEWPORT, OREGON · EST. 2019</div>
+          </div>
+        </div>
+        <div class="built-line">Rebuilt from the original store in <b>4m 32s</b> · design system generated from product photography · 312 reviews migrated</div>
+      </div>
+    </section>
+
+    <!-- ================= SCENE 4 ================= -->
+    <section class="scene" id="s-ops">
+      <div class="wrap">
+        <div class="kpis">
+          <div class="kpi"><div class="l">Revenue · today</div><div class="v">$<span id="kRev">2,847</span></div><div class="d">+18.4% vs. last Saturday</div></div>
+          <div class="kpi"><div class="l">Net margin</div><div class="v"><span id="kMar">64.2</span><span class="u">%</span></div><div class="d">guardrail floor 62%</div></div>
+          <div class="kpi"><div class="l">Decisions today</div><div class="v"><span id="kDec">138</span></div><div class="d"><span id="kPend">3</span> awaiting your approval</div></div>
+          <div class="kpi"><div class="l">Median support reply</div><div class="v">38<span class="u">s</span></div><div class="d">CSAT 4.9 / 5</div></div>
+        </div>
+
+        <div class="ops-grid">
+          <div class="panel">
+            <div class="panel-h"><span class="dotlive"></span>Live decision feed</div>
+            <div class="feed" id="feed"></div>
+          </div>
+
+          <div class="col">
+            <div class="panel">
+              <div class="panel-h">Needs your approval</div>
+              <div class="ap" id="ap1">
+                <div class="ttl">Raise Ethiopia Gedeb $22 → $24<span class="est">est. +$310/wk</span></div>
+                <div class="why">Selling 2.3× forecast; 9 days of stock left before next roast. Estimated elasticity −0.4 — demand holds at $24.</div>
+                <div class="row"><button class="yes">Approve</button><button class="no">Decline</button></div>
+                <div class="done-note"></div>
+              </div>
+              <div class="ap" id="ap2">
+                <div class="ttl">Ship winning hero headline<span class="est">+12.3% CVR</span></div>
+                <div class="why">“Slow mornings, honest coffee.” beat the current headline across 4,112 sessions. 96% confidence.</div>
+                <div class="row"><button class="yes">Approve</button><button class="no">Decline</button></div>
+                <div class="done-note"></div>
+              </div>
+              <div class="ap" id="ap3">
+                <div class="ttl">Winback: 412 lapsed customers, 10% offer<span class="est">est. +$3.1k</span></div>
+                <div class="why">Customers with 2+ orders, quiet for 90 days. Drafted in brand voice; discount stays above your margin floor.</div>
+                <div class="row"><button class="yes">Approve</button><button class="no">Decline</button></div>
+                <div class="done-note"></div>
+              </div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-h">Experiment · hero headline</div>
+              <div class="ab">
+                <div class="vs">
+                  <div class="var">
+                    <div class="nm"><b>“Coffee worth slowing down for.”</b><span>3.1% CVR</span></div>
+                    <div class="bar"><i class="a" id="barA" style="width:44%"></i></div>
+                  </div>
+                  <div class="var">
+                    <div class="nm"><b>“Slow mornings, honest coffee.”</b><span id="cvrB">3.4% CVR</span></div>
+                    <div class="bar"><i class="b" id="barB" style="width:52%"></i></div>
+                  </div>
+                </div>
+                <div class="conf">confidence <b id="confPct">87%</b> · 4,112 sessions · auto-ships at 95% with your approval</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col">
+            <div class="panel">
+              <div class="panel-h">Support · handled by Pilot</div>
+              <div class="tick">
+                <div class="msg"><div class="who">Maya R. · order #1489 · 2 min ago</div>Hi — I ordered the Ethiopia last Tuesday and it still says processing? Kind of worried it's lost.</div>
+                <div class="reply"><div class="who">Pilot · drafting in brand voice</div><span id="replyTxt"></span><span class="caret" id="replyCaret"></span></div>
+                <div class="sent" id="sentNote">✓ sent · 41s after ticket opened · tracking attached</div>
+              </div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-h">What Driftwood pays now</div>
+              <div class="cost">
+                <table>
+                  <tr class="strike"><td>Shopify + 7 apps</td><td>$565/mo</td></tr>
+                  <tr class="strike"><td>Freelance email marketer</td><td>$400/mo</td></tr>
+                  <tr class="strike"><td>Owner's admin time · ~9h/wk</td><td>—</td></tr>
+                  <tr><td>Pilot · flat, no take-rate</td><td style="color:var(--amber)">$99/mo</td></tr>
+                  <tr class="total"><td>Saved every month</td><td>$866+</td></tr>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div id="toasts"></div>
+<div class="hint"><kbd>←</kbd><kbd>→</kbd> move between scenes</div>
+<div class="sim-note">Product demo · simulated data</div>
+
+<script>
+(function(){
+  "use strict";
+  var scenes = [document.getElementById('s-connect'), document.getElementById('s-migrate'),
+                document.getElementById('s-store'), document.getElementById('s-ops')];
+  var tabs = Array.prototype.slice.call(document.querySelectorAll('#tabs button'));
+  var cur = 0, migrated = false, migrating = false;
+
+  function unlock(i){ tabs[i].disabled = false; }
+  function go(i){
+    if(i < 0 || i >= scenes.length || tabs[i].disabled) return;
+    scenes[cur].classList.remove('on');
+    scenes[cur].classList.toggle('left', i > cur);
+    scenes[i].classList.remove('left');
+    scenes[i].classList.add('on');
+    tabs[cur].classList.remove('on');
+    tabs[i].classList.add('on');
+    cur = i;
+    if(i === 1 && !migrated && !migrating) runMigration();
+    if(i === 3) startOps();
+  }
+  tabs.forEach(function(t){ t.addEventListener('click', function(){ go(+t.dataset.s); }); });
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'ArrowRight') go(cur+1);
+    if(e.key === 'ArrowLeft') go(cur-1);
+  });
+  document.getElementById('resetBtn').addEventListener('click', function(){ location.reload(); });
+  document.getElementById('goBtn').addEventListener('click', function(){ go(1); });
+  document.getElementById('toStoreBtn').addEventListener('click', function(){ go(2); });
+  document.getElementById('toOpsBtn').addEventListener('click', function(){ go(3); });
+
+  function toast(main, sub){
+    var d = document.createElement('div');
+    d.className = 'toast';
+    d.innerHTML = main + (sub ? '<small>'+sub+'</small>' : '');
+    document.getElementById('toasts').appendChild(d);
+    setTimeout(function(){ d.style.opacity = '0'; d.style.transition = 'opacity .5s'; }, 4200);
+    setTimeout(function(){ d.remove(); }, 4800);
+  }
+
+  /* ---------------- Scene 2: migration ---------------- */
+  var LINES = [
+    [400,  '<span class="t">00:01</span>connecting to <span class="hl">driftwood-coffee.myshopify.com</span> … <span class="ok">ok</span>'],
+    [900,  '<span class="t">00:02</span>found <span class="hl">24 products</span> · <span class="hl">1,382 orders</span> · <span class="hl">4,209 customers</span> · <span class="hl">312 reviews</span>'],
+    [1000, '<span class="t">00:04</span>reading reviews + product copy … inferring brand voice'],
+    [900,  '<span class="t">00:06</span>voice: <span class="am">“coastal, unhurried, craft-forward — confident, never salesy”</span>'],
+    [800,  '<span class="t">00:09</span>importing catalog ████████████ <span class="ok">24/24</span>'],
+    [900,  '<span class="t">00:13</span>rewriting 24 product pages in brand voice … <span class="ok">done</span>'],
+    [900,  '<span class="t">00:17</span>generating design system from product photography … <span class="ok">done</span>'],
+    [800,  '<span class="t">00:21</span>rebuilding email flows: welcome · winback · cart recovery … <span class="ok">done</span>'],
+    [700,  '<span class="t">00:24</span>replacing app stack …'],
+    [500,  null], [420, null], [420, null], [420, null], [420, null], [420, null], [420, null], [560, null],
+    [800,  '<span class="t">00:29</span>setting guardrails: <span class="hl">margin floor 62%</span> · <span class="hl">price moves ≤5%</span> · <span class="hl">refunds ≤$50 auto</span>'],
+    [900,  '<span class="t">00:31</span><span class="ok">✓ store rebuilt.</span> <span class="hl">4m 32s</span> of agent time · zero downtime · old store untouched'],
+    [600,  '<span class="t">00:31</span>Pilot is now <span class="am">operating this store</span>.']
+  ];
+  var APP_SAVINGS = [150, 99, 99, 60, 35, 24, 19, 79];
+  var saved = 0;
+
+  function runMigration(){
+    migrating = true;
+    var term = document.getElementById('term');
+    var prog = document.getElementById('progBar');
+    var apps = Array.prototype.slice.call(document.querySelectorAll('#appList .app'));
+    var savedEl = document.getElementById('savedAmt');
+    var appIdx = 0, i = 0, elapsed = 0;
+    var total = LINES.reduce(function(s,l){ return s + l[0]; }, 0);
+
+    function step(){
+      if(i >= LINES.length){
+        migrating = false; migrated = true;
+        unlock(2); unlock(3);
+        document.getElementById('migrateCta').classList.add('show');
+        document.getElementById('saveChip').classList.add('show');
+        return;
+      }
+      var pair = LINES[i];
+      setTimeout(function(){
+        elapsed += pair[0];
+        prog.style.width = Math.min(100, Math.round(elapsed/total*100)) + '%';
+        var d = document.createElement('div');
+        d.className = 'ln';
+        if(pair[1] === null){
+          var app = apps[appIdx];
+          var name = app.querySelector('.nm').textContent.split('·')[0].trim();
+          app.classList.add('done');
+          app.querySelector('.st').textContent = 'replaced ✓';
+          saved += APP_SAVINGS[appIdx];
+          savedEl.textContent = saved;
+          d.innerHTML = '<span class="t">00:2'+Math.min(9, 5+appIdx)+'</span>&nbsp;&nbsp;<span class="ok">✓</span> ' +
+            (appIdx === 7 ? 'platform: <span class="hl">'+name+'</span> — no longer needed'
+                          : 'replaced <span class="hl">'+name+'</span> <span class="am">(built in)</span>');
+          appIdx++;
+        } else {
+          d.innerHTML = pair[1];
+        }
+        term.appendChild(d);
+        term.scrollTop = term.scrollHeight;
+        i++; step();
+      }, pair[0]);
+    }
+    step();
+  }
+
+  /* ---------------- Scene 3: copy toggle ---------------- */
+  var tgA = document.getElementById('tgAfter'), tgB = document.getElementById('tgBefore');
+  function setCopy(which){
+    tgA.classList.toggle('on', which === 'after');
+    tgB.classList.toggle('on', which === 'before');
+    document.querySelectorAll('[data-after]').forEach(function(el){
+      if(el.id === 'heroHead' && el.dataset.shipped === '1' && which === 'after'){
+        el.textContent = el.dataset.winner; return;
+      }
+      el.textContent = el.dataset[which];
+    });
+  }
+  tgA.addEventListener('click', function(){ setCopy('after'); });
+  tgB.addEventListener('click', function(){ setCopy('before'); });
+
+  /* ---------------- Scene 4: mission control ---------------- */
+  var opsStarted = false;
+  var rev = 2847, dec = 138, mar = 64.2, pend = 3;
+  var kRev = document.getElementById('kRev'), kDec = document.getElementById('kDec'),
+      kMar = document.getElementById('kMar'), kPend = document.getElementById('kPend');
+  function fmt(n){ return n.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+
+  var FEED_POOL = [
+    ['pricing','Held <b>Longshore Blend</b> at $18 — competitor dropped price, but our conversion is unaffected. No reaction needed.'],
+    ['growth','Cart recovery: personalized note sent to 3 shoppers who left the <b>Cold Brew Kit</b>. 1 already converted (+$34).'],
+    ['support','Answered <b>“is the Ethiopia washed or natural?”</b> from product data. 22 seconds.'],
+    ['stock','<b>Ethiopia Gedeb</b> at 9 days of cover. Roast schedule note sent to owner for Monday.'],
+    ['growth','Moved <b>Roaster’s Subscription</b> above the fold for returning visitors — subscribers convert 2.1× there.'],
+    ['support','Refunded a $14 shipping charge (guardrail: auto-approve ≤ $50). Customer replied “wow, thank you.”'],
+    ['pricing','Weekend margin check: blended margin <b>64.2%</b>, 2.2 pts above your floor.'],
+    ['growth','Email: “48 hours off the roaster” flow sent to 218 customers. Open rate trending 61%.'],
+    ['stock','Paused ads for <b>Cold Brew Kit</b> size L — 4 units left. Resumes on restock, no oversell.'],
+    ['system','Nightly backup + price-change audit log written. Every decision is reversible.']
+  ];
+  var feedEl = document.getElementById('feed');
+  var feedIdx = 0;
+  function pushFeed(tag, html){
+    var d = document.createElement('div');
+    d.className = 'ev';
+    var now = new Date();
+    var ts = now.toTimeString().slice(0,5);
+    d.innerHTML = '<span class="tag '+tag+'">'+tag.toUpperCase()+'</span><span class="b">'+html+'<span class="ts">'+ts+'</span></span>';
+    feedEl.insertBefore(d, feedEl.firstChild);
+    while(feedEl.children.length > 14) feedEl.lastChild.remove();
+    dec++; kDec.textContent = fmt(dec);
+  }
+
+  function startOps(){
+    if(opsStarted) return;
+    opsStarted = true;
+    pushFeed('system','Mission Control live. Pilot has made <b>138 decisions</b> today; 3 need you.');
+    setTimeout(function(){ pushFeed(FEED_POOL[0][0], FEED_POOL[0][1]); feedIdx = 1; }, 1400);
+    setInterval(function(){
+      var it = FEED_POOL[feedIdx % FEED_POOL.length]; feedIdx++;
+      pushFeed(it[0], it[1]);
+    }, 5200);
+    setInterval(function(){
+      rev += 3 + Math.floor(Math.random()*16);
+      kRev.textContent = fmt(rev);
+      mar = Math.max(62.4, Math.min(65.4, mar + (Math.random()-.48)*0.12));
+      kMar.textContent = mar.toFixed(1);
+    }, 2400);
+    animateAB();
+    typeReply();
+  }
+
+  /* A/B experiment ticking toward confidence */
+  function animateAB(){
+    var conf = 87, cvrB = 3.40;
+    var confEl = document.getElementById('confPct'), barB = document.getElementById('barB'),
+        cvrEl = document.getElementById('cvrB');
+    var iv = setInterval(function(){
+      conf = Math.min(96, conf + 1);
+      cvrB = Math.min(3.48, cvrB + 0.01);
+      confEl.textContent = conf + '%';
+      cvrEl.textContent = cvrB.toFixed(2) + '% CVR';
+      barB.style.width = (52 + (conf-87)*0.8) + '%';
+      if(conf >= 96){
+        clearInterval(iv);
+        confEl.parentElement.innerHTML = 'confidence <b>96%</b> · winner ready — <span style="color:var(--ink)">approve “Ship winning hero headline” to make it live</span>';
+      }
+    }, 1600);
+  }
+
+  /* support reply typing */
+  var REPLY = "Hi Maya — your Ethiopia Gedeb roasted this morning and ships tonight; that's why it still shows processing (we never ship stale coffee). Tracking is attached — it'll be with you Thursday. Thanks for your patience, it's worth it. — Driftwood";
+  function typeReply(){
+    var el = document.getElementById('replyTxt'), caret = document.getElementById('replyCaret');
+    var i = 0;
+    var iv = setInterval(function(){
+      i = Math.min(REPLY.length, i + 2 + Math.floor(Math.random()*3));
+      el.textContent = REPLY.slice(0, i);
+      if(i >= REPLY.length){
+        clearInterval(iv);
+        caret.style.display = 'none';
+        document.getElementById('sentNote').classList.add('show');
+      }
+    }, 46);
+  }
+
+  /* approvals */
+  function decPending(){ pend = Math.max(0, pend-1); kPend.textContent = pend; }
+  function wireApproval(id, onApprove, appliedNote){
+    var card = document.getElementById(id);
+    card.querySelector('.yes').addEventListener('click', function(){
+      card.classList.add('applied');
+      card.querySelector('.done-note').textContent = appliedNote;
+      decPending(); onApprove();
+    });
+    card.querySelector('.no').addEventListener('click', function(){
+      card.classList.add('declined');
+      card.querySelector('.done-note').textContent = '✕ declined — Pilot will re-evaluate in 7 days';
+      decPending();
+      pushFeed('system','You declined a recommendation. Pilot logged the reason and adjusted its policy.');
+    });
+  }
+
+  wireApproval('ap1', function(){
+    var p = document.getElementById('priceEthiopia');
+    p.textContent = '$24.00';
+    p.classList.add('flash');
+    setTimeout(function(){ p.classList.remove('flash'); }, 3000);
+    pushFeed('pricing','<b>Applied:</b> Ethiopia Gedeb $22 → $24. Live on the storefront now — go look.');
+    toast('Price is live on your storefront', 'Ethiopia Gedeb · $22.00 → $24.00 · flip to “Your store” to see it');
+    setTimeout(function(){ pushFeed('pricing','First sale at $24 just cleared. Conversion holding, margin +2.1 pts on the SKU.'); rev += 24; kRev.textContent = fmt(rev); }, 9000);
+  }, '✓ applied — price updated on the live storefront');
+
+  wireApproval('ap2', function(){
+    var h = document.getElementById('heroHead');
+    h.classList.add('swap');
+    setTimeout(function(){
+      h.textContent = h.dataset.winner;
+      h.dataset.shipped = '1';
+      h.classList.remove('swap');
+    }, 260);
+    pushFeed('growth','<b>Shipped:</b> winning headline “Slow mornings, honest coffee.” is live. Expected +12.3% CVR.');
+    toast('Winning headline shipped', 'The storefront hero just changed — flip to “Your store” to see it');
+  }, '✓ shipped — headline live, +12.3% CVR expected');
+
+  wireApproval('ap3', function(){
+    pushFeed('growth','<b>Sent:</b> winback to 412 lapsed customers, 10% off, in brand voice.');
+    toast('Winback campaign sent', '412 customers · drafted, personalized, and sent by Pilot');
+    setTimeout(function(){ pushFeed('growth','Winback: 31 opens in the first minute. 2 orders already (+$67).'); rev += 67; kRev.textContent = fmt(rev); }, 12000);
+  }, '✓ sent — 412 emails out, results will land in the feed');
+})();
+</script>
