@@ -1,0 +1,6 @@
+User-agent: *
+Disallow: /admin
+Disallow: /cart
+Disallow: /checkout
+
+Sitemap: https://hearthlinecoffee.com/sitemap.xml

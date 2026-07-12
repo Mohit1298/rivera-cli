@@ -1,0 +1,210 @@
+<title>Agentrank · @@STORE@@ agent-readiness report</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root{
+    --ground:#F5F5F1; --panel:#FFFFFF; --panel2:#EFEFEA;
+    --ink:#1A1D25; --mut:#646D7D; --dim:#98A0AE;
+    --line:#E3E3DC; --line2:#D2D2C9;
+    --accent:#2F45D4; --accent-soft:#E4E8FB;
+    --good:#178A5B; --good-soft:#E1F2EA;
+    --warn:#A97612; --warn-soft:#F6EDDA;
+    --crit:#BC4238; --crit-soft:#F8E6E4;
+    --them:#B9BDC7;
+    --sans:"Avenir Next","Helvetica Neue","Segoe UI",system-ui,sans-serif;
+    --mono:ui-monospace,"SF Mono","Cascadia Code",Menlo,Consolas,monospace;
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark){ :root{
+    --ground:#0F1218; --panel:#161B25; --panel2:#1C2230;
+    --ink:#E8EBF2; --mut:#9AA3B4; --dim:#626B7D;
+    --line:#242B3A; --line2:#313A4D;
+    --accent:#8E9CFF; --accent-soft:#232B4E;
+    --good:#4CC793; --good-soft:#15382B;
+    --warn:#E0A93E; --warn-soft:#3A2E13;
+    --crit:#F08078; --crit-soft:#43201D;
+    --them:#4A5264;
+  }}
+  :root[data-theme="light"]{
+    --ground:#F5F5F1; --panel:#FFFFFF; --panel2:#EFEFEA;
+    --ink:#1A1D25; --mut:#646D7D; --dim:#98A0AE;
+    --line:#E3E3DC; --line2:#D2D2C9;
+    --accent:#2F45D4; --accent-soft:#E4E8FB;
+    --good:#178A5B; --good-soft:#E1F2EA;
+    --warn:#A97612; --warn-soft:#F6EDDA;
+    --crit:#BC4238; --crit-soft:#F8E6E4;
+    --them:#B9BDC7;
+  }
+  :root[data-theme="dark"]{
+    --ground:#0F1218; --panel:#161B25; --panel2:#1C2230;
+    --ink:#E8EBF2; --mut:#9AA3B4; --dim:#626B7D;
+    --line:#242B3A; --line2:#313A4D;
+    --accent:#8E9CFF; --accent-soft:#232B4E;
+    --good:#4CC793; --good-soft:#15382B;
+    --warn:#E0A93E; --warn-soft:#3A2E13;
+    --crit:#F08078; --crit-soft:#43201D;
+    --them:#4A5264;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--ground); color:var(--ink);
+    font-family:var(--sans); font-size:15px; line-height:1.55;
+  }
+  .page{max-width:960px; margin:0 auto; padding:36px 24px 80px}
+
+  /* masthead */
+  .mast{display:flex; align-items:baseline; gap:14px; border-bottom:2px solid var(--ink); padding-bottom:14px}
+  .wordmark{font-family:var(--mono); font-size:14px; letter-spacing:.32em; font-weight:600}
+  .wordmark i{font-style:normal; color:var(--accent)}
+  .mast .kind{font-size:12px; color:var(--mut); letter-spacing:.08em; text-transform:uppercase}
+  .mast .sub{margin-left:auto; font-family:var(--mono); font-size:11.5px; color:var(--mut); font-variant-numeric:tabular-nums; text-align:right}
+
+  /* score cards */
+  .cards{display:flex; gap:14px; margin:26px 0 8px; flex-wrap:wrap}
+  .score-card{
+    flex:1; min-width:240px; background:var(--panel); border:1px solid var(--line);
+    border-radius:10px; padding:18px 20px 14px; position:relative; overflow:hidden;
+  }
+  .score-card::before{content:""; position:absolute; left:0; top:0; bottom:0; width:4px}
+  .score-card.good::before{background:var(--good)}
+  .score-card.warn::before{background:var(--warn)}
+  .score-card.crit::before{background:var(--crit)}
+  .score-card .role{font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--dim); margin-bottom:6px}
+  .score-card .store{font-size:19px; font-weight:600; letter-spacing:-.01em}
+  .score-card .url{font-family:var(--mono); font-size:11.5px; color:var(--mut); margin-bottom:8px}
+  .score-card .num{
+    font-family:var(--mono); font-size:46px; font-weight:600; line-height:1;
+    font-variant-numeric:tabular-nums; letter-spacing:-.02em;
+  }
+  .score-card .num .g{
+    font-size:15px; vertical-align:22px; margin-right:10px; padding:2px 9px;
+    border:1.5px solid currentColor; border-radius:6px;
+  }
+  .score-card.good .num{color:var(--good)}
+  .score-card.warn .num{color:var(--warn)}
+  .score-card.crit .num{color:var(--crit)}
+  .score-card .of{font-size:15px; color:var(--dim); font-weight:400}
+
+  .verdict{
+    font-size:17.5px; line-height:1.5; max-width:64ch; margin:18px 0 34px; text-wrap:balance;
+  }
+  .verdict b{color:var(--accent)}
+
+  h2{
+    font-size:12px; letter-spacing:.16em; text-transform:uppercase; color:var(--mut);
+    border-top:1px solid var(--line2); padding-top:14px; margin:38px 0 16px;
+    display:flex; align-items:baseline; gap:12px;
+  }
+  h2 .n{font-family:var(--mono); color:var(--accent)}
+  h2 .lgs{margin-left:auto; display:flex; gap:14px; text-transform:none; letter-spacing:0}
+  .lg{font-size:12px; color:var(--mut); display:flex; align-items:center; gap:6px}
+  .lg::before{content:""; width:10px; height:10px; border-radius:3px}
+  .lg.us::before{background:var(--accent)}
+  .lg.them::before{background:var(--them)}
+
+  /* pillar rows */
+  .prow{
+    display:grid; grid-template-columns:220px 1fr 44px 1fr 44px; gap:12px; align-items:center;
+    padding:10px 0; border-bottom:1px solid var(--line);
+  }
+  .prow:has(> :nth-child(4):last-child), /* no-compare fallback */
+  .prow.single{grid-template-columns:220px 1fr 44px}
+  .pn{font-size:14px; font-weight:600}
+  .pn em{display:block; font-style:normal; font-size:11px; color:var(--dim); font-weight:400}
+  .bar{height:10px; background:var(--panel2); border-radius:99px; overflow:hidden}
+  .bar i{display:block; height:100%; border-radius:99px}
+  .bar .us{background:var(--accent)}
+  .bar .them{background:var(--them)}
+  .pv{font-family:var(--mono); font-size:13px; font-variant-numeric:tabular-nums; color:var(--mut); text-align:right}
+
+  /* lenses */
+  .lens-wrap{display:grid; grid-template-columns:1fr 1fr; gap:14px}
+  @media (max-width:720px){.lens-wrap{grid-template-columns:1fr} .prow{grid-template-columns:130px 1fr 40px 1fr 40px}}
+  .lens{background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:18px 20px}
+  .lens-h{font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--dim); margin-bottom:10px}
+  .lens-id{font-weight:600; font-size:15.5px}
+  .lens-sum{color:var(--mut); font-size:13.5px; margin:6px 0 10px}
+  .lens-cat{font-family:var(--mono); font-size:12px; color:var(--accent); margin:0 0 6px}
+  .lens-tops{margin:0 0 12px; padding-left:18px; font-size:13px; color:var(--mut)}
+  .lens-tops li{margin:2px 0}
+  .unk{background:var(--crit-soft); border-radius:8px; padding:10px 14px; font-size:12.5px}
+  .unk span{color:var(--crit); font-weight:600}
+  .unk ul{margin:4px 0 0; padding-left:18px; color:var(--mut)}
+  .unk.ok{background:var(--good-soft)}
+  .unk.ok span{color:var(--good); font-weight:500}
+
+  /* findings */
+  .finding{
+    background:var(--panel); border:1px solid var(--line); border-radius:10px;
+    padding:14px 18px 12px; margin-bottom:10px; position:relative; overflow:hidden;
+  }
+  .finding::before{content:""; position:absolute; left:0; top:0; bottom:0; width:4px}
+  .finding.critical::before{background:var(--crit)}
+  .finding.high::before{background:var(--crit); opacity:.55}
+  .finding.medium::before{background:var(--warn)}
+  .finding.pass::before{background:var(--good)}
+  .fh{display:flex; align-items:center; gap:10px; flex-wrap:wrap}
+  .sev{
+    font-family:var(--mono); font-size:10px; letter-spacing:.1em; text-transform:uppercase;
+    padding:3px 8px; border-radius:5px;
+  }
+  .critical .sev{background:var(--crit-soft); color:var(--crit)}
+  .high .sev{background:var(--crit-soft); color:var(--crit); opacity:.85}
+  .medium .sev{background:var(--warn-soft); color:var(--warn)}
+  .ft{font-weight:600; font-size:14.5px}
+  .fp{margin-left:auto; font-size:11px; color:var(--dim); letter-spacing:.06em; text-transform:uppercase}
+  .fd{color:var(--mut); font-size:13.5px; margin:8px 0 6px; max-width:78ch}
+  .fx{font-size:13px; margin:0; color:var(--ink)}
+  .fx b{color:var(--good); font-weight:600}
+
+  details.passed{margin-top:18px}
+  details.passed summary{
+    cursor:pointer; font-size:13px; color:var(--mut); list-style:none;
+    display:inline-flex; align-items:center; gap:8px;
+  }
+  details.passed summary::before{content:"▸"; color:var(--good); transition:transform .15s}
+  details.passed[open] summary::before{transform:rotate(90deg)}
+  details.passed ul{
+    columns:2; margin:12px 0 0; padding-left:18px; font-size:13px; color:var(--mut);
+  }
+  @media (max-width:720px){details.passed ul{columns:1}}
+
+  .method{
+    margin-top:46px; border-top:1px solid var(--line2); padding-top:16px;
+    font-size:12.5px; color:var(--dim); max-width:76ch;
+  }
+  .method b{color:var(--mut); font-weight:600}
+</style>
+
+<div class="page">
+  <div class="mast">
+    <span class="wordmark">AGENT<i>RANK</i></span>
+    <span class="kind">Agent-readiness audit</span>
+    <span class="sub">@@SUBTITLE@@</span>
+  </div>
+
+  <div class="cards">@@CARDS@@</div>
+  <p class="verdict">@@VERDICT@@</p>
+
+  <h2><span class="n">01</span> Readiness by pillar <span class="lgs">@@LEGEND@@</span></h2>
+  @@PILLARS@@
+
+  <h2><span class="n">02</span> Through the agent's eyes</h2>
+  <div class="lens-wrap">@@LENSES@@</div>
+
+  <h2><span class="n">03</span> Findings, ranked by what to fix first</h2>
+  @@FINDINGS@@
+  <details class="passed">
+    <summary>@@NPASS@@ checks passed — show them</summary>
+    <ul>@@PASSED@@</ul>
+  </details>
+
+  <div class="method">
+    <b>Method.</b> Agentrank reads only what an AI shopping agent can read: the public
+    catalog feed (<span style="font-family:var(--mono)">/products.json</span>), robots.txt
+    directives for seven AI crawlers, JSON-LD structured data on the homepage and product
+    pages, variant and category metadata, and published shipping/return/contact policies.
+    Every check maps to a step where an agent either ranks, describes, or completes a
+    purchase from a store. No login, no private data — if Agentrank can't see it,
+    neither can the agent.
+  </div>
+</div>

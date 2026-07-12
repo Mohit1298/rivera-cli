@@ -1,0 +1,12 @@
+User-agent: GPTBot
+Disallow: /
+
+User-agent: PerplexityBot
+Disallow: /
+
+User-agent: *
+Disallow: /admin
+Disallow: /cart
+Disallow: /checkout
+
+Sitemap: https://driftwoodcoffee.com/sitemap.xml

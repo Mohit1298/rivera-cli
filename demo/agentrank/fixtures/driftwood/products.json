@@ -1,0 +1,73 @@
+{
+  "products": [
+    {
+      "id": 1001,
+      "title": "Ethiopia Gedeb",
+      "handle": "ethiopia-gedeb",
+      "product_type": "Coffee",
+      "tags": ["single origin", "natural process"],
+      "body_html": "<p>Ethiopian coffee with fruity notes. Natural process. 12oz bag.</p>",
+      "images": [{"src": "https://driftwoodcoffee.com/cdn/products/ethiopia-gedeb.jpg"}],
+      "variants": [
+        {"title": "Whole Bean", "price": "22.00"},
+        {"title": "Ground", "price": "22.00"}
+      ]
+    },
+    {
+      "id": 1002,
+      "title": "Longshore House Blend",
+      "handle": "longshore-house-blend",
+      "product_type": "Coffee",
+      "tags": [],
+      "body_html": "<p>Our house blend. Smooth and balanced, good for espresso or drip. 12oz bag.</p>",
+      "images": [{"src": "https://driftwoodcoffee.com/cdn/products/longshore.jpg"}],
+      "variants": [
+        {"title": "12OZ / WB", "price": "18.00"},
+        {"title": "12OZ / GR", "price": "18.00"}
+      ]
+    },
+    {
+      "id": 1003,
+      "title": "Cold Brew Kit",
+      "handle": "cold-brew-kit",
+      "product_type": "",
+      "tags": [],
+      "body_html": "<p>Everything you need to make cold brew at home. Our Cold Brew Kit includes one full kilogram of our Longshore house blend, ground coarse specifically for long steeping, plus the same food-grade steeping bag we use on the roastery bar. Follow the printed ratio card and you will get about twelve liters of smooth, low-acid cold brew per kit with no special equipment beyond a large jar.</p>",
+      "images": [{"src": "https://driftwoodcoffee.com/cdn/products/cold-brew-kit.jpg"}],
+      "variants": [{"title": "Default Title", "price": "34.00"}]
+    },
+    {
+      "id": 1004,
+      "title": "Roaster's Subscription",
+      "handle": "roasters-subscription",
+      "product_type": "",
+      "tags": [],
+      "body_html": "<p>Monthly coffee subscription. Cancel anytime. Free shipping included.</p>",
+      "images": [{"src": "https://driftwoodcoffee.com/cdn/products/subscription.jpg"}],
+      "variants": [{"title": "Default Title", "price": "19.00"}]
+    },
+    {
+      "id": 1005,
+      "title": "Guatemala Huehuetenango",
+      "handle": "guatemala-huehuetenango",
+      "product_type": "Coffee",
+      "tags": [],
+      "body_html": "<p>Grown by the Villatoro family at 1,900 meters in the Huehuetenango highlands, this washed lot tastes like baked apple, brown sugar, and a soft orange acidity that carries through a long finish. We roast it a touch past first crack to round out the sweetness, which makes it equally at home as a pour-over or a forgiving everyday drip coffee.</p>",
+      "images": [{"src": "https://driftwoodcoffee.com/cdn/products/guatemala.jpg"}],
+      "variants": [
+        {"title": "Whole Bean", "price": "21.00"},
+        {"title": "Ground", "price": "21.00"}
+      ]
+    },
+    {
+      "id": 1006,
+      "title": "Driftwood Ceramic Pour-Over",
+      "handle": "ceramic-pour-over",
+      "product_type": "",
+      "tags": [],
+      "body_html": "<p>Hand-thrown by a potter two doors down from the roastery, our ceramic pour-over dripper holds heat noticeably better than plastic cones, which keeps extraction stable through the whole brew. The glaze is food-safe and dishwasher-friendly, the flat-bottom geometry is forgiving of uneven pours, and it fits standard flat-bottom filters you can find at any grocery store.</p>",
+      "images": [{"src": "https://driftwoodcoffee.com/cdn/products/pour-over.jpg"}],
+      "variants": [{"title": "Default Title", "price": "42.00"}]
+    }
+  ]
+}

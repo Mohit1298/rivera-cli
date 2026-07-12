@@ -1,0 +1,73 @@
+{
+  "products": [
+    {
+      "id": 2001,
+      "title": "Kenya Nyeri AA",
+      "handle": "kenya-nyeri-aa",
+      "product_type": "Coffee",
+      "tags": ["single origin", "washed", "light roast"],
+      "body_html": "<p>A washed AA lot from smallholder farms around Nyeri, milled at the Othaya cooperative. Expect blackcurrant and grapefruit up front with a syrupy sweetness that holds as the cup cools. We roast it light to protect the acidity, and it shines as a pour-over, an AeroPress, or iced. Roasted to order and shipped within 24 hours.</p>",
+      "images": [{"src": "https://hearthlinecoffee.com/cdn/products/kenya-nyeri.jpg"}],
+      "variants": [
+        {"title": "Whole Bean / 12 oz", "price": "24.00"},
+        {"title": "Ground for Filter / 12 oz", "price": "24.00"}
+      ]
+    },
+    {
+      "id": 2002,
+      "title": "Firebreak Espresso Blend",
+      "handle": "firebreak-espresso",
+      "product_type": "Coffee",
+      "tags": ["blend", "espresso", "medium roast"],
+      "body_html": "<p>Our year-round espresso: a rotating base of Brazilian naturals for body and cocoa, lifted by a washed Central American component for a clean red-fruit finish. Built to cut through milk without turning bitter, and forgiving across a wide range of machines. Dialing-in notes ship with every bag, and our baristas answer recipe questions by email.</p>",
+      "images": [{"src": "https://hearthlinecoffee.com/cdn/products/firebreak.jpg"}],
+      "variants": [
+        {"title": "Whole Bean / 12 oz", "price": "19.00"},
+        {"title": "Whole Bean / 2 lb", "price": "44.00"}
+      ]
+    },
+    {
+      "id": 2003,
+      "title": "Harvest Calendar Subscription",
+      "handle": "harvest-calendar-subscription",
+      "product_type": "Subscription",
+      "tags": ["subscription"],
+      "body_html": "<p>Coffee that follows the harvest, not a warehouse. Each month we ship whatever just landed at its seasonal peak — Ethiopian naturals in winter, Kenyans in spring, Centrals through summer — with an origin card explaining who grew it and why we bought it. Skip a month, change grind, or cancel from a single link in every email. Always free shipping.</p>",
+      "images": [{"src": "https://hearthlinecoffee.com/cdn/products/subscription.jpg"}],
+      "variants": [
+        {"title": "Monthly / 12 oz", "price": "21.00"},
+        {"title": "Every Two Weeks / 12 oz", "price": "21.00"}
+      ]
+    },
+    {
+      "id": 2004,
+      "title": "Colombia El Paraíso Geisha",
+      "handle": "colombia-el-paraiso-geisha",
+      "product_type": "Coffee",
+      "tags": [],
+      "body_html": "<p>A thermal-shock washed Geisha from Diego Bermúdez's farm in Cauca that drinks more like a tea than a coffee: jasmine, white peach, and a lychee-candy sweetness with almost no bitterness. This is a limited lot of roughly 400 bags per season, roasted only on Thursdays so it ships at absolute peak. If it's in stock, it's fresh.</p>",
+      "images": [{"src": "https://hearthlinecoffee.com/cdn/products/geisha.jpg"}],
+      "variants": [{"title": "Whole Bean / 8 oz", "price": "38.00"}]
+    },
+    {
+      "id": 2005,
+      "title": "Hearthline Ceramic Mug",
+      "handle": "hearthline-ceramic-mug",
+      "product_type": "Equipment",
+      "tags": [],
+      "body_html": "<p>A 10-ounce stoneware mug thrown for us by Ash Creek Pottery, glazed in the same rust orange as our roastery door. The walls are thick enough to keep a slow morning cup warm for the better part of an hour, the handle fits three fingers comfortably, and it is dishwasher and microwave safe. Each one varies slightly — that's the point.</p>",
+      "images": [{"src": "https://hearthlinecoffee.com/cdn/products/mug.jpg"}],
+      "variants": [{"title": "Rust Orange", "price": "28.00"}]
+    },
+    {
+      "id": 2006,
+      "title": "Pour-Over Starter Set",
+      "handle": "pour-over-starter-set",
+      "product_type": "Equipment",
+      "tags": [],
+      "body_html": "<p>Everything a first pour-over needs and nothing it doesn't: a plastic V60 (plastic holds temperature better than you'd think and never cracks), a pack of 100 filters, a 12-ounce bag of our Firebreak blend ground for filter, and a laminated recipe card with the exact pour schedule we teach in roastery classes. Add a scale later; start here now.</p>",
+      "images": [{"src": "https://hearthlinecoffee.com/cdn/products/starter-set.jpg"}],
+      "variants": [{"title": "Default Title", "price": "42.00"}]
+    }
+  ]
+}
