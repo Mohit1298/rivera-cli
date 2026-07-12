@@ -1,0 +1,8 @@
+{
+  "functions": {
+    "api/audit.py": { "maxDuration": 60 }
+  },
+  "rewrites": [
+    { "source": "/pilot", "destination": "/pilot.html" }
+  ]
+}

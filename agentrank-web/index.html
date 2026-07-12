@@ -1,0 +1,339 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Agentrank — can AI shopping agents read your store?</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="Audit any Shopify store's readiness for AI shopping agents — ChatGPT, Google, Copilot. 23 checks, scored report, competitor comparison.">
+<style>
+  :root{
+    --ground:#F5F5F1; --panel:#FFFFFF; --panel2:#EFEFEA;
+    --ink:#1A1D25; --mut:#646D7D; --dim:#98A0AE;
+    --line:#E3E3DC; --line2:#D2D2C9;
+    --accent:#2F45D4; --accent-ink:#FFFFFF; --accent-soft:#E4E8FB;
+    --good:#178A5B; --good-soft:#E1F2EA;
+    --warn:#A97612; --warn-soft:#F6EDDA;
+    --crit:#BC4238; --crit-soft:#F8E6E4;
+    --them:#B9BDC7;
+    --sans:"Avenir Next","Helvetica Neue","Segoe UI",system-ui,sans-serif;
+    --mono:ui-monospace,"SF Mono","Cascadia Code",Menlo,Consolas,monospace;
+    color-scheme: light dark;
+  }
+  @media (prefers-color-scheme: dark){ :root{
+    --ground:#0F1218; --panel:#161B25; --panel2:#1C2230;
+    --ink:#E8EBF2; --mut:#9AA3B4; --dim:#626B7D;
+    --line:#242B3A; --line2:#313A4D;
+    --accent:#8E9CFF; --accent-ink:#0F1218; --accent-soft:#232B4E;
+    --good:#4CC793; --good-soft:#15382B;
+    --warn:#E0A93E; --warn-soft:#3A2E13;
+    --crit:#F08078; --crit-soft:#43201D;
+    --them:#4A5264;
+  }}
+  *{box-sizing:border-box}
+  body{margin:0; background:var(--ground); color:var(--ink); font-family:var(--sans); font-size:15px; line-height:1.55}
+  .page{max-width:960px; margin:0 auto; padding:36px 24px 80px}
+  button{font:inherit; cursor:pointer}
+  input{font:inherit}
+
+  .mast{display:flex; align-items:baseline; gap:14px; border-bottom:2px solid var(--ink); padding-bottom:14px}
+  .wordmark{font-family:var(--mono); font-size:14px; letter-spacing:.32em; font-weight:600}
+  .wordmark i{font-style:normal; color:var(--accent)}
+  .mast .kind{font-size:12px; color:var(--mut); letter-spacing:.08em; text-transform:uppercase}
+  .mast a{margin-left:auto; font-size:12.5px; color:var(--mut)}
+
+  /* hero + form */
+  .hero{padding:56px 0 8px; max-width:640px}
+  .hero h1{font-size:clamp(28px,4.5vw,42px); line-height:1.12; letter-spacing:-.015em; margin:0 0 14px; text-wrap:balance}
+  .hero h1 em{font-style:normal; color:var(--accent)}
+  .hero p{color:var(--mut); font-size:16.5px; max-width:56ch; margin:0 0 30px}
+  form{display:grid; gap:10px; max-width:560px}
+  .field label{display:block; font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--dim); margin-bottom:5px}
+  .field input{
+    width:100%; background:var(--panel); border:1px solid var(--line2); border-radius:10px;
+    padding:11px 14px; color:var(--ink); font-family:var(--mono); font-size:14px; outline:none;
+  }
+  .field input:focus{border-color:var(--accent); box-shadow:0 0 0 3px var(--accent-soft)}
+  .actions{display:flex; align-items:center; gap:16px; margin-top:6px; flex-wrap:wrap}
+  .btn{
+    background:var(--accent); color:var(--accent-ink); border:none; border-radius:10px;
+    padding:11px 24px; font-weight:600; font-size:14.5px;
+  }
+  .btn:hover{filter:brightness(1.08)}
+  .btn:disabled{opacity:.5; cursor:default}
+  .link-btn{background:none; border:none; color:var(--mut); font-size:13.5px; text-decoration:underline; text-underline-offset:3px; padding:0}
+  .link-btn:hover{color:var(--ink)}
+
+  #progress{display:none; margin:34px 0 0; font-family:var(--mono); font-size:13px; color:var(--mut)}
+  #progress .dot{display:inline-block; width:8px; height:8px; border-radius:99px; background:var(--accent); margin-right:10px; animation:blink 1s infinite}
+  @keyframes blink{50%{opacity:.25}}
+  #errbox{display:none; margin:26px 0 0; background:var(--crit-soft); color:var(--crit); border-radius:10px; padding:12px 16px; font-size:13.5px; max-width:560px}
+  @media (prefers-reduced-motion: reduce){ #progress .dot{animation:none} }
+
+  /* report (mirrors the CLI report design) */
+  #report{display:none; margin-top:26px}
+  .cards{display:flex; gap:14px; margin:26px 0 8px; flex-wrap:wrap}
+  .score-card{flex:1; min-width:240px; background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:18px 20px 14px; position:relative; overflow:hidden}
+  .score-card::before{content:""; position:absolute; left:0; top:0; bottom:0; width:4px}
+  .score-card.good::before{background:var(--good)}
+  .score-card.warn::before{background:var(--warn)}
+  .score-card.crit::before{background:var(--crit)}
+  .score-card .role{font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--dim); margin-bottom:6px}
+  .score-card .store{font-size:19px; font-weight:600; letter-spacing:-.01em}
+  .score-card .url{font-family:var(--mono); font-size:11.5px; color:var(--mut); margin-bottom:8px}
+  .score-card .num{font-family:var(--mono); font-size:46px; font-weight:600; line-height:1; font-variant-numeric:tabular-nums; letter-spacing:-.02em}
+  .score-card .num .g{font-size:15px; vertical-align:22px; margin-right:10px; padding:2px 9px; border:1.5px solid currentColor; border-radius:6px}
+  .score-card.good .num{color:var(--good)}
+  .score-card.warn .num{color:var(--warn)}
+  .score-card.crit .num{color:var(--crit)}
+  .score-card .of{font-size:15px; color:var(--dim); font-weight:400}
+  .verdict{font-size:17.5px; line-height:1.5; max-width:64ch; margin:18px 0 34px; text-wrap:balance}
+  .verdict b{color:var(--accent)}
+  h2{font-size:12px; letter-spacing:.16em; text-transform:uppercase; color:var(--mut); border-top:1px solid var(--line2); padding-top:14px; margin:38px 0 16px; display:flex; align-items:baseline; gap:12px}
+  h2 .n{font-family:var(--mono); color:var(--accent)}
+  h2 .lgs{margin-left:auto; display:flex; gap:14px; text-transform:none; letter-spacing:0}
+  .lg{font-size:12px; color:var(--mut); display:flex; align-items:center; gap:6px}
+  .lg::before{content:""; width:10px; height:10px; border-radius:3px}
+  .lg.us::before{background:var(--accent)}
+  .lg.them::before{background:var(--them)}
+  .prow{display:grid; grid-template-columns:220px 1fr 44px 1fr 44px; gap:12px; align-items:center; padding:10px 0; border-bottom:1px solid var(--line)}
+  .prow.single{grid-template-columns:220px 1fr 44px}
+  .pn{font-size:14px; font-weight:600}
+  .pn em{display:block; font-style:normal; font-size:11px; color:var(--dim); font-weight:400}
+  .bar{height:10px; background:var(--panel2); border-radius:99px; overflow:hidden}
+  .bar i{display:block; height:100%; border-radius:99px}
+  .bar .us{background:var(--accent)}
+  .bar .them{background:var(--them)}
+  .pv{font-family:var(--mono); font-size:13px; font-variant-numeric:tabular-nums; color:var(--mut); text-align:right}
+  .lens-wrap{display:grid; grid-template-columns:1fr 1fr; gap:14px}
+  .lens-wrap.single{grid-template-columns:1fr}
+  @media (max-width:720px){.lens-wrap{grid-template-columns:1fr} .prow{grid-template-columns:130px 1fr 40px 1fr 40px}}
+  .lens{background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:18px 20px}
+  .lens-h{font-size:11px; letter-spacing:.12em; text-transform:uppercase; color:var(--dim); margin-bottom:10px}
+  .lens-id{font-weight:600; font-size:15.5px}
+  .lens-sum{color:var(--mut); font-size:13.5px; margin:6px 0 10px}
+  .lens-cat{font-family:var(--mono); font-size:12px; color:var(--accent); margin:0 0 6px}
+  .lens-tops{margin:0 0 12px; padding-left:18px; font-size:13px; color:var(--mut)}
+  .lens-tops li{margin:2px 0}
+  .unk{background:var(--crit-soft); border-radius:8px; padding:10px 14px; font-size:12.5px}
+  .unk span{color:var(--crit); font-weight:600}
+  .unk ul{margin:4px 0 0; padding-left:18px; color:var(--mut)}
+  .unk.ok{background:var(--good-soft)}
+  .unk.ok span{color:var(--good); font-weight:500}
+  .finding{background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:14px 18px 12px; margin-bottom:10px; position:relative; overflow:hidden}
+  .finding::before{content:""; position:absolute; left:0; top:0; bottom:0; width:4px}
+  .finding.critical::before{background:var(--crit)}
+  .finding.high::before{background:var(--crit); opacity:.55}
+  .finding.medium::before{background:var(--warn)}
+  .finding.pass::before{background:var(--good)}
+  .fh{display:flex; align-items:center; gap:10px; flex-wrap:wrap}
+  .sev{font-family:var(--mono); font-size:10px; letter-spacing:.1em; text-transform:uppercase; padding:3px 8px; border-radius:5px}
+  .critical .sev{background:var(--crit-soft); color:var(--crit)}
+  .high .sev{background:var(--crit-soft); color:var(--crit); opacity:.85}
+  .medium .sev{background:var(--warn-soft); color:var(--warn)}
+  .ft{font-weight:600; font-size:14.5px}
+  .fp{margin-left:auto; font-size:11px; color:var(--dim); letter-spacing:.06em; text-transform:uppercase}
+  .fd{color:var(--mut); font-size:13.5px; margin:8px 0 6px; max-width:78ch}
+  .fx{font-size:13px; margin:0}
+  .fx b{color:var(--good); font-weight:600}
+  details.passed{margin-top:18px}
+  details.passed summary{cursor:pointer; font-size:13px; color:var(--mut); list-style:none; display:inline-flex; align-items:center; gap:8px}
+  details.passed summary::before{content:"▸"; color:var(--good)}
+  details.passed[open] summary::before{content:"▾"}
+  details.passed ul{columns:2; margin:12px 0 0; padding-left:18px; font-size:13px; color:var(--mut)}
+  @media (max-width:720px){details.passed ul{columns:1}}
+  .method{margin-top:46px; border-top:1px solid var(--line2); padding-top:16px; font-size:12.5px; color:var(--dim); max-width:76ch}
+  .method b{color:var(--mut); font-weight:600}
+  .samplenote{display:none; font-size:12px; color:var(--dim); background:var(--panel2); border-radius:8px; padding:8px 12px; margin-top:20px}
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="mast">
+    <span class="wordmark">AGENT<i>RANK</i></span>
+    <span class="kind">Agent-readiness audit</span>
+    <a href="/pilot">Pilot demo →</a>
+  </div>
+
+  <div class="hero">
+    <h1>When a shopper asks ChatGPT to buy, <em>can it read your store?</em></h1>
+    <p>AI shopping agents rank and buy from stores they can read: open catalogs, structured
+    data, explicit policies. Agentrank audits any Shopify store the way an agent sees it —
+    23 checks, scored, with a fix for every failure.</p>
+    <form id="auditForm">
+      <div class="field">
+        <label for="store">Your store</label>
+        <input id="store" placeholder="yourstore.com" autocomplete="off" spellcheck="false" required>
+      </div>
+      <div class="field">
+        <label for="compare">Competitor · optional</label>
+        <input id="compare" placeholder="competitor.com" autocomplete="off" spellcheck="false">
+      </div>
+      <div class="actions">
+        <button class="btn" id="runBtn" type="submit">Run the audit</button>
+        <button class="link-btn" id="sampleBtn" type="button">or see a sample report</button>
+      </div>
+    </form>
+    <div id="progress"><span class="dot"></span><span id="progressMsg">Connecting…</span></div>
+    <div id="errbox"></div>
+    <div class="samplenote" id="sampleNote">
+      Sample data: two fictional coffee stores, audited by the same pipeline that runs on live stores.
+    </div>
+  </div>
+
+  <div id="report">
+    <div class="cards" id="cards"></div>
+    <p class="verdict" id="verdict"></p>
+    <h2><span class="n">01</span> Readiness by pillar <span class="lgs" id="legend"></span></h2>
+    <div id="pillars"></div>
+    <h2><span class="n">02</span> Through the agent's eyes</h2>
+    <div class="lens-wrap" id="lenses"></div>
+    <h2><span class="n">03</span> Findings, ranked by what to fix first</h2>
+    <div id="findings"></div>
+    <details class="passed"><summary id="passedSummary"></summary><ul id="passedList"></ul></details>
+    <div class="method">
+      <b>Method.</b> Agentrank reads only what an AI shopping agent can read: the public
+      catalog feed (<span style="font-family:var(--mono)">/products.json</span>), robots.txt
+      directives for seven AI crawlers, JSON-LD structured data on the homepage and product
+      pages, variant and category metadata, and published shipping/return/contact policies.
+      Every check maps to a step where an agent either ranks, describes, or completes a
+      purchase from a store. No login, no private data — if Agentrank can't see it,
+      neither can the agent.
+    </div>
+  </div>
+</div>
+
+<script>
+const SAMPLE = {"results": [{"name": "Driftwood Coffee Co.", "url": "driftwoodcoffee.com", "checks": [{"pillar": "Agent access", "title": "Machine-readable catalog feed", "status": "pass", "weight": 3, "detail": "/products.json is open — agents can read 6 products in one request.", "fix": "Keep the public products.json endpoint enabled; it is how agents ingest your catalog.", "severity": "pass"}, {"pillar": "Agent access", "title": "AI crawler access in robots.txt", "status": "fail", "weight": 3, "detail": "robots.txt blocks: GPTBot, PerplexityBot. Those assistants cannot legally read this store — you are invisible in their shopping answers.", "fix": "Remove the Disallow rules for AI crawler user-agents you want sales from.", "severity": "critical"}, {"pillar": "Agent access", "title": "llms.txt guidance file", "status": "warn", "weight": 1, "detail": "No llms.txt. Optional but cheap: a plain-text map of your store for language models.", "fix": "Publish /llms.txt with your top collections, policies, and brand one-liner.", "severity": "medium"}, {"pillar": "Agent access", "title": "Sitemap discoverable", "status": "pass", "weight": 2, "detail": "Sitemap found.", "fix": "Expose /sitemap.xml and reference it from robots.txt.", "severity": "pass"}, {"pillar": "Structured data", "title": "Product JSON-LD on product pages", "status": "pass", "weight": 3, "detail": "Product schema present — agents get name, price, and availability without guessing.", "fix": "Emit schema.org/Product JSON-LD on every product page (most themes can; verify it survived customization).", "severity": "pass"}, {"pillar": "Structured data", "title": "Offer price + currency in schema", "status": "pass", "weight": 3, "detail": "Offer: 22.00 USD.", "fix": "Include offers.price and offers.priceCurrency in Product JSON-LD.", "severity": "pass"}, {"pillar": "Structured data", "title": "Availability in schema", "status": "fail", "weight": 2, "detail": "No availability field. Agents deprioritize products they can't confirm are in stock.", "fix": "Emit offers.availability (schema.org/InStock etc.) per variant.", "severity": "high"}, {"pillar": "Structured data", "title": "Brand declared", "status": "warn", "weight": 1, "detail": "No brand in Product schema — hurts entity matching when a shopper asks for you by name.", "fix": "Add brand to Product JSON-LD.", "severity": "medium"}, {"pillar": "Structured data", "title": "SKU / GTIN identifiers", "status": "warn", "weight": 2, "detail": "No SKU/GTIN in schema. Agents use identifiers to dedupe and compare across stores; without them you lose comparison placements.", "fix": "Populate sku (and gtin where products have barcodes) in Product JSON-LD.", "severity": "medium"}, {"pillar": "Structured data", "title": "Ratings exposed (aggregateRating)", "status": "fail", "weight": 2, "detail": "Reviews are not exposed as aggregateRating schema. To an agent, this store has zero social proof — even if you have hundreds of reviews.", "fix": "Have your reviews app emit aggregateRating/review JSON-LD on product pages.", "severity": "high"}, {"pillar": "Structured data", "title": "Organization schema on homepage", "status": "warn", "weight": 1, "detail": "No Organization schema on the homepage — weakens brand entity recognition.", "fix": "Add Organization JSON-LD (name, url, logo, sameAs socials).", "severity": "medium"}, {"pillar": "Structured data", "title": "Canonical URLs on product pages", "status": "warn", "weight": 1, "detail": "No canonical link — variant/collection URL duplicates can split your product's identity across several URLs.", "fix": "Emit rel=canonical on product pages.", "severity": "medium"}, {"pillar": "Structured data", "title": "Homepage meta description", "status": "warn", "weight": 1, "detail": "“Welcome to our online store!”", "fix": "Write a 50–160 character description that says what you sell and for whom.", "severity": "medium"}, {"pillar": "Catalog clarity", "title": "Substantive product descriptions", "status": "warn", "weight": 3, "detail": "50% of products have ≥40 words of real description (3/6). Agents answer questions (origin, fit, materials) straight from this text — thin copy means wrong or no answers.", "fix": "Rewrite thin product descriptions; cover the questions a shopper would ask a clerk.", "severity": "medium"}, {"pillar": "Catalog clarity", "title": "Every product has imagery", "status": "pass", "weight": 1, "detail": "6/6 products have images.", "fix": "Add images to image-less products; multimodal agents check them.", "severity": "pass"}, {"pillar": "Catalog clarity", "title": "Product types categorized", "status": "warn", "weight": 2, "detail": "50% of products carry a product_type. Category fields feed agents' filters (“show me pour-over gear under $40”).", "fix": "Set product_type on every product; use consistent values.", "severity": "medium"}, {"pillar": "Catalog clarity", "title": "Products tagged with attributes", "status": "warn", "weight": 1, "detail": "17% of products have tags (attributes shoppers filter by).", "fix": "Tag products with the attributes shoppers filter by.", "severity": "medium"}, {"pillar": "Catalog clarity", "title": "Clean, unambiguous titles", "status": "pass", "weight": 1, "detail": "100% of titles are ≤75 chars without shouting or keyword stuffing.", "fix": "Name products the way a human would say them aloud.", "severity": "pass"}, {"pillar": "Catalog clarity", "title": "Variant options readable by agents", "status": "pass", "weight": 2, "detail": "Variant options are self-describing.", "fix": "Spell out option values: “Small”, “Black”, “Whole Bean”.", "severity": "pass"}, {"pillar": "Trust signals", "title": "Shipping policy with concrete timeframe", "status": "warn", "weight": 2, "detail": "Shipping policy exists but never states how many days delivery takes.", "fix": "Publish /policies/shipping-policy with explicit delivery windows.", "severity": "medium"}, {"pillar": "Trust signals", "title": "Return policy with explicit window", "status": "warn", "weight": 3, "detail": "Return policy exists but no explicit day-count window found.", "fix": "Publish /policies/refund-policy with a concrete window (e.g. “30 days”).", "severity": "medium"}, {"pillar": "Trust signals", "title": "Contact page reachable", "status": "warn", "weight": 1, "detail": "No /pages/contact. A reachable human is part of agents' merchant-quality scoring.", "fix": "Publish a contact page with a real email or form.", "severity": "medium"}, {"pillar": "Trust signals", "title": "No $0 or malformed prices live", "status": "pass", "weight": 2, "detail": "All published variant prices are non-zero.", "fix": "Unpublish or fix zero-priced variants.", "severity": "pass"}], "pillars": {"Agent access": 61, "Structured data": 56, "Catalog clarity": 70, "Trust signals": 62}, "overall": 62, "grade": "D", "lens": {"identity": "Driftwood Coffee Co.", "summary": "Welcome to our online store!", "catalog": "6 products readable, mostly Coffee.", "tops": ["Ethiopia Gedeb ($22.00)", "Longshore House Blend ($18.00)", "Cold Brew Kit ($34.00)"], "unknowns": ["AI crawler access in robots.txt", "Availability in schema", "Ratings exposed (aggregateRating)"]}}, {"name": "Hearthline Coffee Roasters", "url": "hearthlinecoffee.com", "checks": [{"pillar": "Agent access", "title": "Machine-readable catalog feed", "status": "pass", "weight": 3, "detail": "/products.json is open — agents can read 6 products in one request.", "fix": "Keep the public products.json endpoint enabled; it is how agents ingest your catalog.", "severity": "pass"}, {"pillar": "Agent access", "title": "AI crawler access in robots.txt", "status": "pass", "weight": 3, "detail": "No AI shopping crawler (GPTBot, OAI-SearchBot, ClaudeBot, Google-Extended, Perplexity, Bingbot) is blocked.", "fix": "Remove the Disallow rules for AI crawler user-agents you want sales from.", "severity": "pass"}, {"pillar": "Agent access", "title": "llms.txt guidance file", "status": "warn", "weight": 1, "detail": "No llms.txt. Optional but cheap: a plain-text map of your store for language models.", "fix": "Publish /llms.txt with your top collections, policies, and brand one-liner.", "severity": "medium"}, {"pillar": "Agent access", "title": "Sitemap discoverable", "status": "pass", "weight": 2, "detail": "Sitemap found.", "fix": "Expose /sitemap.xml and reference it from robots.txt.", "severity": "pass"}, {"pillar": "Structured data", "title": "Product JSON-LD on product pages", "status": "pass", "weight": 3, "detail": "Product schema present — agents get name, price, and availability without guessing.", "fix": "Emit schema.org/Product JSON-LD on every product page (most themes can; verify it survived customization).", "severity": "pass"}, {"pillar": "Structured data", "title": "Offer price + currency in schema", "status": "pass", "weight": 3, "detail": "Offer: 24.00 USD.", "fix": "Include offers.price and offers.priceCurrency in Product JSON-LD.", "severity": "pass"}, {"pillar": "Structured data", "title": "Availability in schema", "status": "pass", "weight": 2, "detail": "Availability declared.", "fix": "Emit offers.availability (schema.org/InStock etc.) per variant.", "severity": "pass"}, {"pillar": "Structured data", "title": "Brand declared", "status": "pass", "weight": 1, "detail": "Brand present in schema.", "fix": "Add brand to Product JSON-LD.", "severity": "pass"}, {"pillar": "Structured data", "title": "SKU / GTIN identifiers", "status": "warn", "weight": 2, "detail": "No SKU/GTIN in schema. Agents use identifiers to dedupe and compare across stores; without them you lose comparison placements.", "fix": "Populate sku (and gtin where products have barcodes) in Product JSON-LD.", "severity": "medium"}, {"pillar": "Structured data", "title": "Ratings exposed (aggregateRating)", "status": "pass", "weight": 2, "detail": "aggregateRating present — your reviews count in agent ranking.", "fix": "Have your reviews app emit aggregateRating/review JSON-LD on product pages.", "severity": "pass"}, {"pillar": "Structured data", "title": "Organization schema on homepage", "status": "warn", "weight": 1, "detail": "No Organization schema on the homepage — weakens brand entity recognition.", "fix": "Add Organization JSON-LD (name, url, logo, sameAs socials).", "severity": "medium"}, {"pillar": "Structured data", "title": "Canonical URLs on product pages", "status": "warn", "weight": 1, "detail": "No canonical link — variant/collection URL duplicates can split your product's identity across several URLs.", "fix": "Emit rel=canonical on product pages.", "severity": "medium"}, {"pillar": "Structured data", "title": "Homepage meta description", "status": "pass", "weight": 1, "detail": "“Hearthline roasts fresh-crop specialty coffee to order in Portland and ships within 24 hours. Single origins, seasonal blends, and a subscri…”", "fix": "Write a 50–160 character description that says what you sell and for whom.", "severity": "pass"}, {"pillar": "Catalog clarity", "title": "Substantive product descriptions", "status": "pass", "weight": 3, "detail": "100% of products have ≥40 words of real description (6/6). Agents answer questions (origin, fit, materials) straight from this text — thin copy means wrong or no answers.", "fix": "Rewrite thin product descriptions; cover the questions a shopper would ask a clerk.", "severity": "pass"}, {"pillar": "Catalog clarity", "title": "Every product has imagery", "status": "pass", "weight": 1, "detail": "6/6 products have images.", "fix": "Add images to image-less products; multimodal agents check them.", "severity": "pass"}, {"pillar": "Catalog clarity", "title": "Product types categorized", "status": "pass", "weight": 2, "detail": "100% of products carry a product_type. Category fields feed agents' filters (“show me pour-over gear under $40”).", "fix": "Set product_type on every product; use consistent values.", "severity": "pass"}, {"pillar": "Catalog clarity", "title": "Products tagged with attributes", "status": "warn", "weight": 1, "detail": "50% of products have tags (attributes shoppers filter by).", "fix": "Tag products with the attributes shoppers filter by.", "severity": "medium"}, {"pillar": "Catalog clarity", "title": "Clean, unambiguous titles", "status": "pass", "weight": 1, "detail": "100% of titles are ≤75 chars without shouting or keyword stuffing.", "fix": "Name products the way a human would say them aloud.", "severity": "pass"}, {"pillar": "Catalog clarity", "title": "Variant options readable by agents", "status": "pass", "weight": 2, "detail": "Variant options are self-describing.", "fix": "Spell out option values: “Small”, “Black”, “Whole Bean”.", "severity": "pass"}, {"pillar": "Trust signals", "title": "Shipping policy with concrete timeframe", "status": "pass", "weight": 2, "detail": "Shipping policy states a delivery window — agents quote it in answers.", "fix": "Publish /policies/shipping-policy with explicit delivery windows.", "severity": "pass"}, {"pillar": "Trust signals", "title": "Return policy with explicit window", "status": "pass", "weight": 3, "detail": "Return window is explicit — a strong agent trust signal for completing checkout.", "fix": "Publish /policies/refund-policy with a concrete window (e.g. “30 days”).", "severity": "pass"}, {"pillar": "Trust signals", "title": "Contact page reachable", "status": "pass", "weight": 1, "detail": "Contact page found.", "fix": "Publish a contact page with a real email or form.", "severity": "pass"}, {"pillar": "Trust signals", "title": "No $0 or malformed prices live", "status": "pass", "weight": 2, "detail": "All published variant prices are non-zero.", "fix": "Unpublish or fix zero-priced variants.", "severity": "pass"}], "pillars": {"Agent access": 94, "Structured data": 88, "Catalog clarity": 95, "Trust signals": 100}, "overall": 94, "grade": "A", "lens": {"identity": "Hearthline Coffee Roasters — fresh-crop specialty coffee, roasted to order", "summary": "Hearthline roasts fresh-crop specialty coffee to order in Portland and ships within 24 hours. Single origins, seasonal blends, and a subscription that follows the harvest calendar.", "catalog": "6 products readable, mostly Coffee.", "tops": ["Kenya Nyeri AA ($24.00)", "Firebreak Espresso Blend ($19.00)", "Harvest Calendar Subscription ($21.00)"], "unknowns": []}}], "errors": []};
+const PILLARS = ["Agent access", "Structured data", "Catalog clarity", "Trust signals"];
+const PILLAR_WEIGHT = {"Agent access": 25, "Structured data": 30, "Catalog clarity": 25, "Trust signals": 20};
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+const PROGRESS_MSGS = [
+  "Reading robots.txt for 7 AI crawlers…",
+  "Pulling the public catalog feed (/products.json)…",
+  "Parsing JSON-LD on product pages…",
+  "Checking shipping and return policies…",
+  "Scoring 23 checks across 4 pillars…",
+];
+
+function render(data){
+  const [a, b] = data.results;
+
+  const card = (r, role) => {
+    const tone = r.overall >= 80 ? "good" : (r.overall >= 65 ? "warn" : "crit");
+    return `<div class="score-card ${tone}"><div class="role">${esc(role)}</div>
+      <div class="store">${esc(r.name)}</div><div class="url">${esc(r.url)}</div>
+      <div class="num"><span class="g">${r.grade}</span>${r.overall}<span class="of">/100</span></div></div>`;
+  };
+  $("cards").innerHTML = card(a, "Your store") + (b ? card(b, "Competitor") : "");
+
+  let verdict;
+  if (b) {
+    const gap = b.overall - a.overall;
+    if (gap > 5) verdict = `An AI shopping agent can read <b>${esc(b.name)}</b> almost completely. It can only partially read <b>${esc(a.name)}</b> — a ${gap}-point gap that decides who gets recommended when a shopper asks an assistant to buy.`;
+    else if (gap < -5) verdict = `<b>${esc(a.name)}</b> is currently more agent-readable than ${esc(b.name)} — a lead worth protecting as assistants take over discovery.`;
+    else verdict = "Both stores are similarly readable to agents — the first to fix its criticals wins the channel.";
+  } else {
+    verdict = `<b>${esc(a.name)}</b> scores ${a.overall}/100 for agent readability. Every failed check below is a question an AI assistant cannot answer about this store.`;
+  }
+  $("verdict").innerHTML = verdict;
+
+  $("legend").innerHTML = `<span class="lg us">${esc(a.name)}</span>` + (b ? `<span class="lg them">${esc(b.name)}</span>` : "");
+  $("pillars").innerHTML = PILLARS.map(p => {
+    const sa = a.pillars[p];
+    const right = b ? `<div class="bar"><i class="them" style="width:${b.pillars[p]}%"></i></div><span class="pv">${b.pillars[p]}</span>` : "";
+    return `<div class="prow${b ? "" : " single"}"><span class="pn">${esc(p)}<em>${PILLAR_WEIGHT[p]}% of score</em></span>
+      <div class="bar"><i class="us" style="width:${sa}%"></i></div><span class="pv">${sa}</span>${right}</div>`;
+  }).join("");
+
+  const lens = (r) => {
+    const L = r.lens;
+    const tops = L.tops.length ? L.tops.map(t => `<li>${esc(t)}</li>`).join("") : "<li>— nothing readable —</li>";
+    const unk = L.unknowns.length
+      ? `<div class="unk"><span>The agent cannot verify:</span><ul>${L.unknowns.map(u => `<li>${esc(u)}</li>`).join("")}</ul></div>`
+      : `<div class="unk ok"><span>No blind spots — the agent can verify everything it needs.</span></div>`;
+    return `<div class="lens"><div class="lens-h">${esc(r.name)} · what the agent sees</div>
+      <div class="lens-id">${esc(L.identity)}</div><p class="lens-sum">“${esc(L.summary)}”</p>
+      <p class="lens-cat">${esc(L.catalog)}</p><ul class="lens-tops">${tops}</ul>${unk}</div>`;
+  };
+  $("lenses").className = "lens-wrap" + (b ? "" : " single");
+  $("lenses").innerHTML = lens(a) + (b ? lens(b) : "");
+
+  const rank = {critical: 0, high: 1, medium: 2};
+  const findings = a.checks.filter(c => c.status !== "pass")
+    .sort((x, y) => rank[x.severity] - rank[y.severity] || y.weight - x.weight);
+  $("findings").innerHTML = findings.length ? findings.map(c =>
+    `<div class="finding ${c.severity}"><div class="fh"><span class="sev">${c.severity}</span>
+     <span class="ft">${esc(c.title)}</span><span class="fp">${esc(c.pillar)}</span></div>
+     <p class="fd">${esc(c.detail)}</p><p class="fx"><b>Fix:</b> ${esc(c.fix)}</p></div>`).join("")
+    : `<div class="finding pass"><p class="fd">No failed checks. This store is agent-ready.</p></div>`;
+
+  const passed = a.checks.filter(c => c.status === "pass");
+  $("passedSummary").textContent = `${passed.length} checks passed — show them`;
+  $("passedList").innerHTML = passed.map(c => `<li>${esc(c.title)}</li>`).join("");
+
+  $("report").style.display = "block";
+  $("report").scrollIntoView({behavior: "smooth", block: "start"});
+}
+
+let progTimer = null;
+function setBusy(busy){
+  $("runBtn").disabled = busy;
+  $("progress").style.display = busy ? "block" : "none";
+  clearInterval(progTimer);
+  if (busy) {
+    let i = 0;
+    $("progressMsg").textContent = PROGRESS_MSGS[0];
+    progTimer = setInterval(() => { i = (i + 1) % PROGRESS_MSGS.length; $("progressMsg").textContent = PROGRESS_MSGS[i]; }, 2200);
+  }
+}
+function showError(msg){
+  $("errbox").style.display = "block";
+  $("errbox").textContent = msg;
+}
+
+$("auditForm").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  $("errbox").style.display = "none";
+  $("sampleNote").style.display = "none";
+  const store = $("store").value.trim();
+  const compare = $("compare").value.trim();
+  if (!store) return;
+  setBusy(true);
+  try {
+    const qs = new URLSearchParams({store});
+    if (compare) qs.set("compare", compare);
+    const res = await fetch("/api/audit?" + qs.toString());
+    const data = await res.json();
+    if (!res.ok || !data.results || !data.results.length) {
+      throw new Error(data.error || "audit failed");
+    }
+    if (data.errors && data.errors.length) {
+      showError(`Note: could not audit ${data.errors.map(x => x.target).join(", ")} — ${data.errors[0].error}`);
+    }
+    render(data);
+  } catch (err) {
+    showError(
+      location.protocol === "file:"
+        ? "The live audit needs the deployed serverless function — open this page on its Vercel URL (or use the sample report)."
+        : `Could not audit that store: ${err.message}`
+    );
+  } finally {
+    setBusy(false);
+  }
+});
+
+$("sampleBtn").addEventListener("click", () => {
+  $("errbox").style.display = "none";
+  if (!SAMPLE) return showError("Sample data missing from this build.");
+  $("store").value = SAMPLE.results[0].url;
+  if (SAMPLE.results[1]) $("compare").value = SAMPLE.results[1].url;
+  $("sampleNote").style.display = "block";
+  render(SAMPLE);
+});
+
+if (new URLSearchParams(location.search).has("sample")) $("sampleBtn").click();
+</script>
+</body>
+</html>
