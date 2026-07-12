@@ -6,14 +6,28 @@ frontend renders into a report. Stdlib only — no requirements.txt needed.
 
 import concurrent.futures
 import json
+import os
+import sys
+import traceback
 from http.server import BaseHTTPRequestHandler
 from urllib.parse import urlparse, parse_qs
+
+# Vercel's Python runtime doesn't always put the function's own directory on
+# sys.path, which breaks sibling imports like _audit_core.
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from _audit_core import audit_url
 
 
 class handler(BaseHTTPRequestHandler):
     def do_GET(self):
+        try:
+            self._handle()
+        except Exception:
+            self._json(500, {"error": "internal error while auditing",
+                             "detail": traceback.format_exc(limit=3)})
+
+    def _handle(self):
         qs = parse_qs(urlparse(self.path).query)
         store = (qs.get("store") or [""])[0].strip()
         compare = (qs.get("compare") or [""])[0].strip()

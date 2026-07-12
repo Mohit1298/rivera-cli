@@ -305,9 +305,12 @@ $("auditForm").addEventListener("submit", async (e) => {
     const qs = new URLSearchParams({store});
     if (compare) qs.set("compare", compare);
     const res = await fetch("/api/audit?" + qs.toString());
-    const data = await res.json();
+    const text = await res.text();
+    let data;
+    try { data = JSON.parse(text); }
+    catch { throw new Error(`the audit function returned ${res.status}: ${text.slice(0, 140)}`); }
     if (!res.ok || !data.results || !data.results.length) {
-      throw new Error(data.error || "audit failed");
+      throw new Error(data.detail || data.error || "audit failed");
     }
     if (data.errors && data.errors.length) {
       showError(`Note: could not audit ${data.errors.map(x => x.target).join(", ")} — ${data.errors[0].error}`);
